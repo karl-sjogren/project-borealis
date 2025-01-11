@@ -61,7 +61,7 @@ namespace Borealis.Core.Migrations
                     b.HasIndex("ExternalId")
                         .IsUnique();
 
-                    b.ToTable("WhiteoutSurvivalPlayer");
+                    b.ToTable("Players");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -286,7 +286,7 @@ namespace Borealis.Core.Migrations
 
                             b1.HasKey("WhiteoutSurvivalPlayerId", "__synthesizedOrdinal");
 
-                            b1.ToTable("WhiteoutSurvivalPlayer");
+                            b1.ToTable("Players");
 
                             b1.ToJson("PreviousNames");
 

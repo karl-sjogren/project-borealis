@@ -12,11 +12,11 @@ public record WhiteoutSurvivalPlayerResponse {
     [JsonPropertyName("Nickname")]
     public required string Name { get; init; }
 
+    [JsonPropertyName("avatar_image")]
+    public string? AvatarUrl { get; init; }
+
     [JsonPropertyName("Stove_lv")]
     public int FurnaceLevel { get; init; }
-
-    [JsonPropertyName("Stove_lv_content")]
-    public string? FurnaceLevelBadge { get; init; }
 
     [JsonPropertyName("Total_recharge_amount")]
     public int TotalRechargeAmount { get; init; }

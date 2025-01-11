@@ -20,9 +20,11 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Polly" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="9.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="Shorthand.Vite" Version="0.2.0" />
     <PackageVersion Include="Shouldly" Version="4.2.1" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="21.2.1" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.Wrappers" Version="21.2.1" />

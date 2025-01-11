@@ -1,14 +1,19 @@
 using Borealis.Core.Contracts;
+using Borealis.Core.HttpClients.Models;
 using Borealis.Core.Models;
+using Borealis.Core.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Core.Services;
 
-public class PlayerService : IPlayerService {
+public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerService {
     private readonly BorealisContext _context;
     private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<PlayerService> _logger;
+
+    protected override string DefaultSortProperty => nameof(WhiteoutSurvivalPlayer.FurnaceLevel);
+    protected override bool DefaultSortAscending => false;
 
     public PlayerService(
             BorealisContext context,
@@ -31,20 +36,46 @@ public class PlayerService : IPlayerService {
         return Results.Success(player);
     }
 
-    public async Task<PagedResult<WhiteoutSurvivalPlayer>> GetPagedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken) {
-        var players = await _context.Players
-            .OrderByDescending(x => x.FurnaceLevel)
-            .Skip(pageIndex * pageSize)
-            .Take(pageSize)
+    public async Task<Result<WhiteoutSurvivalPlayer>> GetByExternalIdAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
+        var player = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
+
+        if(player is null) {
+            return Results.NotFound<WhiteoutSurvivalPlayer>();
+        }
+
+        return Results.Success(player);
+    }
+
+    public async Task<PagedResult<WhiteoutSurvivalPlayer>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken) {
+        var players = await BuildQuery(_context.Players, query)
             .ToListAsync(cancellationToken);
 
-        var totalPlayers = await _context.Players.CountAsync(cancellationToken);
+        var totalPlayers = await BuildQuery(_context.Players, query).CountAsync(cancellationToken);
 
-        return Results.PagedSuccess(players, pageIndex, pageSize, totalPlayers);
+        return Results.PagedSuccess(players, query, totalPlayers);
+    }
+
+    private IQueryable<WhiteoutSurvivalPlayer> BuildQuery(IQueryable<WhiteoutSurvivalPlayer> dbQuery, PlayerQuery query) {
+        if(!string.IsNullOrWhiteSpace(query.Query)) {
+            dbQuery = dbQuery.Where(x => x.Name.Contains(query.Query) || (x.Notes != null && x.Notes.Contains(query.Query)));
+        }
+
+        if(!query.ShowAll) {
+            dbQuery = dbQuery.Where(x => x.IsInAlliance);
+        }
+
+        return base.AddBaseQuery(dbQuery, query);
     }
 
     public async Task<Result<WhiteoutSurvivalPlayer>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
-        var response = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(whiteoutSurvivalPlayerId, cancellationToken);
+        WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalPlayerResponse> response;
+
+        try {
+            response = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(whiteoutSurvivalPlayerId, cancellationToken);
+        } catch(Exception ex) {
+            _logger.LogError(ex, "Failed to synchronize player {PlayerId}", whiteoutSurvivalPlayerId);
+            return Results.Failure<WhiteoutSurvivalPlayer>("Failed to synchronize player.");
+        }
 
         if(response.Code != 0 || response.Data is null) {
             return Results.NotFound<WhiteoutSurvivalPlayer>();

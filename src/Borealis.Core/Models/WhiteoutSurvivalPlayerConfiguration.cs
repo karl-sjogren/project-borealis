@@ -27,5 +27,7 @@ public class WhiteoutSurvivalPlayerConfiguration : IEntityTypeConfiguration<Whit
         builder.OwnsMany(b => b.PreviousNames, navigationBuilder => navigationBuilder.ToJson());
 
         builder.Property(b => b.Notes);
+
+        builder.Ignore(b => b.FurnaceLevelString);
     }
 }

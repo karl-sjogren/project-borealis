@@ -1,0 +1,32 @@
+.players-table {
+  thead {
+    text-wrap: nowrap;
+
+    .name {
+      width: 100%;
+    }
+  }
+
+  .furnace-level {
+    position: relative;
+
+    &.level-fc1,
+    &.level-fc2,
+    &.level-fc3,
+    &.level-fc4,
+    &.level-fc5,
+    &.level-fc6,
+    &.level-fc7,
+    &.level-fc8,
+    &.level-fc9,
+    &.level-fc10 {
+      &:after {
+        position: absolute;
+        top: -0.5rem;
+
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+
+.furnace-level {
+  &.level-fc1,
+  &.level-fc2,
+  &.level-fc3,
+  &.level-fc4,
+  &.level-fc5,
+  &.level-fc6,
+  &.level-fc7,
+  &.level-fc8,
+  &.level-fc9,
+  &.level-fc10 {
+    .level-text {
+      display: none;
+    }
+
+    &:after {
+      content: '';
+
+      display: inline-block;
+      height: 3rem;
+      width: 3rem;
+      background-size: contain;
+    }
+
+    &.level-fc1 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc1.png');
+      }
+    }
+
+    &.level-fc2 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc2.png');
+      }
+    }
+
+    &.level-fc3 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc3.png');
+      }
+    }
+
+    &.level-fc4 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc4.png');
+      }
+    }
+
+    &.level-fc5 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc5.png');
+      }
+    }
+
+    &.level-fc6 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc6.png');
+      }
+    }
+
+    &.level-fc7 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc7.png');
+      }
+    }
+
+    &.level-fc8 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc8.png');
+      }
+    }
+
+    &.level-fc9 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc9.png');
+      }
+    }
+
+    &.level-fc10 {
+      &:after {
+        background-image: url('../assets/furnace-levels/fc10.png');
+      }
+    }
+  }
+}

@@ -3,21 +3,23 @@ using System.Text.Json;
 using Borealis.Core.Common;
 using Borealis.Core.Contracts;
 using Borealis.Core.HttpClients.Models;
+using Borealis.Core.JsonConverters;
 using Borealis.Core.Options;
 using Microsoft.Extensions.Options;
 
 namespace Borealis.Core.HttpClients;
 
 public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpClient {
-    private readonly HttpClient _httpClient;
     private readonly WhiteoutSurvivalOptions _options;
     private readonly TimeProvider _timeProvider;
 
-    private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web);
+    private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web) {
+        Converters = { new WhiteoutSurvivalPlayerResponseJsonConverter() }
+    };
+
     protected override JsonSerializerOptions SerializerOptions => _serializerOptions;
 
-    public WhiteoutSurvivalHttpClient(HttpClient httpClient, IOptions<WhiteoutSurvivalOptions> options, TimeProvider timeProvider) : base(httpClient) {
-        _httpClient = httpClient;
+    public WhiteoutSurvivalHttpClient(HttpClient httpClient, IOptions<WhiteoutSurvivalOptions> options, TimeProvider timeProvider, ILogger<WhiteoutSurvivalHttpClient> logger) : base(httpClient, logger) {
         _options = options.Value;
         _timeProvider = timeProvider;
     }
@@ -32,7 +34,7 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
             Content = new WhiteoutSurvivalEncodedRequestContent(_options.Secret, data)
         };
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        var response = await HttpClient.SendAsync(request, cancellationToken);
 
         await EnsureSuccessStatusCodeAsync(response, cancellationToken);
 
@@ -52,7 +54,7 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
             Content = new WhiteoutSurvivalEncodedRequestContent(_options.Secret, data)
         };
 
-        var response = await _httpClient.SendAsync(request, cancellationToken);
+        var response = await HttpClient.SendAsync(request, cancellationToken);
 
         await EnsureSuccessStatusCodeAsync(response, cancellationToken);
 

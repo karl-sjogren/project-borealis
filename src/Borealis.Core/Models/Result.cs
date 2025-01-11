@@ -1,3 +1,5 @@
+using Borealis.Core.Requests;
+
 namespace Borealis.Core.Models;
 
 public record Result {
@@ -19,6 +21,9 @@ public record PagedResult<T> : Result {
 public static class Results {
     public static Result Success() => new() { Success = true, Message = "Success" };
     public static Result<T> Success<T>(T data) => new() { Success = true, Message = "Success", Data = data };
-    public static PagedResult<T> PagedSuccess<T>(IReadOnlyCollection<T> items, int pageIndex, int pageSize, int totalCount) => new() { Success = true, Message = "Success", Items = items, PageIndex = pageIndex, PageSize = pageSize, TotalCount = totalCount };
+    public static Result Failure(string message) => new() { Success = false, Message = message };
+    public static Result<T> Failure<T>(string message) => new() { Success = false, Message = message };
+
+    public static PagedResult<T> PagedSuccess<T>(IReadOnlyCollection<T> items, QueryBase query, int totalCount) => new() { Success = true, Message = "Success", Items = items, PageIndex = query.PageIndex, PageSize = query.PageSize, TotalCount = totalCount };
     public static Result<T> NotFound<T>() => new() { Success = false, Message = "Not found" };
 }

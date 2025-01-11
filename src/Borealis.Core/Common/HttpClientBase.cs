@@ -5,12 +5,14 @@ using Borealis.Core.Exceptions;
 namespace Borealis.Core.Common;
 
 public abstract class HttpClientBase {
-    private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web);
+    private readonly ILogger _logger;
 
-    protected HttpClientBase(HttpClient httpClient) {
+    protected HttpClientBase(HttpClient httpClient, ILogger logger) {
         HttpClient = httpClient;
+        _logger = logger;
     }
 
+    private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web);
     protected virtual JsonSerializerOptions SerializerOptions => _serializerOptions;
 
     protected HttpClient HttpClient { get; }
@@ -57,6 +59,12 @@ public abstract class HttpClientBase {
     protected virtual async Task<T?> DeserializeResponseAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken) {
         var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-        return await JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
+        try {
+            return await JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
+        } catch(Exception exception) {
+            var json = await response.Content.ReadAsStringAsync(cancellationToken);
+            _logger.LogError(exception, "Failed to deserialize JSON response: {Json}", json);
+            return default;
+        }
     }
 }

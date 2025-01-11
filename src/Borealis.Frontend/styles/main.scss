@@ -1,4 +1,6 @@
+@use "bootstrap/scss/bootstrap";
+@use "players-table";
+@use "furnace-level";
 
-body {
-  background-color: #fff;
-}
+$bootstrap-icons-font-dir: "../node_modules/bootstrap-icons/font/fonts/";
+@import "bootstrap-icons/font/bootstrap-icons";

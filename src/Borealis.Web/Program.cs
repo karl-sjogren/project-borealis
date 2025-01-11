@@ -8,6 +8,11 @@ using Borealis.Core.Options;
 using System.Net.Http.Headers;
 using Borealis.Core.Contracts;
 using Borealis.Core.Services;
+using Shorthand.Vite;
+using Polly;
+using Polly.Extensions.Http;
+using Borealis.Web.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,7 +38,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => {
 })
     .AddEntityFrameworkStores<BorealisContext>();
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => {
+    options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+});
 
 builder.Services.ConfigureApplicationCookie(options => {
     // Cookie settings
@@ -47,6 +54,13 @@ builder.Services.ConfigureApplicationCookie(options => {
 
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
 
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
+    return HttpPolicyExtensions
+        .HandleTransientHttpError()
+        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+        .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+}
+
 builder.Services.AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttpClient>()
     .ConfigureHttpClient((serviceProvider, client) => {
         var options = serviceProvider.GetRequiredService<IOptions<WhiteoutSurvivalOptions>>().Value;
@@ -54,13 +68,20 @@ builder.Services.AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttp
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         client.DefaultRequestHeaders.Add("Origin", options.OriginUrl);
-    });
+    })
+    .AddPolicyHandler(GetRetryPolicy());
 
 builder.Services.AddAuthentication()
         .AddDiscord(options => {
             options.ClientId = builder.Configuration["DiscordClientId"] ?? throw new InvalidOperationException("DiscordClientId is not set in the configuration.");
             options.ClientSecret = builder.Configuration["DiscordClientSecret"] ?? throw new InvalidOperationException("DiscordClientSecret is not set in the configuration.");
         });
+
+builder.Services.AddVite(options => {
+    options.ManifestFileName = ".vite/manifest.json";
+    options.Port = 5010;
+    options.Https = true;
+});
 
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 
@@ -90,7 +111,9 @@ app.UseAuthorization();
 app.MapStaticAssets();
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapRazorPages()
+   .WithStaticAssets();
 
 app.Run();

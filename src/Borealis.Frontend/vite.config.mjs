@@ -30,7 +30,7 @@ export default defineConfig({
   build: {
     target: esBuildTarget,
     cssCodeSplit: false,
-    outDir: resolve(__dirname, '../Borealis.Web/wwwroot//'),
+    outDir: resolve(__dirname, '../Borealis.Web/wwwroot/'),
     emptyOutDir: false,
     assetsDir: 'assets',
     reportCompressedSize: true,
