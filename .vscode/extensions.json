@@ -6,5 +6,10 @@
     "eamodio.gitlens",
     "github.vscode-github-actions",
     "editorconfig.editorconfig",
+    "vitest.explorer",
+    "sibiraj-s.vscode-scss-formatter",
+    "mrmlnc.vscode-scss",
+    "stylelint.vscode-stylelint",
+    "dbaeumer.vscode-eslint",
   ]
 }

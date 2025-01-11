@@ -235,3 +235,8 @@ tab_width=2
 
 [*.{sh}]
 end_of_line=lf
+
+[**/Migrations/*.cs]
+generated_code = true
+dotnet_diagnostic.IDE0005.severity = none
+dotnet_diagnostic.*.severity = none

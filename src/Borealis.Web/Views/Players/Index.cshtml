@@ -1,0 +1,30 @@
+@using Borealis.Web.ViewModels
+@model PlayersIndexViewModel
+@{
+    ViewData["Title"] = "Players";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Players</h1>
+
+    <p>Here is a list of players:</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Player ID</th>
+                <th>Level</th>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var player in Model.Players) {
+                <tr>
+                    <td>@player.ExternalId</td>
+                    <td>@player.FurnaceLevel</td>
+                    <td>@player.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

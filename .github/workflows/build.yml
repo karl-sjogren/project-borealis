@@ -30,6 +30,78 @@ env:
   PUBLISH_CODECOV: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/heads/main')
 
 jobs:
+  frontend-test:
+    name: Frontend tests
+    runs-on: ubuntu-latest
+
+    steps:
+    # This is needed to pass linting consistently
+    - name: Set GIT to use CRLF
+      run: |
+        git config --global core.autocrlf true
+        git config --global core.eol crlf
+
+    - name: Checkout sources
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        check-latest: true
+
+    - name: Run Yarn
+      run: yarn --immutable --immutable-cache
+      working-directory: ./src/Borealis.Frontend/
+
+    - name: Run frontend linting
+      run: |
+        yarn lint:js
+        yarn lint:css
+      working-directory: ./src/Borealis.Frontend/
+
+    - name: Run frontend tests
+      run: yarn test:ci
+      working-directory: ./src/Borealis.Frontend/
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-test-results
+        path: |
+          ./src/Borealis.Frontend/test-results/junit.xml
+          ./src/Borealis.Frontend/coverage/cobertura-coverage.xml
+
+  frontend-build:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    needs: [ frontend-test ]
+
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        check-latest: true
+
+    - name: Run Yarn
+      run: yarn --immutable --immutable-cache
+      working-directory: ./src/Borealis.Frontend/
+
+    - name: Build Frontend
+      run: yarn build
+      working-directory: ./src/Borealis.Frontend/
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-artifacts
+        path: ./src/Borealis.Web/wwwroot/
 
   net-test:
     name: .NET tests
@@ -70,7 +142,7 @@ jobs:
     name: Publish test and coverage results
     runs-on: ubuntu-latest
 
-    needs: [ net-test ]
+    needs: [ net-test, frontend-test ]
 
     steps:
     # While we don't use sources directly in this job the test reporter wants to check
@@ -154,7 +226,7 @@ jobs:
     name: .NET build
     runs-on: ubuntu-latest
 
-    needs: [ net-test ]
+    needs: [ net-test, frontend-test ]
 
     steps:
     - name: Checkout sources

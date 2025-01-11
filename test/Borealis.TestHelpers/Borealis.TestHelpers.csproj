@@ -4,4 +4,8 @@
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Borealis.Core\Borealis.Core.csproj" />
+  </ItemGroup>
+
 </Project>
