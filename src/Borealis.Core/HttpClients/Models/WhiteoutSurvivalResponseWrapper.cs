@@ -32,6 +32,7 @@ public record WhiteoutSurvivalResponseWrapper {
     /// - 40007: Code expired
     /// - 40008: Code already used
     /// - 40009: Not logged in
+    /// - 40011: Currently unknown
     /// </summary>
     [JsonIgnore]
     public int ErrorCode { get; set; }

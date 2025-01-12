@@ -4,9 +4,9 @@ using Borealis.Core.Requests;
 namespace Borealis.Core.Contracts;
 
 public interface IPlayerService {
-    Task<Result<WhiteoutSurvivalPlayer>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken);
-    Task<Result<WhiteoutSurvivalPlayer>> GetByExternalIdAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken);
-    Task<PagedResult<WhiteoutSurvivalPlayer>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken);
-    Task<Result<WhiteoutSurvivalPlayer>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken);
-    Task<Result<WhiteoutSurvivalPlayer>> SetPlayerNotesAsync(Guid playerId, string notes, CancellationToken cancellationToken);
+    Task<Result<Player>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken);
+    Task<Result<Player>> GetByExternalIdAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken);
+    Task<PagedResult<Player>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken);
+    Task<Result<Player>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken);
+    Task<Result<Player>> UpdateAsync(Player player, CancellationToken cancellationToken);
 }

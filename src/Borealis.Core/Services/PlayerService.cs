@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Core.Services;
 
-public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerService {
+public class PlayerService : QueryServiceBase<Player>, IPlayerService {
     private readonly BorealisContext _context;
     private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<PlayerService> _logger;
 
-    protected override string DefaultSortProperty => nameof(WhiteoutSurvivalPlayer.FurnaceLevel);
+    protected override string DefaultSortProperty => nameof(Player.FurnaceLevel);
     protected override bool DefaultSortAscending => false;
 
     public PlayerService(
@@ -26,27 +26,30 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
         _logger = logger;
     }
 
-    public async Task<Result<WhiteoutSurvivalPlayer>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken) {
-        var entity = await _context.Players.FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
+    public async Task<Result<Player>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken) {
+        var entity = await _context
+            .Players
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
 
         if(entity is null) {
-            return Results.NotFound<WhiteoutSurvivalPlayer>();
+            return Results.NotFound<Player>();
         }
 
         return Results.Success(entity);
     }
 
-    public async Task<Result<WhiteoutSurvivalPlayer>> GetByExternalIdAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
+    public async Task<Result<Player>> GetByExternalIdAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
         var entity = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
 
         if(entity is null) {
-            return Results.NotFound<WhiteoutSurvivalPlayer>();
+            return Results.NotFound<Player>();
         }
 
         return Results.Success(entity);
     }
 
-    public async Task<PagedResult<WhiteoutSurvivalPlayer>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken) {
+    public async Task<PagedResult<Player>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken) {
         var entities = await BuildQuery(_context.Players, query)
             .Skip(query.PageIndex * query.PageSize)
             .Take(query.PageSize)
@@ -57,7 +60,7 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
         return Results.PagedSuccess(entities, query, totalCount);
     }
 
-    private IQueryable<WhiteoutSurvivalPlayer> BuildQuery(IQueryable<WhiteoutSurvivalPlayer> dbQuery, PlayerQuery query) {
+    private IQueryable<Player> BuildQuery(IQueryable<Player> dbQuery, PlayerQuery query) {
         if(!string.IsNullOrWhiteSpace(query.Query)) {
             dbQuery = dbQuery.Where(x => x.Name.Contains(query.Query) || (x.Notes != null && x.Notes.Contains(query.Query)));
         }
@@ -69,18 +72,18 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
         return base.AddSorting(dbQuery, query);
     }
 
-    public async Task<Result<WhiteoutSurvivalPlayer>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
+    public async Task<Result<Player>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
         WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalPlayerResponse> response;
 
         try {
             response = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(whiteoutSurvivalPlayerId, cancellationToken);
         } catch(Exception ex) {
             _logger.LogError(ex, "Failed to synchronize player {PlayerId}", whiteoutSurvivalPlayerId);
-            return Results.Failure<WhiteoutSurvivalPlayer>("Failed to synchronize player.");
+            return Results.Failure<Player>("Failed to synchronize player.");
         }
 
         if(response.Code != 0 || response.Data is null) {
-            return Results.NotFound<WhiteoutSurvivalPlayer>();
+            return Results.NotFound<Player>();
         }
 
         var externalPlayer = response.Data;
@@ -88,7 +91,7 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
         var existingPlayer = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
         if(existingPlayer is null) {
             var now = _timeProvider.GetUtcNow();
-            existingPlayer = new WhiteoutSurvivalPlayer {
+            existingPlayer = new Player {
                 ExternalId = externalPlayer.FurnaceId,
                 Name = externalPlayer.Name,
                 FurnaceLevel = externalPlayer.FurnaceLevel,
@@ -121,21 +124,23 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
         return Results.Success(existingPlayer);
     }
 
-    public async Task<Result<WhiteoutSurvivalPlayer>> SetPlayerNotesAsync(Guid playerId, string notes, CancellationToken cancellationToken) {
-        var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
+    public async Task<Result<Player>> UpdateAsync(Player player, CancellationToken cancellationToken) {
+        var existingPlayer = await _context.Players.FirstOrDefaultAsync(x => x.Id == player.Id, cancellationToken);
 
-        if(player is null) {
-            return Results.NotFound<WhiteoutSurvivalPlayer>();
+        if(existingPlayer is null) {
+            return Results.NotFound<Player>();
         }
 
-        player.Notes = notes;
+        existingPlayer.Notes = player.Notes?.Trim();
+        existingPlayer.IsInAlliance = player.IsInAlliance;
+        existingPlayer.AwayUntil = player.AwayUntil;
 
-        if(_context.Entry(player).State == EntityState.Modified) {
-            player.UpdatedAt = _timeProvider.GetUtcNow();
+        if(_context.Entry(existingPlayer).State == EntityState.Modified) {
+            existingPlayer.UpdatedAt = _timeProvider.GetUtcNow();
         }
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Results.Success(player);
+        return Results.Success(existingPlayer);
     }
 }

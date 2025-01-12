@@ -55,13 +55,16 @@ public class PlayersController : Controller {
             return NotFound();
         }
 
-        var noteResult = await _playerService.SetPlayerNotesAsync(id, notes, cancellationToken);
-        if(!noteResult.Success) {
+        var player = playerResult.Data!;
+        player.Notes = notes;
+
+        var updateResult = await _playerService.UpdateAsync(player, cancellationToken);
+        if(!updateResult.Success) {
             throw new Exception("Failed to set player notes.");
         }
 
         var viewModel = new PlayersDetailsViewModel {
-            Player = noteResult.Data!
+            Player = updateResult.Data!
         };
 
         return View("Details", viewModel);
@@ -91,7 +94,7 @@ public class PlayersController : Controller {
             .Distinct()
             .ToList() ?? [];
 
-        var result = new Dictionary<string, WhiteoutSurvivalPlayer?>();
+        var result = new Dictionary<string, Player?>();
         foreach(var playerId in playerIds) {
             var existingPlayer = await _playerService.GetByExternalIdAsync(playerId, cancellationToken);
             if(existingPlayer?.Data is not null) {

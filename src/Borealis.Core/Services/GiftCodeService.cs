@@ -11,7 +11,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<GiftCodeService> _logger;
 
-    protected override string DefaultSortProperty => nameof(WhiteoutSurvivalPlayer.CreatedAt);
+    protected override string DefaultSortProperty => nameof(Player.CreatedAt);
     protected override bool DefaultSortAscending => false;
 
     public GiftCodeService(
@@ -26,7 +26,10 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
     }
 
     public async Task<Result<GiftCode>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken) {
-        var entity = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
+        var entity = await _context
+            .GiftCodes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
 
         if(entity is null) {
             return Results.NotFound<GiftCode>();
@@ -49,7 +52,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .FirstOrDefaultAsync(cancellationToken);
 
         if(player is not null) {
-            var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken);
+            var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken); // We need to "sign in" the player
             var redeemResult = await _whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
 
             switch(redeemResult.ErrorCode) {
@@ -62,8 +65,10 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
                     return Results.Failure("Player not found.");
                 case 40007:
                     return Results.Failure("Gift code expired.");
+                case 40009:
+                    return Results.Failure("Player not logged in.");
                 default:
-                    return Results.Failure("Unknown error code: " + redeemResult.ErrorCode);
+                    return Results.Failure($"Unknown error code: {redeemResult.ErrorCode}, message: {redeemResult.Message}");
             }
         }
 
@@ -110,6 +115,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.NotFound("Gift code not found.");
         }
 
+        var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken); // We need to "sign in" the player
         var existingRedemption = await _context.GiftCodeRedemptions.FirstOrDefaultAsync(x => x.PlayerId == player.Id && x.GiftCodeId == giftCodeEntity.Id, cancellationToken);
 
         if(existingRedemption is not null) {

@@ -4,6 +4,7 @@ using Borealis.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Borealis.Core.Migrations
 {
     [DbContext(typeof(BorealisContext))]
-    partial class BorealisContextModelSnapshot : ModelSnapshot
+    [Migration("20250112125814_RemoveGiftCodeInvalid")]
+    partial class RemoveGiftCodeInvalid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,14 +116,11 @@ namespace Borealis.Core.Migrations
                             }));
                 });
 
-            modelBuilder.Entity("Borealis.Core.Models.Player", b =>
+            modelBuilder.Entity("Borealis.Core.Models.WhiteoutSurvivalPlayer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateOnly?>("AwayUntil")
-                        .HasColumnType("date");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
@@ -389,7 +389,7 @@ namespace Borealis.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Borealis.Core.Models.Player", "Player")
+                    b.HasOne("Borealis.Core.Models.WhiteoutSurvivalPlayer", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -400,11 +400,11 @@ namespace Borealis.Core.Migrations
                     b.Navigation("Player");
                 });
 
-            modelBuilder.Entity("Borealis.Core.Models.Player", b =>
+            modelBuilder.Entity("Borealis.Core.Models.WhiteoutSurvivalPlayer", b =>
                 {
                     b.OwnsMany("Borealis.Core.Models.WhiteoutSurvivalPlayerNameHistoryEntry", "PreviousNames", b1 =>
                         {
-                            b1.Property<Guid>("PlayerId")
+                            b1.Property<Guid>("WhiteoutSurvivalPlayerId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<int>("__synthesizedOrdinal")
@@ -418,14 +418,14 @@ namespace Borealis.Core.Migrations
                             b1.Property<DateTimeOffset>("Timestamp")
                                 .HasColumnType("datetimeoffset");
 
-                            b1.HasKey("PlayerId", "__synthesizedOrdinal");
+                            b1.HasKey("WhiteoutSurvivalPlayerId", "__synthesizedOrdinal");
 
                             b1.ToTable("Players");
 
                             b1.ToJson("PreviousNames");
 
                             b1.WithOwner()
-                                .HasForeignKey("PlayerId");
+                                .HasForeignKey("WhiteoutSurvivalPlayerId");
                         });
 
                     b.Navigation("PreviousNames");

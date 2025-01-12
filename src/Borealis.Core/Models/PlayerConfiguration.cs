@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Borealis.Core.Models;
 
-public class WhiteoutSurvivalPlayerConfiguration : IEntityTypeConfiguration<WhiteoutSurvivalPlayer> {
-    public void Configure(EntityTypeBuilder<WhiteoutSurvivalPlayer> builder) {
+public class PlayerConfiguration : IEntityTypeConfiguration<Player> {
+    public void Configure(EntityTypeBuilder<Player> builder) {
         builder.HasKey(b => b.Id);
 
         builder.ToTable(options => options.IsTemporal());
@@ -29,6 +29,8 @@ public class WhiteoutSurvivalPlayerConfiguration : IEntityTypeConfiguration<Whit
         builder.OwnsMany(b => b.PreviousNames, navigationBuilder => navigationBuilder.ToJson());
 
         builder.Property(b => b.Notes);
+
+        builder.Property(b => b.AwayUntil);
 
         builder.Ignore(b => b.FurnaceLevelString);
 

@@ -23,6 +23,12 @@
             <dt class="col-sm-3">In alliance</dt>
             <dd class="col-sm-9">@(Model.Player.IsInAlliance ? "Yes" : "No")</dd>
 
+            @if(Model.Player.AwayUntil is not null)
+            {
+                <dt class="col-sm-3">Away until</dt>
+                <dd class="col-sm-9">@Model.Player.AwayUntil</dd>
+            }
+
             <dt class="col-sm-3">Created at</dt>
             <dd class="col-sm-9">@Model.Player.CreatedAt</dd>
 
@@ -39,4 +45,18 @@
 
         <button type="submit" class="btn btn-primary">Save notes</button>
     </form>
+
+    <h2>Previous names</h2>
+
+    @if(!Model.Player.PreviousNames.Any()) {
+        <p>No previous names recorded</p>
+    } else {
+        <ul>
+            @foreach(var previousName in Model.Player.PreviousNames)
+            {
+                <li>@previousName.Name - @previousName.Timestamp</li>
+            }
+        </ul>
+    }
+
 </div>

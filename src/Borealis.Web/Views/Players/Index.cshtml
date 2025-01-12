@@ -3,119 +3,123 @@
 @{
     ViewData["Title"] = "Players";
 }
-
-<div>
-    <h1 class="display-4">Players</h1>
-</div>
-
-<a asp-action="AddPlayers" class="btn btn-primary btn-sm">Add players</a>
-
-<form method="get">
-    <input type="hidden" name="pageIndex" value="@Model.PageIndex" />
-    <input type="hidden" name="pageSize" value="@Model.PageSize" />
-    <div class="input-group mb-3">
-        <input type="text" class="form-control" name="query" placeholder="Search" value="@Model.Query" />
-        <div class="input-group-text">
-            <input class="form-check-input mt-0" type="checkbox" name="ShowAll" value="True" checked="@Model.ShowAll" title="Search all players">
-        </div>
-        <button class="btn btn-outline-secondary" type="submit">Search</button>
+<div id="players-index-page">
+    <div>
+        <h1 class="display-4">Players</h1>
     </div>
-</form>
 
-<p>Results: @Model.TotalCount</p>
+    <a asp-action="AddPlayers" class="btn btn-primary btn-sm">Add players</a>
 
-<div class="table-responsive">
-    <table class="table table-striped table-hover players-table">
-        <thead>
-            <tr>
-                <th class="player-id">Player ID</th>
-                <th class="furnace-level">Level</th>
-                <th class="state">State</th>
-                <th class="in-alliance">In alliance</th>
-                <th class="name">Name</th>
-                <th class="actions"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var player in Model.Players) {
-                <tr id="player-@player.Id">
-                    <td>@player.ExternalId</td>
-                    <td>
-                        <span class="furnace-level level-@player.FurnaceLevelString.ToLowerInvariant()">
-                            <span class="level-text">@player.FurnaceLevelString</span>
-                        </span>
-                    </td>
-                    <td>@player.State</td>
-                    <td>@(player.IsInAlliance ? "Yes" : "No")</td>
-                    <td>
-                        @player.Name
-                        @if(player.HasNotes) {
-                            <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Notes" data-bs-content="@player.HtmlNotes" data-bs-html="true">
-                                <span class="visually-hidden">Click to toggle popover</span>
-                                <i class="bi bi-file-text-fill"></i>
-                            </button>
-                        }
-                    </td>
-                    <td>
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Button group with nested dropdown">
-                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@player.Id"><i class="bi bi-pencil"></i></a>
+    <form method="get">
+        <input type="hidden" name="pageIndex" value="@Model.PageIndex" />
+        <input type="hidden" name="pageSize" value="@Model.PageSize" />
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="query" placeholder="Search" value="@Model.Query" />
+            <div class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" name="ShowAll" value="True" checked="@Model.ShowAll" title="Search all players">
+            </div>
+            <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+    </form>
 
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                            <ul class="dropdown-menu">
-                                @if(player.IsInAlliance) {
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person-dash"></i> Remove from alliance</a></li>
-                                } else {
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person-add"></i> Add to alliance</a></li>
-                                }
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-arrow-clockwise"></i> Refresh</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Delete</a></li>
-                            </ul>
-                        </div>
-                        </div>
-                    </td>
+    <p>Results: @Model.TotalCount</p>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover players-table">
+            <thead>
+                <tr>
+                    <th class="player-id">Player ID</th>
+                    <th class="furnace-level">Level</th>
+                    <th class="state">State</th>
+                    <th class="in-alliance">In alliance</th>
+                    <th class="name">Name</th>
+                    <th class="actions"></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var player in Model.Players) {
+                    <tr data-player-id="@player.Id" class="player-row @(player.IsInAlliance ? "is-in-alliance" : "is-not-in-alliance")">
+                        <td>@player.ExternalId</td>
+                        <td>
+                            <span class="furnace-level level-@player.FurnaceLevelString.ToLowerInvariant()">
+                                <span class="level-text">@player.FurnaceLevelString</span>
+                            </span>
+                        </td>
+                        <td>@player.State</td>
+                        <td class="in-alliance">@(player.IsInAlliance ? "Yes" : "No")</td>
+                        <td>
+                            @player.Name
+                            @if(player.HasNotes) {
+                                <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Notes" data-bs-content="@player.HtmlNotes" data-bs-html="true">
+                                    <span class="visually-hidden">Click to show notes</span>
+                                    <i class="bi bi-file-text-fill"></i>
+                                </button>
+                            }
+                            @if(player.AwayUntil is not null) {
+                                <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Player is away" data-bs-content="Player is away until @player.AwayUntil">
+                                    <span class="visually-hidden">Click to show when player will be back</span>
+                                    <i class="bi bi-person-walking"></i>
+                                </button>
+                            }
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Button group with nested dropdown">
+                            <a class="btn btn-primary" asp-action="Details" asp-route-id="@player.Id"><i class="bi bi-pencil"></i></a>
+
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="true" aria-expanded="false"></button>
+                                <ul class="dropdown-menu">
+                                    <li class="remove-from-alliance-list-item"><button class="dropdown-item remove-from-alliance-button"><i class="bi bi-person-dash"></i> Remove from alliance</button></li>
+                                    <li class="add-to-alliance-list-item" ><button class="dropdown-item add-to-alliance-button"><i class="bi bi-person-add"></i> Add to alliance</button></li>
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-arrow-clockwise"></i> Refresh</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Delete</a></li>
+                                </ul>
+                            </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <ul class="pagination justify-content-center">
+        @if(Model.HasPreviousPage) {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-pageSize="@Model.PageSize" asp-route-Query="@Model.Query" asp-route-ShowAll="@Model.ShowAll">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="visually-hidden">Previous</span>
+                </a>
+            </li>
+        } else {
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="visually-hidden">Previous</span>
+                </span>
+            </li>
+        }
+
+        @for(var i = 0; i <= Model.TotalPages - 1; i++) {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-action="Index" asp-route-pageIndex="@i" asp-route-pageSize="@Model.PageSize" asp-route-Query="@Model.Query" asp-route-ShowAll="@Model.ShowAll">@(i + 1)</a>
+            </li>
+        }
+
+        @if(Model.HasNextPage) {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-pageSize="@Model.PageSize" asp-route-Query="@Model.Query" asp-route-ShowAll="@Model.ShowAll">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="visually-hidden">Next</span>
+                </a>
+            </li>
+        } else {
+            <li class="page-item disabled">
+                <span class="page-link">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="visually-hidden">Next</span>
+                </span>
+            </li>
+        }
+    </ul>
 </div>
-
-<ul class="pagination justify-content-center">
-    @if(Model.HasPreviousPage) {
-        <li class="page-item">
-            <a class="page-link" asp-action="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-pageSize="@Model.PageSize" asp-route-Query="@Model.Query" asp-route-ShowAll="@Model.ShowAll">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="visually-hidden">Previous</span>
-            </a>
-        </li>
-    } else {
-        <li class="page-item disabled">
-            <span class="page-link">
-                <span aria-hidden="true">&laquo;</span>
-                <span class="visually-hidden">Previous</span>
-            </span>
-        </li>
-    }
-
-    @for(var i = 0; i <= Model.TotalPages - 1; i++) {
-        <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-            <a class="page-link" asp-action="Index" asp-route-pageIndex="@i" asp-route-pageSize="@Model.PageSize" asp-route-Query="@Model.Query" asp-route-ShowAll="@Model.ShowAll">@(i + 1)</a>
-        </li>
-    }
-
-    @if(Model.HasNextPage) {
-        <li class="page-item">
-            <a class="page-link" asp-action="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-pageSize="@Model.PageSize" asp-route-Query="@Model.Query" asp-route-ShowAll="@Model.ShowAll">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="visually-hidden">Next</span>
-            </a>
-        </li>
-    } else {
-        <li class="page-item disabled">
-            <span class="page-link">
-                <span aria-hidden="true">&raquo;</span>
-                <span class="visually-hidden">Next</span>
-            </span>
-        </li>
-    }
-</ul>

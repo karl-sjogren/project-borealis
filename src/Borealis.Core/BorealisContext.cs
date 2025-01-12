@@ -9,7 +9,7 @@ public class BorealisContext : IdentityDbContext {
         : base(options) {
     }
 
-    public DbSet<WhiteoutSurvivalPlayer> Players { get; set; }
+    public DbSet<Player> Players { get; set; }
     public DbSet<GiftCode> GiftCodes { get; set; }
     public DbSet<GiftCodeRedemption> GiftCodeRedemptions { get; set; }
 

@@ -19,7 +19,7 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
         _logger = logger;
     }
 
-    public async Task AddToQueueAsync(WhiteoutSurvivalPlayer player, GiftCode giftCode, CancellationToken cancellationToken) {
+    public async Task AddToQueueAsync(Player player, GiftCode giftCode, CancellationToken cancellationToken) {
         if(_queue.Any(x => x.Player.Id == player.Id && x.GiftCode.Id == giftCode.Id)) {
             return;
         }
@@ -63,7 +63,7 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
     }
 
     private class GiftCodeRedemptionQueueItem {
-        public required WhiteoutSurvivalPlayer Player { get; set; }
+        public required Player Player { get; set; }
         public required GiftCode GiftCode { get; set; }
         public required DateTimeOffset EnqueuedAt { get; set; }
     }
