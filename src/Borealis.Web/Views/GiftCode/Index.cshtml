@@ -26,6 +26,7 @@
         <thead>
             <tr>
                 <th class="code">Code</th>
+                <th class="is-expired">Expired</th>
                 <th class="created-at">Added</th>
                 <th class="actions"></th>
             </tr>
@@ -35,7 +36,6 @@
                 <tr id="code-@giftCode.Id">
                     <td>@giftCode.Code</td>
                     <td>@(giftCode.IsExpired ? "Yes" : "No")</td>
-                    <td>@(giftCode.IsInvalid ? "Yes" : "No")</td>
                     <td>@giftCode.CreatedAt</td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group" aria-label="Button group with nested dropdown">

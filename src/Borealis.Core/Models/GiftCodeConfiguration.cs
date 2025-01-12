@@ -17,8 +17,6 @@ public class GiftCodeConfiguration : IEntityTypeConfiguration<GiftCode> {
 
         builder.Property(b => b.IsExpired).IsRequired();
 
-        builder.Property(b => b.IsInvalid).IsRequired();
-
         builder.HasMany(b => b.Redemptions).WithOne();
     }
 }

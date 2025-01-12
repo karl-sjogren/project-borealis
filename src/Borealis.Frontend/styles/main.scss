@@ -1,6 +1,6 @@
-@use "bootstrap/scss/bootstrap";
-@use "players-table";
-@use "furnace-level";
+@use 'bootstrap/scss/bootstrap';
+@use 'players-table';
+@use 'furnace-level';
 
-$bootstrap-icons-font-dir: "../node_modules/bootstrap-icons/font/fonts/";
-@import "bootstrap-icons/font/bootstrap-icons";
+$bootstrap-icons-font-dir: '../node_modules/bootstrap-icons/font/fonts/';
+@import 'bootstrap-icons/font/bootstrap-icons';

@@ -1,0 +1,34 @@
+@model GiftCodeAddGiftCodeViewModel
+
+@{
+    ViewData["Title"] = "Add gift code";
+}
+
+<div class="row">
+    <h1 class="display-4">Add gift code</h1>
+
+    <form method="post" enctype="application/x-www-form-urlencoded">
+        <div class="mb-3">
+            <label for="gift-code" class="form-label">Code</label>
+            <input type="text" class="form-control" id="gift-code" name="Code" value="@Model.Code">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add gift code</button>
+    </form>
+</div>
+
+@if(Model.ResultString is not null) {
+    <div class="row">
+        @if(Model.Success == true) {
+            <div class="alert alert-success" role="alert">
+                @Model.ResultString
+            </div>
+        }
+        else {
+            <div class="alert alert-warning" role="alert">
+                @Model.ResultString
+            </div>
+        }
+    </div>
+}
+

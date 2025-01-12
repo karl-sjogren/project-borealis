@@ -39,9 +39,6 @@ namespace Borealis.Core.Migrations
                     b.Property<bool>("IsExpired")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsInvalid")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("PeriodEnd")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
@@ -102,11 +99,11 @@ namespace Borealis.Core.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("GiftCodeRedemption");
+                    b.ToTable("GiftCodeRedemptions");
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                             {
-                                ttb.UseHistoryTable("GiftCodeRedemptionHistory");
+                                ttb.UseHistoryTable("GiftCodeRedemptionsHistory");
                                 ttb
                                     .HasPeriodStart("PeriodStart")
                                     .HasColumnName("PeriodStart");

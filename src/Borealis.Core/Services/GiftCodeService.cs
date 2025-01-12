@@ -40,7 +40,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
 
         // Gift codes are unfortunately case-sensitive
         if(existingGiftCode?.Code.Equals(giftCode, StringComparison.Ordinal) == true) {
-            return Results.Conflict("A gift code with the same code already exists.");
+            return Results.Conflict("Gift code already exists.");
         }
 
         var player = await _context
@@ -49,6 +49,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .FirstOrDefaultAsync(cancellationToken);
 
         if(player is not null) {
+            var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken);
             var redeemResult = await _whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
 
             switch(redeemResult.ErrorCode) {

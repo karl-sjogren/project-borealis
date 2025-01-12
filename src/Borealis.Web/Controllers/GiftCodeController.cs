@@ -1,13 +1,13 @@
 using Borealis.Core.Contracts;
 using Borealis.Core.Requests;
 using Borealis.Web.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Borealis.Web.Controllers;
 
 [Route("gift-codes")]
-[Authorize]
+//[Authorize]
 public class GiftCodeController : Controller {
     private readonly IGiftCodeService _giftCodeService;
     private readonly ILogger<GiftCodeController> _logger;
@@ -54,8 +54,10 @@ public class GiftCodeController : Controller {
         var result = await _giftCodeService.AddGiftCodeAsync(cleanedCode, cancellationToken);
 
         if(result.Success) {
+            viewModel.Success = true;
             viewModel.ResultString = "Gift code added. Started redemption.";
         } else {
+            viewModel.Success = false;
             viewModel.ResultString = result.Message;
         }
 

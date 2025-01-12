@@ -31,6 +31,7 @@ public record WhiteoutSurvivalResponseWrapper {
     /// - 40004: Player not found
     /// - 40007: Code expired
     /// - 40008: Code already used
+    /// - 40009: Not logged in
     /// </summary>
     [JsonIgnore]
     public int ErrorCode { get; set; }
