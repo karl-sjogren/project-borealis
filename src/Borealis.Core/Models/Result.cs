@@ -23,7 +23,9 @@ public static class Results {
     public static Result<T> Success<T>(T data) => new() { Success = true, Message = "Success", Data = data };
     public static Result Failure(string message) => new() { Success = false, Message = message };
     public static Result<T> Failure<T>(string message) => new() { Success = false, Message = message };
+    public static Result Conflict(string message) => new() { Success = false, Message = message };
 
     public static PagedResult<T> PagedSuccess<T>(IReadOnlyCollection<T> items, QueryBase query, int totalCount) => new() { Success = true, Message = "Success", Items = items, PageIndex = query.PageIndex, PageSize = query.PageSize, TotalCount = totalCount };
-    public static Result<T> NotFound<T>() => new() { Success = false, Message = "Not found" };
+    public static Result NotFound(string? message = null) => new() { Success = false, Message = message ?? "Not found" };
+    public static Result<T> NotFound<T>(string? message = null) => new() { Success = false, Message = message ?? "Not found" };
 }

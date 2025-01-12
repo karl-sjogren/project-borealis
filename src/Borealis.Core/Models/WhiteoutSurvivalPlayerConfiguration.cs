@@ -7,6 +7,8 @@ public class WhiteoutSurvivalPlayerConfiguration : IEntityTypeConfiguration<Whit
     public void Configure(EntityTypeBuilder<WhiteoutSurvivalPlayer> builder) {
         builder.HasKey(b => b.Id);
 
+        builder.ToTable(options => options.IsTemporal());
+
         builder.HasAlternateKey(b => b.ExternalId);
         builder.HasIndex(b => b.ExternalId).IsUnique();
 
@@ -29,5 +31,7 @@ public class WhiteoutSurvivalPlayerConfiguration : IEntityTypeConfiguration<Whit
         builder.Property(b => b.Notes);
 
         builder.Ignore(b => b.FurnaceLevelString);
+
+        builder.Ignore(b => b.HasNotes);
     }
 }

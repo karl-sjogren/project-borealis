@@ -10,6 +10,8 @@ public class BorealisContext : IdentityDbContext {
     }
 
     public DbSet<WhiteoutSurvivalPlayer> Players { get; set; }
+    public DbSet<GiftCode> GiftCodes { get; set; }
+    public DbSet<GiftCodeRedemption> GiftCodeRedemptions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);

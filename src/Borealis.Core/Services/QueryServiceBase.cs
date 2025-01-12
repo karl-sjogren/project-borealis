@@ -7,11 +7,7 @@ public abstract class QueryServiceBase<T> where T : class {
     protected abstract string DefaultSortProperty { get; }
     protected abstract bool DefaultSortAscending { get; }
 
-    protected virtual IQueryable<T> AddBaseQuery(IQueryable<T> dbQuery, QueryBase query) {
-        dbQuery = dbQuery
-            .Skip(query.PageIndex * query.PageSize)
-            .Take(query.PageSize);
-
+    protected virtual IQueryable<T> AddSorting(IQueryable<T> dbQuery, QueryBase query) {
         if(!string.IsNullOrWhiteSpace(query.SortField)) {
             if(query.SortAscending) {
                 dbQuery = dbQuery

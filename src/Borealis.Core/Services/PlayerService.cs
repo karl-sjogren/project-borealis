@@ -27,32 +27,34 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
     }
 
     public async Task<Result<WhiteoutSurvivalPlayer>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken) {
-        var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
+        var entity = await _context.Players.FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
 
-        if(player is null) {
+        if(entity is null) {
             return Results.NotFound<WhiteoutSurvivalPlayer>();
         }
 
-        return Results.Success(player);
+        return Results.Success(entity);
     }
 
     public async Task<Result<WhiteoutSurvivalPlayer>> GetByExternalIdAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
-        var player = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
+        var entity = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
 
-        if(player is null) {
+        if(entity is null) {
             return Results.NotFound<WhiteoutSurvivalPlayer>();
         }
 
-        return Results.Success(player);
+        return Results.Success(entity);
     }
 
     public async Task<PagedResult<WhiteoutSurvivalPlayer>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken) {
-        var players = await BuildQuery(_context.Players, query)
+        var entities = await BuildQuery(_context.Players, query)
+            .Skip(query.PageIndex * query.PageSize)
+            .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
-        var totalPlayers = await BuildQuery(_context.Players, query).CountAsync(cancellationToken);
+        var totalCount = await BuildQuery(_context.Players, query).CountAsync(cancellationToken);
 
-        return Results.PagedSuccess(players, query, totalPlayers);
+        return Results.PagedSuccess(entities, query, totalCount);
     }
 
     private IQueryable<WhiteoutSurvivalPlayer> BuildQuery(IQueryable<WhiteoutSurvivalPlayer> dbQuery, PlayerQuery query) {
@@ -64,7 +66,7 @@ public class PlayerService : QueryServiceBase<WhiteoutSurvivalPlayer>, IPlayerSe
             dbQuery = dbQuery.Where(x => x.IsInAlliance);
         }
 
-        return base.AddBaseQuery(dbQuery, query);
+        return base.AddSorting(dbQuery, query);
     }
 
     public async Task<Result<WhiteoutSurvivalPlayer>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {

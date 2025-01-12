@@ -13,6 +13,8 @@ using Polly;
 using Polly.Extensions.Http;
 using Borealis.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Authentication;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,10 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => {
     options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+
+    options.User.RequireUniqueEmail = true;
 })
     .AddEntityFrameworkStores<BorealisContext>();
 
@@ -75,6 +81,14 @@ builder.Services.AddAuthentication()
         .AddDiscord(options => {
             options.ClientId = builder.Configuration["DiscordClientId"] ?? throw new InvalidOperationException("DiscordClientId is not set in the configuration.");
             options.ClientSecret = builder.Configuration["DiscordClientSecret"] ?? throw new InvalidOperationException("DiscordClientSecret is not set in the configuration.");
+
+            options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "https://cdn.discordapp.com/avatars/{0}/{1}.{2}",
+                    user.GetString("id"),
+                    user.GetString("avatar"),
+                    user.GetString("avatar")?.StartsWith("a_", StringComparison.Ordinal) == true ? "gif" : "png"));
         });
 
 builder.Services.AddVite(options => {
@@ -84,6 +98,9 @@ builder.Services.AddVite(options => {
 });
 
 builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IGiftCodeService, GiftCodeService>();
+
+builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
 
 var app = builder.Build();
 

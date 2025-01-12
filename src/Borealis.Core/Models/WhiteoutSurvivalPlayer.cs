@@ -11,6 +11,8 @@ public class WhiteoutSurvivalPlayer : EntityBase {
 
     public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
 
+    public string HtmlNotes => Notes?.Replace("\n", "<br />", StringComparison.OrdinalIgnoreCase) ?? "";
+
     public string FurnaceLevelString {
         get {
             if(FurnaceLevel <= 34) {

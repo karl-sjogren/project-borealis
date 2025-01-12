@@ -21,34 +21,36 @@
     <div class="row">
         <h2>Results</h2>
 
-        <table class="table table-responsive table-striped table-hover players-table">
-            <thead>
-                <tr>
-                    <th class="player-id">Player ID</th>
-                    <th class="furnace-level">Level</th>
-                    <th class="state">State</th>
-                    <th class="name">Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var (playerId, player) in Model.Results) {
+        <div class="table-responsive">
+            <table class="table table-responsive table-striped table-hover players-table">
+                <thead>
                     <tr>
-                        <td>@playerId</td>
-                        @if(player is not null) {
-                            <td>
-                                <span class="furnace-level level-@player.FurnaceLevelString.ToLowerInvariant()">
-                                    <span class="level-text">@player.FurnaceLevelString</span>
-                                </span>
-                            </td>
-                            <td>@player.State</td>
-                            <td>@player.Name</td>
-                        }
-                        else {
-                            <td colspan="3">Player not found</td>
-                        }
+                        <th class="player-id">Player ID</th>
+                        <th class="furnace-level">Level</th>
+                        <th class="state">State</th>
+                        <th class="name">Name</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var (playerId, player) in Model.Results) {
+                        <tr>
+                            <td>@playerId</td>
+                            @if(player is not null) {
+                                <td>
+                                    <span class="furnace-level level-@player.FurnaceLevelString.ToLowerInvariant()">
+                                        <span class="level-text">@player.FurnaceLevelString</span>
+                                    </span>
+                                </td>
+                                <td>@player.State</td>
+                                <td>@player.Name</td>
+                            }
+                            else {
+                                <td colspan="3">Player not found</td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 }
