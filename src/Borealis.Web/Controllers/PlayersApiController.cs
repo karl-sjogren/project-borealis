@@ -1,12 +1,10 @@
 using Borealis.Core.Contracts;
 using Borealis.Web.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Borealis.Web.Controllers;
 
 [Route("api/players")]
-[Authorize]
 public class PlayersAPIController : Controller {
     private readonly IPlayerService _playerService;
     private readonly ILogger<PlayersAPIController> _logger;

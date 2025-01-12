@@ -15,6 +15,9 @@ using Borealis.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Authentication;
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Borealis.Web.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,17 +38,25 @@ builder.Services.AddDbContext<BorealisContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => {
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
     options.SignIn.RequireConfirmedAccount = false;
     options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
 
     options.User.RequireUniqueEmail = true;
 })
-    .AddEntityFrameworkStores<BorealisContext>();
+    .AddEntityFrameworkStores<BorealisContext>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
 
-builder.Services.AddControllersWithViews(options => {
+builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .RequireRole("TrustedUser")
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
 });
 
 builder.Services.ConfigureApplicationCookie(options => {
@@ -53,8 +64,8 @@ builder.Services.ConfigureApplicationCookie(options => {
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
 
-    options.LoginPath = "/Identity/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.LoginPath = "/";
+    options.AccessDeniedPath = "/";
     options.SlidingExpiration = true;
 });
 
@@ -107,7 +118,13 @@ var app = builder.Build();
 // Apply migrations
 using(var scope = app.Services.CreateScope()) {
     var db = scope.ServiceProvider.GetRequiredService<BorealisContext>();
-    db.Database.Migrate();
+    await db.Database.MigrateAsync();
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await AuthenticationSeeder.SeedRolesAsync(roleManager);
+
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    await AuthenticationSeeder.SeedUserRolesAsync(userManager);
 }
 
 // Configure the HTTP request pipeline.
@@ -133,4 +150,4 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
-app.Run();
+await app.RunAsync();

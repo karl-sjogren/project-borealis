@@ -1,8 +1,26 @@
-﻿@{
+﻿@model HomeIndexViewModel
+
+@{
     ViewData["Title"] = "Project Borealis";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome to Project Borealis</h1>
-    <p>Project Borealis is an alliance management tool footer Whiteout Survival.</p>
+    <p>Project Borealis is an alliance management tool for Whiteout Survival.</p>
+
+    @if(Model.IsAuthenticated) {
+        @if(!Model.IsAllowedAccess) {
+            <p>You are logged in but not yet allowed access. Ask your R4/R5 to grant it to you.</p>
+        }
+    } else {
+        <form id="external-account" asp-area="Identity" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+            <div>
+                <p>
+                    @foreach (var provider in Model.ExternalLogins) {
+                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">Login in with @provider.DisplayName</button>
+                    }
+                </p>
+            </div>
+        </form>
+    }
 </div>
