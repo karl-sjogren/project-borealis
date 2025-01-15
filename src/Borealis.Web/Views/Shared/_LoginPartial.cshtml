@@ -1,10 +1,12 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
 
 <ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User)) {
+@if (Context.User?.Identity?.IsAuthenticated == true) {
     <li class="nav-item">
-        Hello @User.Identity?.Name!
+        <a class="nav-link">Hello @User.Identity?.Name!</a>
+    </li>
+    <li class="nav-item">
+        <a asp-controller="Account" asp-action="SignOut" asp-route-returnUrl="@Url.Action("Index", "Home")" class="nav-link">Logout</a>
     </li>
 }
 </ul>

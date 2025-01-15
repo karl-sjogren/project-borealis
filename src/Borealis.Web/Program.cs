@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Borealis.Core;
@@ -15,9 +14,10 @@ using Borealis.Web.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Authentication;
 using System.Globalization;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Borealis.Web.Authentication;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using AspNet.Security.OAuth.Discord;
+using Borealis.Web.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,25 +38,15 @@ builder.Services.AddDbContext<BorealisContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
-    options.SignIn.RequireConfirmedAccount = false;
-    options.SignIn.RequireConfirmedEmail = false;
-    options.SignIn.RequireConfirmedPhoneNumber = false;
-
-    options.User.RequireUniqueEmail = true;
-})
-    .AddEntityFrameworkStores<BorealisContext>()
-    .AddDefaultTokenProviders()
-    .AddDefaultUI();
-
 builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
 
+    /*
     var policy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .RequireRole("TrustedUser")
         .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
+    options.Filters.Add(new AuthorizeFilter(policy));*/
 });
 
 builder.Services.ConfigureApplicationCookie(options => {
@@ -70,6 +60,7 @@ builder.Services.ConfigureApplicationCookie(options => {
 });
 
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
+builder.Services.Configure<BorealisAuthenticationOptions>(builder.Configuration.GetSection("BorealisAuthentication"));
 
 static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
     return HttpPolicyExtensions
@@ -88,11 +79,17 @@ builder.Services.AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttp
     })
     .AddPolicyHandler(GetRetryPolicy());
 
-builder.Services.AddAuthentication()
+builder.Services
+    .AddAuthentication(options => {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
+    })
+        .AddCookie()
         .AddDiscord(options => {
             options.ClientId = builder.Configuration["DiscordClientId"] ?? throw new InvalidOperationException("DiscordClientId is not set in the configuration.");
             options.ClientSecret = builder.Configuration["DiscordClientSecret"] ?? throw new InvalidOperationException("DiscordClientSecret is not set in the configuration.");
 
+            options.ClaimActions.MapCustomJson(ClaimTypes.Name, user => user.GetString("global_name"));
             options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
                 string.Format(
                     CultureInfo.InvariantCulture,
@@ -100,6 +97,43 @@ builder.Services.AddAuthentication()
                     user.GetString("id"),
                     user.GetString("avatar"),
                     user.GetString("avatar")?.StartsWith("a_", StringComparison.Ordinal) == true ? "gif" : "png"));
+
+            options.Events.OnCreatingTicket = async (ctx) => {
+                var options = ctx.HttpContext.RequestServices.GetRequiredService<IOptionsSnapshot<BorealisAuthenticationOptions>>();
+
+                var userIdentity = ctx.Principal?.Identity as ClaimsIdentity;
+
+                if(userIdentity == null) {
+                    return;
+                }
+
+                var externalId = userIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if(string.IsNullOrWhiteSpace(externalId)) {
+                    return;
+                }
+
+                var borealisContext = ctx.HttpContext.RequestServices.GetRequiredService<BorealisContext>();
+
+                var user = await borealisContext.Users.FirstOrDefaultAsync(x => x.ExternalId == externalId);
+
+                if(user is null) {
+                    return;
+                }
+
+                userIdentity.RemoveClaim(userIdentity.FindFirst(ClaimTypes.Name));
+                userIdentity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
+
+                if(user.IsApproved) {
+                    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "TrustedUser"));
+                } else {
+                    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "PendingApproval"));
+                }
+
+                if(user.IsAdmin) {
+                    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "AdminUser"));
+                }
+            };
         });
 
 builder.Services.AddVite(options => {
@@ -110,8 +144,10 @@ builder.Services.AddVite(options => {
 
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IGiftCodeService, GiftCodeService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
+builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
 
 var app = builder.Build();
 
@@ -119,12 +155,12 @@ var app = builder.Build();
 using(var scope = app.Services.CreateScope()) {
     var db = scope.ServiceProvider.GetRequiredService<BorealisContext>();
     await db.Database.MigrateAsync();
-
+    /*
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await AuthenticationSeeder.SeedRolesAsync(roleManager);
 
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    await AuthenticationSeeder.SeedUserRolesAsync(userManager);
+    await AuthenticationSeeder.SeedUserRolesAsync(userManager);*/
 }
 
 // Configure the HTTP request pipeline.

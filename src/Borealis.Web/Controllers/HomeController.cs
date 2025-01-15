@@ -1,27 +1,35 @@
 using System.Diagnostics;
+using System.Security.Claims;
+using Borealis.Core;
 using Borealis.Web.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Web.Controllers;
 
-[AllowAnonymous]
 public class HomeController : Controller {
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly BorealisContext _context;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(SignInManager<IdentityUser> signInManager, ILogger<HomeController> logger) {
-        _signInManager = signInManager;
+    public HomeController(BorealisContext context, ILogger<HomeController> logger) {
+        _context = context;
         _logger = logger;
     }
 
     public async Task<IActionResult> IndexAsync() {
+        var externalIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if(externalIdClaim is null) {
+            return View(new HomeIndexViewModel {
+                IsAuthenticated = User.Identity?.IsAuthenticated ?? false
+            });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.ExternalId == externalIdClaim.Value);
+
         var viewModel = new HomeIndexViewModel {
             IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
-            IsAllowedAccess = User.IsInRole("TrustedUser"),
-            ExternalLogins = [.. await _signInManager.GetExternalAuthenticationSchemesAsync()],
-            ReturnUrl = Url.Content("~/")
+            IsPendingApproval = User.IsInRole("PendingApproval"),
+            IsApprovedUser = User.IsInRole("TrustedUser")
         };
 
         return View(viewModel);

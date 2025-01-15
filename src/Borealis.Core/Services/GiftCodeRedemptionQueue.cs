@@ -57,7 +57,6 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
 
             if(!result.Success) {
                 _logger.LogError("Failed to redeem gift code for player {PlayerId}.", item.Player.ExternalId);
-                _queue.Enqueue(item);
             }
         }
     }

@@ -1,14 +1,13 @@
-using Microsoft.AspNetCore.Identity;
+using Borealis.Core.Models;
 
 namespace Borealis.Web.ViewModels;
 
 public class UsersIndexViewModel {
-    public IReadOnlyCollection<IdentityUser> Users { get; set; } = [];
+    public IReadOnlyCollection<User> Users { get; set; } = [];
     public int PageIndex { get; set; }
     public int PageSize { get; set; }
     public int TotalCount { get; set; }
     public string Query { get; set; } = "";
-    public bool ShowAll { get; set; }
 
     public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
     public bool HasPreviousPage => PageIndex > 0;

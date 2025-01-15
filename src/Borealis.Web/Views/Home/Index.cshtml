@@ -1,4 +1,5 @@
-﻿@model HomeIndexViewModel
+﻿@using Borealis.Web.Controllers
+@model HomeIndexViewModel
 
 @{
     ViewData["Title"] = "Project Borealis";
@@ -9,18 +10,18 @@
     <p>Project Borealis is an alliance management tool for Whiteout Survival.</p>
 
     @if(Model.IsAuthenticated) {
-        @if(!Model.IsAllowedAccess) {
-            <p>You are logged in but not yet allowed access. Ask your R4/R5 to grant it to you.</p>
+        @if(Model.IsPendingApproval) {
+            <p>You are logged in but not yet allowed access. Ask an administrator to approve your request.</p>
+
+            <p>When approved you will need to login again.</p>
+
+            <a asp-controller="Account" asp-action="SignOut" asp-route-returnUrl="@Url.Action("Index"))" class="btn btn-primary">Login again</a>
+        } else if(!Model.IsApprovedUser){
+            <p>To get access to this tool you need to request access and be approved by an administrator.</p>
+
+            <a asp-controller="Account" asp-action="RequestApproval" class="btn btn-primary">Request approval</a>
         }
     } else {
-        <form id="external-account" asp-area="Identity" asp-page="/Account/ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-            <div>
-                <p>
-                    @foreach (var provider in Model.ExternalLogins) {
-                        <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">Login in with @provider.DisplayName</button>
-                    }
-                </p>
-            </div>
-        </form>
+        <a asp-controller="Account" asp-action="DiscordLogin" class="btn btn-primary">Login with Discord</a>
     }
 </div>

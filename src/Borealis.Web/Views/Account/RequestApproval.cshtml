@@ -1,0 +1,38 @@
+﻿@using Borealis.Web.Controllers
+
+@model AccountRequestApprovalViewModel
+
+@{
+    if(Model.IsInitialUser) {
+        ViewData["Title"] = "Initial setup";
+    } else {
+        ViewData["Title"] = "Request approval";
+    }
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Project Borealis</h1>
+
+    @if(Model.IsPendingApproval) {
+        <p>Your request for approval has been sent. Ask an administrator to approve your request.</p>
+
+        <p>When approved you will need to login again.</p>
+
+        <a asp-action="SignOut" asp-route-returnUrl="@Url.Action("Index", "Home"))" class="btn btn-primary">Login again</a>
+    } else {
+        @if(Model.IsInitialUser) {
+            <p>It looks like you are the first user. You can now create an administrator account.</p>
+        } else {
+            <p>It looks like you are not yet approved. Ask your R4/R5 to grant it to you.</p>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="@Model.Name">
+            </div>
+            <button type="submit" class="btn btn-primary">Request approval</button>
+        </form>
+    }
+
+</div>

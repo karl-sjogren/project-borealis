@@ -2,11 +2,13 @@ using Borealis.Core.Contracts;
 using Borealis.Core.Models;
 using Borealis.Core.Requests;
 using Borealis.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Borealis.Web.Controllers;
 
 [Route("players")]
+[Authorize(Roles = "TrustedUser")]
 public class PlayersController : Controller {
     private readonly IPlayerService _playerService;
     private readonly ILogger<PlayersController> _logger;

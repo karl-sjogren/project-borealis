@@ -8,4 +8,5 @@ public interface IGiftCodeService {
     Task<PagedResult<GiftCode>> GetPagedAsync(GiftCodeQuery query, CancellationToken cancellationToken);
     Task<Result> AddGiftCodeAsync(string giftCode, CancellationToken cancellationToken);
     Task<Result> RedeemGiftCodeAsync(int whiteoutSurvivalPlayerId, string giftCode, CancellationToken cancellationToken);
+    Task<Result> EnqueueGiftCodeAsync(Guid giftCodeId, CancellationToken cancellationToken);
 }
