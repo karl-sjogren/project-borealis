@@ -117,7 +117,7 @@ builder.Services
 
                 var user = await borealisContext.Users.FirstOrDefaultAsync(x => x.ExternalId == externalId);
 
-                if(user is null) {
+                if(user is null || user.IsLockedOut) {
                     return;
                 }
 
