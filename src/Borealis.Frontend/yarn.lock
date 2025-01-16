@@ -2348,7 +2348,7 @@ __metadata:
     bootstrap-icons: "npm:^1.11.3"
     browserslist: "npm:^4.24.3"
     cssnano: "npm:^7.0.6"
-    esbuild: "npm:^0.24.0"
+    esbuild: "npm:^0.24.2"
     esbuild-plugin-browserslist: "npm:^0.15.0"
     eslint: "npm:^9.17.0"
     eslint-plugin-compat: "npm:^6.0.2"
