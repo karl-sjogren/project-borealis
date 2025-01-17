@@ -160,9 +160,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codecov/bundler-plugin-core@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "@codecov/bundler-plugin-core@npm:1.6.0"
+"@codecov/bundler-plugin-core@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "@codecov/bundler-plugin-core@npm:1.7.0"
   dependencies:
     "@actions/core": "npm:^1.10.1"
     "@actions/github": "npm:^6.0.0"
@@ -170,19 +170,19 @@ __metadata:
     semver: "npm:^7.5.4"
     unplugin: "npm:^1.10.1"
     zod: "npm:^3.22.4"
-  checksum: 10/6e0f0624ce55d198237b89f4eb46d3a7e18020b045c6dac762f4e43dbef0c4e2c56388d83d9a154560f16b96ce533141e4988a09f78388cbc3e94ec425550855
+  checksum: 10/8e4262d0e5b5ecb165b9b714825444a13fe04e41f016c8710b45e28e572aafcd82162fb2bbabe0463348f90ed93d58ed72301e73720269fa7733dd830fd60435
   languageName: node
   linkType: hard
 
-"@codecov/vite-plugin@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "@codecov/vite-plugin@npm:1.6.0"
+"@codecov/vite-plugin@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "@codecov/vite-plugin@npm:1.7.0"
   dependencies:
-    "@codecov/bundler-plugin-core": "npm:^1.6.0"
+    "@codecov/bundler-plugin-core": "npm:^1.7.0"
     unplugin: "npm:^1.10.1"
   peerDependencies:
-    vite: 4.x || 5.x
-  checksum: 10/625ae3b77ed0421377ee1c04f0eef6ef67da782192a2850dc030d7472c8a3ae05c782e2b9d0385504903052d887d1c0d680440e6de8976d02eff43d6be139f16
+    vite: 4.x || 5.x || 6.x
+  checksum: 10/17ddeb4fc0513fc6a83ff111781a5298555bd6f6dcf22a8b37acdf71e79a7c9aaebbb40a3703c98f02f414f053a4f16add4948321383953959f8ad35c3775959
   languageName: node
   linkType: hard
 
@@ -2170,7 +2170,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "Borealis.frontend@workspace:."
   dependencies:
-    "@codecov/vite-plugin": "npm:^1.6.0"
+    "@codecov/vite-plugin": "npm:^1.7.0"
     "@popperjs/core": "npm:^2.11.8"
     "@stylistic/eslint-plugin-js": "npm:^2.12.1"
     "@stylistic/stylelint-plugin": "npm:^3.1.1"
