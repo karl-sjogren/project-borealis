@@ -17,5 +17,9 @@ public class BorealisContext : DbContext {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(BorealisContext).Assembly);
+
+        if(Database.IsSqlServer()) {
+            modelBuilder.HasServiceTier("Basic");
+        }
     }
 }

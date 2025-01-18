@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 # OSX files
 .DS_Store
+start-docker-container.sh

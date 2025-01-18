@@ -18,40 +18,45 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using AspNet.Security.OAuth.Discord;
 using Borealis.Web.HostedServices;
+using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Add services to the container.
-var connectionStringBuilder = new SqlConnectionStringBuilder {
-    DataSource = builder.Configuration["DatabaseHost"],
-    InitialCatalog = builder.Configuration["DatabaseName"],
-    IntegratedSecurity = false,
-    UserID = builder.Configuration["DatabaseUser"],
-    Password = builder.Configuration["DatabasePassword"],
-    TrustServerCertificate = true
-};
+if(builder.Configuration["UseSqlServer"] == "true") {
+    var connectionStringBuilder = new SqlConnectionStringBuilder {
+        DataSource = builder.Configuration["DatabaseHost"],
+        InitialCatalog = builder.Configuration["DatabaseName"],
+        IntegratedSecurity = false,
+        UserID = builder.Configuration["DatabaseUser"],
+        Password = builder.Configuration["DatabasePassword"],
+        TrustServerCertificate = true
+    };
 
-builder.Services.AddDbContext<BorealisContext>(options =>
-    options.UseSqlServer(connectionStringBuilder.ConnectionString));
+    builder.Services.AddDbContext<BorealisContext>(options =>
+        options.UseSqlServer(connectionStringBuilder.ConnectionString));
+} else {
+    var connectionStringBuilder = new SqliteConnectionStringBuilder {
+        Mode = SqliteOpenMode.ReadWriteCreate,
+        DataSource = builder.Configuration["SqlitePath"]
+    };
+
+    builder.Services.AddDbContext<BorealisContext>(options =>
+        options.UseSqlite(connectionStringBuilder.ConnectionString));
+}
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-
-    /*
-    var policy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .RequireRole("TrustedUser")
-        .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));*/
 });
 
 builder.Services.ConfigureApplicationCookie(options => {
     // Cookie settings
     options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
 
     options.LoginPath = "/";
