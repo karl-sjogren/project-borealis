@@ -7,8 +7,6 @@ public class GiftCodeRedemptionConfiguration : IEntityTypeConfiguration<GiftCode
     public void Configure(EntityTypeBuilder<GiftCodeRedemption> builder) {
         builder.HasKey(b => b.Id);
 
-        builder.ToTable(options => options.IsTemporal());
-
         builder.Property(b => b.RedeemedAt).IsRequired();
 
         builder.HasOne(b => b.Player).WithMany().IsRequired().HasForeignKey(b => b.PlayerId);

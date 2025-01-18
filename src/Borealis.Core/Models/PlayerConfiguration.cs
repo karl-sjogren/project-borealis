@@ -7,8 +7,6 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player> {
     public void Configure(EntityTypeBuilder<Player> builder) {
         builder.HasKey(b => b.Id);
 
-        builder.ToTable(options => options.IsTemporal());
-
         builder.HasAlternateKey(b => b.ExternalId);
         builder.HasIndex(b => b.ExternalId).IsUnique();
 

@@ -7,8 +7,6 @@ public class GiftCodeConfiguration : IEntityTypeConfiguration<GiftCode> {
     public void Configure(EntityTypeBuilder<GiftCode> builder) {
         builder.HasKey(b => b.Id);
 
-        builder.ToTable(options => options.IsTemporal());
-
         builder.Property(b => b.CreatedAt).IsRequired();
 
         builder.Property(b => b.UpdatedAt).IsRequired();

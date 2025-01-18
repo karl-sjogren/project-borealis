@@ -7,8 +7,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User> {
     public void Configure(EntityTypeBuilder<User> builder) {
         builder.HasKey(b => b.Id);
 
-        builder.ToTable(options => options.IsTemporal());
-
         builder.Property(b => b.CreatedAt).IsRequired();
 
         builder.Property(b => b.UpdatedAt).IsRequired();

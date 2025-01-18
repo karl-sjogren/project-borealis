@@ -1,51 +1,36 @@
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Borealis.Core;
-using Borealis.Core.HttpClients;
-using Microsoft.Extensions.Options;
-using Borealis.Core.Options;
+using System.Globalization;
 using System.Net.Http.Headers;
+using System.Security.Claims;
+using AspNet.Security.OAuth.Discord;
+using Borealis.Core;
 using Borealis.Core.Contracts;
+using Borealis.Core.HttpClients;
+using Borealis.Core.Options;
 using Borealis.Core.Services;
-using Shorthand.Vite;
+using Borealis.Web.HostedServices;
+using Borealis.Web.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
-using Borealis.Web.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Authentication;
-using System.Globalization;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using AspNet.Security.OAuth.Discord;
-using Borealis.Web.HostedServices;
-using Microsoft.Data.Sqlite;
+using Shorthand.Vite;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Add services to the container.
-if(builder.Configuration["UseSqlServer"] == "true") {
-    var connectionStringBuilder = new SqlConnectionStringBuilder {
-        DataSource = builder.Configuration["DatabaseHost"],
-        InitialCatalog = builder.Configuration["DatabaseName"],
-        IntegratedSecurity = false,
-        UserID = builder.Configuration["DatabaseUser"],
-        Password = builder.Configuration["DatabasePassword"],
-        TrustServerCertificate = true
-    };
+var connectionStringBuilder = new SqliteConnectionStringBuilder {
+    Mode = SqliteOpenMode.ReadWriteCreate,
+    DataSource = builder.Configuration["SqlitePath"]
+};
 
-    builder.Services.AddDbContext<BorealisContext>(options =>
-        options.UseSqlServer(connectionStringBuilder.ConnectionString));
-} else {
-    var connectionStringBuilder = new SqliteConnectionStringBuilder {
-        Mode = SqliteOpenMode.ReadWriteCreate,
-        DataSource = builder.Configuration["SqlitePath"]
-    };
-
-    builder.Services.AddDbContext<BorealisContext>(options =>
-        options.UseSqlite(connectionStringBuilder.ConnectionString));
-}
+builder.Services.AddDbContext<BorealisContext>(options =>
+    options.UseSqlite(connectionStringBuilder.ConnectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
