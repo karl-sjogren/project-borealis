@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Borealis.Core.Migrations
 {
     [DbContext(typeof(BorealisContext))]
-    [Migration("20250118201713_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20250118233334_AddMessageTemplates")]
+    partial class AddMessageTemplates
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,14 +31,14 @@ namespace Borealis.Core.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsExpired")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -57,8 +57,8 @@ namespace Borealis.Core.Migrations
                     b.Property<Guid>("PlayerId")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("RedeemedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("RedeemedAt")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -67,6 +67,32 @@ namespace Borealis.Core.Migrations
                     b.HasIndex("PlayerId");
 
                     b.ToTable("GiftCodeRedemptions");
+                });
+
+            modelBuilder.Entity("Borealis.Core.Models.MessageTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MessageTemplates");
                 });
 
             modelBuilder.Entity("Borealis.Core.Models.Player", b =>
@@ -78,8 +104,8 @@ namespace Borealis.Core.Migrations
                     b.Property<DateOnly?>("AwayUntil")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ExternalId")
                         .HasColumnType("INTEGER");
@@ -101,8 +127,8 @@ namespace Borealis.Core.Migrations
                     b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -120,8 +146,8 @@ namespace Borealis.Core.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("CreatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ExternalId")
                         .IsRequired()
@@ -142,8 +168,8 @@ namespace Borealis.Core.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .HasColumnType("TEXT");
+                    b.Property<long>("UpdatedAt")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -169,6 +195,37 @@ namespace Borealis.Core.Migrations
                     b.Navigation("Player");
                 });
 
+            modelBuilder.Entity("Borealis.Core.Models.MessageTemplate", b =>
+                {
+                    b.OwnsMany("Borealis.Core.Models.MessageTemplateHistoryEntry", "HistorialMessages", b1 =>
+                        {
+                            b1.Property<Guid>("MessageTemplateId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<string>("Message")
+                                .IsRequired()
+                                .HasColumnType("TEXT");
+
+                            b1.Property<long>("Timestamp")
+                                .HasColumnType("INTEGER");
+
+                            b1.HasKey("MessageTemplateId", "__synthesizedOrdinal");
+
+                            b1.ToTable("MessageTemplates");
+
+                            b1.ToJson("HistorialMessages");
+
+                            b1.WithOwner()
+                                .HasForeignKey("MessageTemplateId");
+                        });
+
+                    b.Navigation("HistorialMessages");
+                });
+
             modelBuilder.Entity("Borealis.Core.Models.Player", b =>
                 {
                     b.OwnsMany("Borealis.Core.Models.WhiteoutSurvivalPlayerNameHistoryEntry", "PreviousNames", b1 =>
@@ -184,8 +241,8 @@ namespace Borealis.Core.Migrations
                                 .IsRequired()
                                 .HasColumnType("TEXT");
 
-                            b1.Property<DateTimeOffset>("Timestamp")
-                                .HasColumnType("TEXT");
+                            b1.Property<long>("Timestamp")
+                                .HasColumnType("INTEGER");
 
                             b1.HasKey("PlayerId", "__synthesizedOrdinal");
 

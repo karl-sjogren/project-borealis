@@ -3,6 +3,7 @@ using System;
 using Borealis.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Borealis.Core.Migrations
 {
     [DbContext(typeof(BorealisContext))]
-    partial class BorealisContextModelSnapshot : ModelSnapshot
+    [Migration("20250118230038_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -66,32 +69,6 @@ namespace Borealis.Core.Migrations
                     b.ToTable("GiftCodeRedemptions");
                 });
 
-            modelBuilder.Entity("Borealis.Core.Models.MessageTemplate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("CreatedAt")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("UpdatedAt")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MessageTemplates");
-                });
-
             modelBuilder.Entity("Borealis.Core.Models.Player", b =>
                 {
                     b.Property<Guid>("Id")
@@ -105,9 +82,6 @@ namespace Borealis.Core.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ExternalId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("ForceRedeemGiftCodes")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("FurnaceLevel")
@@ -193,37 +167,6 @@ namespace Borealis.Core.Migrations
                     b.Navigation("GiftCode");
 
                     b.Navigation("Player");
-                });
-
-            modelBuilder.Entity("Borealis.Core.Models.MessageTemplate", b =>
-                {
-                    b.OwnsMany("Borealis.Core.Models.MessageTemplateHistoryEntry", "HistorialMessages", b1 =>
-                        {
-                            b1.Property<Guid>("MessageTemplateId")
-                                .HasColumnType("TEXT");
-
-                            b1.Property<int>("__synthesizedOrdinal")
-                                .ValueGeneratedOnAddOrUpdate()
-                                .HasColumnType("INTEGER");
-
-                            b1.Property<string>("Message")
-                                .IsRequired()
-                                .HasColumnType("TEXT");
-
-                            b1.Property<long>("Timestamp")
-                                .HasColumnType("INTEGER");
-
-                            b1.HasKey("MessageTemplateId", "__synthesizedOrdinal");
-
-                            b1.ToTable("MessageTemplates");
-
-                            b1.ToJson("HistorialMessages");
-
-                            b1.WithOwner()
-                                .HasForeignKey("MessageTemplateId");
-                        });
-
-                    b.Navigation("HistorialMessages");
                 });
 
             modelBuilder.Entity("Borealis.Core.Models.Player", b =>

@@ -26,13 +26,21 @@
             <p>It looks like you are not yet approved. Ask your R4/R5 to grant it to you.</p>
         }
 
-        <form method="post">
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="@Model.Name">
+        <div class="row text-start">
+            <div class="col-md-6 offset-md-3">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">User name</label>
+                        <input type="text" class="form-control" id="name" name="name" value="@Model.Name">
+                    </div>
+                    @if(Model.IsInitialUser) {
+                        <button type="submit" class="btn btn-primary">Create admin user</button>
+                    } else {
+                        <button type="submit" class="btn btn-primary">Request approval</button>
+                    }
+                </form>
             </div>
-            <button type="submit" class="btn btn-primary">Request approval</button>
-        </form>
+        </div>
     }
 
 </div>

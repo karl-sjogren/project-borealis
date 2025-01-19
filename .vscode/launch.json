@@ -12,7 +12,7 @@
         "launchSettingsFilePath": "${workspaceFolder}/src/Borealis.Web/Properties/launchSettings.json",
         "program": "${workspaceFolder}/src/Borealis.Web/bin/Debug/net9.0/Borealis.Web.dll",
         "args": [],
-        "cwd": "${workspaceFolder}",
+        "cwd": "${workspaceFolder}/src/Borealis.Web/",
         "stopAtEntry": false,
         "env": {
           "ASPNETCORE_ENVIRONMENT": "Development"

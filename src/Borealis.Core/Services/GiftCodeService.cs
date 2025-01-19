@@ -61,6 +61,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             switch(redeemResult.ErrorCode) {
                 case 20000: // Code success
                 case 40008: // Code already used
+                case 40011: // Code already used
                     break;
                 case 40014:
                     return Results.Failure("Gift code not found.");
@@ -89,7 +90,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
     }
 
     public async Task<PagedResult<GiftCode>> GetPagedAsync(GiftCodeQuery query, CancellationToken cancellationToken) {
-        var entities = await BuildQuery(_context.GiftCodes, query)
+        var entities = await BuildQuery(_context.GiftCodes.AsNoTracking(), query)
             .Skip(query.PageIndex * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
@@ -114,8 +115,13 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.NotFound("Gift code not found.");
         }
 
+        if(giftCode.IsExpired) {
+            return Results.Failure("Gift code is expired.");
+        }
+
         var players = await _context
             .Players
+            .Where(x => x.IsInAlliance || x.ForceRedeemGiftCodes)
             .OrderByDescending(x => x.ExternalId)
             .ToListAsync(cancellationToken);
 
@@ -176,5 +182,16 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         await _context.SaveChangesAsync(cancellationToken);
 
         return Results.Success();
+    }
+
+    public async Task<ICollection<GiftCodeRedemption>> GetRedemptionsForPlayerAsync(Guid playerId, CancellationToken cancellationToken) {
+        return await _context
+            .GiftCodeRedemptions
+            .Include(x => x.Player)
+            .Include(x => x.GiftCode)
+            .AsNoTracking()
+            .Where(x => x.PlayerId == playerId)
+            .OrderByDescending(x => x.RedeemedAt)
+            .ToListAsync(cancellationToken);
     }
 }

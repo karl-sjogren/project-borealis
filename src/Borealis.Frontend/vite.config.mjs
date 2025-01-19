@@ -18,7 +18,7 @@ export default defineConfig({
     copy({
       hook: 'buildStart',
       targets: [
-        { src: 'static/**/*', dest: resolve(__dirname, '../Borealis.Web/wwwroot/static') }
+        { src: 'static/**/*', dest: resolve(__dirname, './artifacts/static') }
       ]
     }),
     codecovVitePlugin({
@@ -30,7 +30,7 @@ export default defineConfig({
   build: {
     target: esBuildTarget,
     cssCodeSplit: false,
-    outDir: resolve(__dirname, '../Borealis.Web/wwwroot/'),
+    outDir: resolve(__dirname, './artifacts/'),
     emptyOutDir: false,
     assetsDir: 'assets',
     reportCompressedSize: true,

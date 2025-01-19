@@ -9,4 +9,5 @@ public interface IGiftCodeService {
     Task<Result> AddGiftCodeAsync(string giftCode, CancellationToken cancellationToken);
     Task<Result> RedeemGiftCodeAsync(int whiteoutSurvivalPlayerId, string giftCode, CancellationToken cancellationToken);
     Task<Result> EnqueueGiftCodeAsync(Guid giftCodeId, CancellationToken cancellationToken);
+    Task<ICollection<GiftCodeRedemption>> GetRedemptionsForPlayerAsync(Guid playerId, CancellationToken cancellationToken);
 }

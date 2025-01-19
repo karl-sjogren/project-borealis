@@ -23,6 +23,7 @@ public class PlayerConfiguration : IEntityTypeConfiguration<Player> {
         builder.Property(b => b.FurnaceLevel).IsRequired();
 
         builder.Property(b => b.IsInAlliance).IsRequired();
+        builder.Property(b => b.ForceRedeemGiftCodes).IsRequired();
 
         builder.OwnsMany(b => b.PreviousNames, navigationBuilder => navigationBuilder.ToJson());
 

@@ -36,7 +36,7 @@ public class UserService : QueryServiceBase<User>, IUserService {
     }
 
     public async Task<PagedResult<User>> GetPagedAsync(UserQuery query, CancellationToken cancellationToken) {
-        var entities = await BuildQuery(_context.Users, query)
+        var entities = await BuildQuery(_context.Users.AsNoTracking(), query)
             .Skip(query.PageIndex * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);

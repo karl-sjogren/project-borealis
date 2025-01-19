@@ -13,6 +13,13 @@
             <textarea class="form-control" id="playerIds" name="PlayerIds" rows="6">@Model.PlayerIds</textarea>
         </div>
 
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="add-as-is-in-alliance" name="AddAsInAlliance" value="true" checked="@Model.AddAsInAlliance">
+            <label class="form-check-labe" for="add-as-is-in-alliance">
+                Add as "In alliance"
+            </label>
+        </div>
+
         <button type="submit" class="btn btn-primary">Add players</button>
     </form>
 </div>

@@ -50,7 +50,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
     }
 
     public async Task<PagedResult<Player>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken) {
-        var entities = await BuildQuery(_context.Players, query)
+        var entities = await BuildQuery(_context.Players.AsNoTracking(), query)
             .Skip(query.PageIndex * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
@@ -72,7 +72,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
         return base.AddSorting(dbQuery, query);
     }
 
-    public async Task<Result<Player>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, CancellationToken cancellationToken) {
+    public async Task<Result<Player>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, bool addAsInAlliance, CancellationToken cancellationToken) {
         WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalPlayerResponse> response;
 
         try {
@@ -95,7 +95,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
                 ExternalId = externalPlayer.FurnaceId,
                 Name = externalPlayer.Name,
                 FurnaceLevel = externalPlayer.FurnaceLevel,
-                IsInAlliance = false,
+                IsInAlliance = addAsInAlliance,
                 State = externalPlayer.State,
                 UpdatedAt = now,
                 CreatedAt = now

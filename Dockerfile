@@ -4,23 +4,35 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG TARGETARCH
 WORKDIR /source
 
-# Copy project file and restore as distinct layers
 COPY --link . .
 RUN dotnet restore -a $TARGETARCH
-
-# Copy source code and publish app
-COPY --link . .
 RUN dotnet publish ./src/Borealis.Web/Borealis.Web.csproj -a $TARGETARCH --no-restore -o /app
 
+# Build frontend
+FROM node:22 AS frontend
+WORKDIR /source
+
+COPY --link ./src/Borealis.Frontend .
+RUN yarn
+RUN yarn build
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
+RUN mkdir -p Database
+RUN mkdir -p wwwroot
+RUN mkdir -p accounts
+
 COPY --link --from=build /app .
+COPY --link --from=frontend /source/artifacts ./wwwroot
 
 USER $APP_UID
-EXPOSE 8080/tcp
 
-RUN ls -la /app
+ENV ASPNETCORE_HTTP_PORTS=80;8080
+ENV ASPNETCORE_HTTPS_PORTS=443;8081
+
+EXPOSE 8080/tcp
+EXPOSE 8081/tcp
+
 ENTRYPOINT ["./Borealis.Web"]

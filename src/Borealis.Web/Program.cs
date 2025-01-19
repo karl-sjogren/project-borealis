@@ -12,9 +12,11 @@ using Borealis.Web.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Net.Http.Headers;
 using Polly;
 using Polly.Extensions.Http;
 using Shorthand.Vite;
@@ -38,11 +40,16 @@ builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
 });
 
+if(builder.Environment.IsProduction()) {
+    builder.Services.AddLettuceEncrypt();
+}
+
 builder.Services.ConfigureApplicationCookie(options => {
     // Cookie settings
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
+    options.SlidingExpiration = true;
 
     options.LoginPath = "/";
     options.AccessDeniedPath = "/";
@@ -107,7 +114,7 @@ builder.Services
 
                 var user = await borealisContext.Users.FirstOrDefaultAsync(x => x.ExternalId == externalId);
 
-                if(user is null || user.IsLockedOut) {
+                if(user?.IsLockedOut != false) {
                     return;
                 }
 
@@ -132,12 +139,14 @@ builder.Services.AddVite(options => {
     options.Https = true;
 });
 
-builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IGiftCodeService, GiftCodeService>();
+builder.Services.AddScoped<IMessageTemplateService, MessageTemplateService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
 builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
+builder.Services.AddHostedService<UpdatePlayersHostedService>();
 
 var app = builder.Build();
 
@@ -145,12 +154,6 @@ var app = builder.Build();
 using(var scope = app.Services.CreateScope()) {
     var db = scope.ServiceProvider.GetRequiredService<BorealisContext>();
     await db.Database.MigrateAsync();
-    /*
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await AuthenticationSeeder.SeedRolesAsync(roleManager);
-
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-    await AuthenticationSeeder.SeedUserRolesAsync(userManager);*/
 }
 
 // Configure the HTTP request pipeline.
@@ -168,7 +171,20 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+static void onPrepareResponse(StaticFileResponseContext ctx) {
+    string[] _staticAssetPaths = ["/assets"];
+
+    var requestPath = ctx.Context.Request.Path;
+    if(!_staticAssetPaths.Any(path => requestPath.StartsWithSegments(path, StringComparison.OrdinalIgnoreCase))) {
+        return;
+    }
+
+    var cacheDuration = TimeSpan.FromDays(365).TotalSeconds;
+    ctx.Context.Response.Headers[HeaderNames.CacheControl] = "public,must-revalidate,max-age=" + cacheDuration + ",immutable";
+}
+
+app.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = onPrepareResponse });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

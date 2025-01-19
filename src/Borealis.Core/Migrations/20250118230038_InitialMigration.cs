@@ -18,8 +18,8 @@ namespace Borealis.Core.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Code = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
                     IsExpired = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,8 +38,8 @@ namespace Borealis.Core.Migrations
                     IsInAlliance = table.Column<bool>(type: "INTEGER", nullable: false),
                     AwayUntil = table.Column<DateOnly>(type: "TEXT", nullable: true),
                     Notes = table.Column<string>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "INTEGER", nullable: false),
                     PreviousNames = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -58,8 +58,8 @@ namespace Borealis.Core.Migrations
                     IsApproved = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsLockedOut = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsAdmin = table.Column<bool>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    CreatedAt = table.Column<long>(type: "INTEGER", nullable: false),
+                    UpdatedAt = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,7 +73,7 @@ namespace Borealis.Core.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     GiftCodeId = table.Column<Guid>(type: "TEXT", nullable: false),
                     PlayerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    RedeemedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                    RedeemedAt = table.Column<long>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

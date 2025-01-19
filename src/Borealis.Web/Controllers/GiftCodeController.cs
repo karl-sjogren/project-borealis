@@ -10,23 +10,27 @@ namespace Borealis.Web.Controllers;
 [Authorize(Roles = "TrustedUser")]
 public class GiftCodeController : Controller {
     private readonly IGiftCodeService _giftCodeService;
+    private readonly IGiftCodeRedemptionQueue _giftCodeRedemptionQueue;
     private readonly ILogger<GiftCodeController> _logger;
 
-    public GiftCodeController(IGiftCodeService giftCodeService, ILogger<GiftCodeController> logger) {
+    public GiftCodeController(IGiftCodeService giftCodeService, IGiftCodeRedemptionQueue giftCodeRedemptionQueue, ILogger<GiftCodeController> logger) {
         _giftCodeService = giftCodeService;
+        _giftCodeRedemptionQueue = giftCodeRedemptionQueue;
         _logger = logger;
     }
 
     [HttpGet]
     public async Task<ActionResult<PlayersIndexViewModel>> IndexAsync([FromQuery] GiftCodeQuery giftCodeQuery, CancellationToken cancellationToken) {
         var result = await _giftCodeService.GetPagedAsync(giftCodeQuery, cancellationToken);
+        var queueLength = await _giftCodeRedemptionQueue.GetQueueLengthAsync();
 
         var viewModel = new GiftCodeIndexViewModel {
             GiftCodes = result.Items,
             PageIndex = result.PageIndex,
             PageSize = result.PageSize,
             TotalCount = result.TotalCount,
-            Query = giftCodeQuery.Query
+            Query = giftCodeQuery.Query,
+            CurrentlyRedeeming = queueLength
         };
 
         return View(viewModel);

@@ -6,9 +6,12 @@
 
 <div class="row">
     <h1 class="display-4">
-        <span class="furnace-level level-@Model.Player.FurnaceLevelString.ToLowerInvariant()">
-            <span class="level-text">@Model.Player.FurnaceLevelString</span>
-        </span>
+        @if(Model.Player.HasFireCrystalFurnace) {
+            <span class="furnace-level level-@Model.Player.FurnaceLevelString.ToLowerInvariant()">
+                <span class="level-text">@Model.Player.FurnaceLevelString</span>
+            </span>
+        }
+
         @Model.Player.Name
     </h1>
 
@@ -19,6 +22,9 @@
 
             <dt class="col-sm-3">State</dt>
             <dd class="col-sm-9">@Model.Player.State</dd>
+
+            <dt class="col-sm-3">Exact furnace level</dt>
+            <dd class="col-sm-9">@Model.Player.ExactFurnaceLevelString</dd>
 
             <dt class="col-sm-3">In alliance</dt>
             <dd class="col-sm-9">@(Model.Player.IsInAlliance ? "Yes" : "No")</dd>
@@ -38,13 +44,50 @@
     </div>
 
     <form method="post" enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name="Notes" value="@Model.Notes" />
         <div class="mb-3">
-            <label for="notes" class="form-label">Notes</label>
-            <textarea class="form-control" id="notes" name="notes" rows="6">@Model.Player.Notes</textarea>
+            <label for="away-until" class="form-label">Away until</label>
+            <input type="date" class="form-control" id="away-until" name="AwayUntil" value="@Model.Player.AwayUntil" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Save notes</button>
+        <button type="submit" class="btn btn-primary mb-3">Save away date</button>
     </form>
+
+    <form method="post" enctype="application/x-www-form-urlencoded">
+        <input type="hidden" name="AwayUntil" value="@Model.AwayUntil" />
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea class="form-control" id="notes" name="Notes" rows="6">@Model.Player.Notes</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary mb-3">Save notes</button>
+    </form>
+
+    <h2>Redeemed gift codes</h2>
+
+    @if(!Model.RedeemedGiftCodes.Any()) {
+        <p>No gift codes redeemed</p>
+    } else {
+        <div class="table-responsive">
+            <table class="table table-responsive table-striped table-hover players-table">
+                <thead>
+                    <tr>
+                        <th class="code">Code</th>
+                        <th class="redeemed-at">Redeemed at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var giftCode in Model.RedeemedGiftCodes)
+                    {
+                        <tr>
+                            <td>@giftCode.GiftCode.Code</td>
+                            <td>@giftCode.RedeemedAt</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 
     <h2>Previous names</h2>
 

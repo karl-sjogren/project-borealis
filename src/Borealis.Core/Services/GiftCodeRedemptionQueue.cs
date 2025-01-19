@@ -43,6 +43,10 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
         });
     }
 
+    public Task<int> GetQueueLengthAsync() {
+        return Task.FromResult(_queue.Count);
+    }
+
     public async Task ProcessQueueAsync(CancellationToken cancellationToken) {
         using var scope = _serviceScopeFactory.CreateScope();
         var giftCodeService = scope.ServiceProvider.GetRequiredService<IGiftCodeService>();

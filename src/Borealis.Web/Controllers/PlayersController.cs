@@ -11,10 +11,12 @@ namespace Borealis.Web.Controllers;
 [Authorize(Roles = "TrustedUser")]
 public class PlayersController : Controller {
     private readonly IPlayerService _playerService;
+    private readonly IGiftCodeService _giftCodeService;
     private readonly ILogger<PlayersController> _logger;
 
-    public PlayersController(IPlayerService playerService, ILogger<PlayersController> logger) {
+    public PlayersController(IPlayerService playerService, IGiftCodeService giftCodeService, ILogger<PlayersController> logger) {
         _playerService = playerService;
+        _giftCodeService = giftCodeService;
         _logger = logger;
     }
 
@@ -42,29 +44,36 @@ public class PlayersController : Controller {
         }
 
         var viewModel = new PlayersDetailsViewModel {
-            Player = result.Data!
+            Player = result.Data!,
+            Notes = result.Data!.Notes,
+            AwayUntil = result.Data!.AwayUntil,
+            RedeemedGiftCodes = await _giftCodeService.GetRedemptionsForPlayerAsync(id, cancellationToken)
         };
 
         return View(viewModel);
     }
 
     [HttpPost("{id}")]
-    public async Task<ActionResult<PlayersDetailsViewModel>> DetailsAsync([FromRoute] Guid id, [FromForm] string notes, CancellationToken cancellationToken) {
+    public async Task<ActionResult<PlayersDetailsViewModel>> DetailsAsync([FromRoute] Guid id, [FromForm] PlayersDetailsViewModel viewModel, CancellationToken cancellationToken) {
         var playerResult = await _playerService.GetByIdAsync(id, cancellationToken);
         if(!playerResult.Success) {
             return NotFound();
         }
 
         var player = playerResult.Data!;
-        player.Notes = notes;
+        player.Notes = viewModel.Notes?.Trim();
+        player.AwayUntil = viewModel.AwayUntil;
 
         var updateResult = await _playerService.UpdateAsync(player, cancellationToken);
         if(!updateResult.Success) {
-            throw new Exception("Failed to set player notes.");
+            throw new Exception("Failed to update player.");
         }
 
-        var viewModel = new PlayersDetailsViewModel {
-            Player = updateResult.Data!
+        viewModel = new PlayersDetailsViewModel {
+            Player = updateResult.Data!,
+            Notes = updateResult.Data!.Notes,
+            AwayUntil = updateResult.Data!.AwayUntil,
+            RedeemedGiftCodes = await _giftCodeService.GetRedemptionsForPlayerAsync(id, cancellationToken)
         };
 
         return View("Details", viewModel);
@@ -102,7 +111,7 @@ public class PlayersController : Controller {
                 continue;
             }
 
-            var playerResult = await _playerService.SynchronizePlayerAsync(playerId, cancellationToken);
+            var playerResult = await _playerService.SynchronizePlayerAsync(playerId, viewModel.AddAsInAlliance, cancellationToken);
 
             result.Add(playerId.ToString(), playerResult?.Data);
         }

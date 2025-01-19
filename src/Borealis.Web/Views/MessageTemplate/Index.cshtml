@@ -1,14 +1,14 @@
-@model GiftCodeIndexViewModel
+@model MessageTemplateIndexViewModel
 
 @{
-    ViewData["Title"] = "Gift codes";
+    ViewData["Title"] = "Message templates";
 }
 
 <div>
-    <h1 class="display-4">Gift codes</h1>
+    <h1 class="display-4">Message templates</h1>
 </div>
 
-<a asp-action="AddGiftCode" class="btn btn-primary btn-sm mb-3">Add gift code</a>
+<a asp-action="New" class="btn btn-primary btn-sm mb-3">Create Message template</a>
 
 <form method="get">
     <input type="hidden" name="pageIndex" value="@Model.PageIndex" />
@@ -19,32 +19,31 @@
     </div>
 </form>
 
-<p>Results: @Model.TotalCount, currently redeeming: @Model.CurrentlyRedeeming</p>
+<p>Results: @Model.TotalCount</p>
 
 <div class="table-responsive">
     <table class="table table-striped table-hover players-table">
         <thead>
             <tr>
-                <th class="code">Code</th>
-                <th class="is-expired">Expired</th>
-                <th class="created-at">Added</th>
+                <th class="user-name">Name</th>
+                <th class="message">Message</th>
+                <th class="updated-at">Updated at</th>
                 <th class="actions"></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var giftCode in Model.GiftCodes) {
-                <tr id="code-@giftCode.Id">
-                    <td>@giftCode.Code</td>
-                    <td>@(giftCode.IsExpired ? "Yes" : "No")</td>
-                    <td>@giftCode.CreatedAt</td>
+            @foreach (var messageTemplate in Model.MessageTemplates) {
+                <tr id="user-@messageTemplate.Id">
+                    <td>@messageTemplate.Name</td>
+                    <td>@messageTemplate.Message</td>
+                    <td>@messageTemplate.UpdatedAt</td>
                     <td>
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Button group with nested dropdown">
-                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@giftCode.Id"><i class="bi bi-pencil"></i></a>
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Actions for user @messageTemplate.Name">
+                        <a class="btn btn-primary" asp-action="Details" asp-route-id="@messageTemplate.Id"><i class="bi bi-pencil"></i></a>
 
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-arrow-clockwise"></i> Redeem again</a></li>
                                 <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Delete</a></li>
                             </ul>
                         </div>

@@ -15,6 +15,8 @@ public class GiftCodeRedemptionQueueProcessingHostedService : BackgroundService 
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
+        await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
+
         while(!stoppingToken.IsCancellationRequested) {
             using var scope = _serviceScopeFactory.CreateScope();
             var queue = scope.ServiceProvider.GetRequiredService<IGiftCodeRedemptionQueue>();
@@ -25,7 +27,7 @@ public class GiftCodeRedemptionQueueProcessingHostedService : BackgroundService 
                 _logger.LogError(ex, "An error occurred while processing the gift code redemption queue.");
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
         }
     }
 }
