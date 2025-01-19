@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Project Borealis</title>
 
+    <link href="@await Vite.GetAssetUrlAsync("assets/borealis-icon.png")" rel="icon">
+
     <environment exclude="Development">
         <link rel="modulepreload" href="@await Vite.GetAssetUrlAsync("scripts/index.mjs")" as="script" />
         <link rel="stylesheet" href="@await Vite.GetAssetUrlAsync("style.css")" />
@@ -31,7 +33,7 @@
                                 <a class="nav-link" asp-area="" asp-controller="Players" asp-action="Index">Players</a>
                             </li>
                             <li>
-                                <a class="nav-link" asp-area="" asp-controller="MessageTemplate" asp-action="Index">Message templates</a>
+                                <a class="nav-link" asp-area="" asp-controller="Alliances" asp-action="Index">Message templates</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="GiftCode" asp-action="Index">Gift codes</a>
@@ -48,11 +50,21 @@
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container text-center pt-3">
+            Project Borealis -
+            <a href="https://www.flaticon.com/free-icons/aurora" title="Aurora icons">Project icon created by Freepik - Flaticon</a> -
+            <a href="https://github.com/karl-sjogren/project-borealis/" title="Project Borealis on GitHub">Check the code on github <i class="bi bi-github"></i></a>
+        </div>
+
+    </footer>
 
     <script src="@await Vite.GetAssetUrlAsync("scripts/index.mjs")" type="module"></script>
 

@@ -1,27 +1,6 @@
-# Karls Opinionated Solution Template
+# Project Borealis
 
-This project was scaffolded using Karls Opinionated Solution Template.
+Alliance management tool for Whiteout Survival. Currently used by AFO in state
+851 but could setup and used by any alliance.
 
-It has been created with the following features:
-
-* Source code goes in the `src` folder.
-* Tests go in the `tests` folder.
-* An editor config file is added with Karls preferred settings.
-* A gitignore file is added with the default .NET gitignore settings.
-* A NuGet config file is added with the default NuGet feed settings.
-* Several Directory.Build.props files are added.
-  * One in the root folder which references analyzers and some global settings.
-  * One in the `src` folder which sets `InternalsVisibleTo` to test projects ands
-    adds the `BannedApiAnalyzers` package.
-  * One in the `tests` folder which sets up some default settings for test assemblies,
-    adds implicit usings for Moq, Xunit and Shouldly. It also adds code coverage and
-    test result output for release builds.
-* Several GitHub Actions workflows are added.
-  * One that runs tests and builds the project on every push except from Dependabot.
-  * One that runs tests and builds the project on every pull request from Dependabot.
-  * One that can be used to combine several Dependabot updates into one single pull request.
-* A frontend project is added with the following features:
-  * Yarn 4 with zero installs.
-  * Vite (<https://vitejs.dev/>) for building and Vitest (<https://vitest.dev/>) for testing.
-  * Sass for styling via postcss. Setup with cssnano and autoprefixer.
-  * Linting using ESLint and Stylelint with a bunch of plugins and rules.
+Project icon by [Freepik](https://www.flaticon.com/authors/freepik) from [Flaticon](https://www.flaticon.com/)
