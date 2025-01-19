@@ -92,6 +92,17 @@ public class AccountController : Controller {
         return Challenge(properties, DiscordAuthenticationDefaults.AuthenticationScheme);
     }
 
+    [HttpGet("relogin")]
+    public async Task<IActionResult> ReloginAsync() {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var properties = new AuthenticationProperties {
+            RedirectUri = Url.Action("Index", "Home")
+        };
+
+        return Challenge(properties, DiscordAuthenticationDefaults.AuthenticationScheme);
+    }
+
     [HttpGet("sign-out")]
     public async Task<IActionResult> SignOutAsync(string? returnUrl) {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
