@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Project Borealis</title>
 
-    <link href="@await Vite.GetAssetUrlAsync("assets/borealis-icon.png")" rel="icon">
+    <link href="/static/borealis-icon.png" rel="icon">
 
     <environment exclude="Development">
         <link rel="modulepreload" href="@await Vite.GetAssetUrlAsync("scripts/index.mjs")" as="script" />

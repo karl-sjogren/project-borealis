@@ -1,1 +1,4 @@
 Borealis.db*
+
+wwwroot/static/
+wwwroot/manifest.json

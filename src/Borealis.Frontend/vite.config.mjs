@@ -18,7 +18,8 @@ export default defineConfig({
     copy({
       hook: 'buildStart',
       targets: [
-        { src: 'static/**/*', dest: resolve(__dirname, './artifacts/static') }
+        { src: 'static/**/*', dest: resolve(__dirname, './artifacts/static') },
+        { src: 'static/**/*', dest: resolve(__dirname, '../Borealis.Web/wwwroot/static') }
       ]
     }),
     codecovVitePlugin({
