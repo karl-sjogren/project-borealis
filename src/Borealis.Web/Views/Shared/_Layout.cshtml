@@ -5,7 +5,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Project Borealis</title>
+
+    @{
+        var title = ViewData["Title"] as string;
+        if(string.IsNullOrWhiteSpace(title)) {
+            title = "Project Borealis";
+        } else {
+            title = $"{title} - Project Borealis";
+        }
+    }
+    <title>@title</title>
 
     <link href="/static/borealis-icon.png" rel="icon">
 
@@ -33,7 +42,7 @@
                                 <a class="nav-link" asp-area="" asp-controller="Players" asp-action="Index">Players</a>
                             </li>
                             <li>
-                                <a class="nav-link" asp-area="" asp-controller="Alliances" asp-action="Index">Message templates</a>
+                                <a class="nav-link" asp-area="" asp-controller="MessageTemplate" asp-action="Index">Message templates</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" asp-area="" asp-controller="GiftCode" asp-action="Index">Gift codes</a>

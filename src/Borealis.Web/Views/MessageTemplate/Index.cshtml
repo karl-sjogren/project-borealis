@@ -37,15 +37,15 @@
                     <td>@messageTemplate.UpdatedAt</td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group" aria-label="Actions for @messageTemplate.Name">
-                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@messageTemplate.Id"><i class="bi bi-pencil"></i></a>
-                        <button class="btn btn-primary button-copy-data" data-copy-data="@messageTemplate.Message"><i class="bi bi-clipboard"></i></button>
+                            <a class="btn btn-primary" asp-action="Edit" asp-route-id="@messageTemplate.Id"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-primary button-copy-data" data-copy-data="@messageTemplate.Message"><i class="bi bi-clipboard"></i></button>
 
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Delete</a></li>
-                            </ul>
-                        </div>
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Delete</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </td>
                 </tr>

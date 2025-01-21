@@ -48,12 +48,11 @@ builder.Services.ConfigureApplicationCookie(options => {
     // Cookie settings
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
-    options.ExpireTimeSpan = TimeSpan.FromHours(2);
+    options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;
 
     options.LoginPath = "/";
     options.AccessDeniedPath = "/";
-    options.SlidingExpiration = true;
 });
 
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
@@ -81,7 +80,11 @@ builder.Services
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
     })
-        .AddCookie()
+        .AddCookie(options => {
+            options.Cookie.IsEssential = true;
+            options.ExpireTimeSpan = TimeSpan.FromHours(48);
+            options.SlidingExpiration = true;
+        })
         .AddDiscord(options => {
             options.ClientId = builder.Configuration["DiscordClientId"] ?? throw new InvalidOperationException("DiscordClientId is not set in the configuration.");
             options.ClientSecret = builder.Configuration["DiscordClientSecret"] ?? throw new InvalidOperationException("DiscordClientSecret is not set in the configuration.");
@@ -130,6 +133,8 @@ builder.Services
                 if(user.IsAdmin) {
                     userIdentity.AddClaim(new Claim(ClaimTypes.Role, "AdminUser"));
                 }
+
+                ctx.Properties.IsPersistent = true;
             };
         });
 
