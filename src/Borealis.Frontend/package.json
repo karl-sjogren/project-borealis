@@ -38,7 +38,7 @@
     "eslint-plugin-testing-library": "^7.1.1",
     "eslint-plugin-vitest": "^0.5.4",
     "jquery": "^3.7.1",
-    "jsdom": "^25.0.1",
+    "jsdom": "^26.0.0",
     "jsdom-testing-mocks": "^1.13.1",
     "postcss": "^8.5.1",
     "postcss-scss": "^4.0.9",
