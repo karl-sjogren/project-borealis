@@ -25,12 +25,27 @@ const initTableButtons = pageElement => {
      */
     const button = event.target;
 
-    if(!button.classList.contains('add-to-alliance-button') && !button.classList.contains('remove-from-alliance-button')) {
+    if(!button.classList.contains('add-to-alliance-button') && !button.classList.contains('remove-from-alliance-button') && !button.classList.contains('delete-player-button')) {
       return;
     }
 
     event.stopPropagation();
     event.preventDefault();
+
+    if(button.classList.contains('delete-player-button')) {
+      if(!confirm('Are you sure you want to delete this player?')) {
+        return;
+      }
+
+      const row = firstAnscestorOrDefault(button, element => element.classList.contains('player-row'));
+      const playerId = row.dataset.playerId;
+
+      await deletePlayer(playerId);
+
+      row.remove();
+
+      return;
+    }
 
     const isAddButton = button.classList.contains('add-to-alliance-button');
 
@@ -63,6 +78,21 @@ const updateAllianceStatus = async(playerId, addToAlliance) => {
 
   if(!response.ok) {
     console.error(`Failed to change alliance status of player: ${response.status} ${response.statusText}`);
+    return null;
+  }
+};
+
+/**
+ * Removes a player from the system
+ * @param {string} playerId The player ID
+ */
+const deletePlayer = async(playerId) => {
+  const url = `/api/players/${playerId}`;
+
+  const response = await fetch(url, { method: 'DELETE' });
+
+  if(!response.ok) {
+    console.error(`Failed to delete player: ${response.status} ${response.statusText}`);
     return null;
   }
 };

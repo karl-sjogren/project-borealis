@@ -145,4 +145,17 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
 
         return Results.Success(existingPlayer);
     }
+
+    public async Task<Result> DeleteAsync(Guid playerId, CancellationToken cancellationToken) {
+        var player = await _context.Players.FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
+
+        if(player is null) {
+            return Results.NotFound();
+        }
+
+        _context.Players.Remove(player);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Results.Success();
+    }
 }

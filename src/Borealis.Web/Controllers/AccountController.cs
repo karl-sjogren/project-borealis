@@ -26,7 +26,8 @@ public class AccountController : Controller {
     [HttpGet("request-approval")]
     public async Task<IActionResult> RequestApprovalAsync() {
         var viewModel = new AccountRequestApprovalViewModel {
-            IsInitialUser = !await _context.Users.AnyAsync()
+            IsInitialUser = !await _context.Users.AnyAsync(),
+            IsPendingApproval = User.IsInRole("PendingApproval")
         };
 
         return View(viewModel);

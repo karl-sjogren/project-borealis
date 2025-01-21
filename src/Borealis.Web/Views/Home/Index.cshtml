@@ -15,7 +15,7 @@
 
             <p>When approved you will need to login again.</p>
 
-            <a asp-controller="Account" asp-action="SignOut" asp-route-returnUrl="@Url.Action("Index"))" class="btn btn-primary">Login again</a>
+            <a asp-controller="Account" asp-action="SignOut" asp-route-returnUrl="@Url.Action("Index")" class="btn btn-primary">Login again</a>
         } else if(!Model.IsApprovedUser){
             <p>To get access to this tool you need to request access and be approved by an administrator.</p>
 

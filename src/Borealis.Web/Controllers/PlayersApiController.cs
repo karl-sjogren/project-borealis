@@ -16,6 +16,17 @@ public class PlayersAPIController : Controller {
         _logger = logger;
     }
 
+    [HttpDelete("{playerId:guid}")]
+    public async Task<ActionResult<PlayersIndexViewModel>> DeleteAsync(Guid playerId, CancellationToken cancellationToken) {
+        var result = await _playerService.DeleteAsync(playerId, cancellationToken);
+
+        if(!result.Success) {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
     [HttpPut("{playerId:guid}/add-to-alliance")]
     public async Task<ActionResult<PlayersIndexViewModel>> AddToAllianceAsync(Guid playerId, CancellationToken cancellationToken) {
         var result = await _playerService.GetByIdAsync(playerId, cancellationToken);

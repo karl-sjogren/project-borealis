@@ -55,22 +55,35 @@ public class UserService : QueryServiceBase<User>, IUserService {
     }
 
     public async Task<Result<User>> UpdateAsync(User user, CancellationToken cancellationToken) {
-        var existingPlayer = await _context.Users.FirstOrDefaultAsync(x => x.Id == user.Id, cancellationToken);
+        var existingUser = await _context.Users.FirstOrDefaultAsync(x => x.Id == user.Id, cancellationToken);
 
-        if(existingPlayer is null) {
+        if(existingUser is null) {
             return Results.NotFound<User>();
         }
 
-        existingPlayer.IsApproved = user.IsApproved;
-        existingPlayer.IsAdmin = user.IsAdmin;
-        existingPlayer.IsLockedOut = user.IsLockedOut;
+        existingUser.IsApproved = user.IsApproved;
+        existingUser.IsAdmin = user.IsAdmin;
+        existingUser.IsLockedOut = user.IsLockedOut;
 
-        if(_context.Entry(existingPlayer).State == EntityState.Modified) {
-            existingPlayer.UpdatedAt = _timeProvider.GetUtcNow();
+        if(_context.Entry(existingUser).State == EntityState.Modified) {
+            existingUser.UpdatedAt = _timeProvider.GetUtcNow();
         }
 
         await _context.SaveChangesAsync(cancellationToken);
 
-        return Results.Success(existingPlayer);
+        return Results.Success(existingUser);
+    }
+
+    public async Task<Result> DeleteAsync(Guid userId, CancellationToken cancellationToken) {
+        var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+
+        if(user is null) {
+            return Results.NotFound();
+        }
+
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Results.Success();
     }
 }

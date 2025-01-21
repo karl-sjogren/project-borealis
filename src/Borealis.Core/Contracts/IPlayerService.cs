@@ -9,4 +9,5 @@ public interface IPlayerService {
     Task<PagedResult<Player>> GetPagedAsync(PlayerQuery query, CancellationToken cancellationToken);
     Task<Result<Player>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, bool addAsInAlliance, CancellationToken cancellationToken);
     Task<Result<Player>> UpdateAsync(Player player, CancellationToken cancellationToken);
+    Task<Result> DeleteAsync(Guid playerId, CancellationToken cancellationToken);
 }
