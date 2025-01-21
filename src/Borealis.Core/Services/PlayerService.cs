@@ -62,7 +62,9 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
 
     private IQueryable<Player> BuildQuery(IQueryable<Player> dbQuery, PlayerQuery query) {
         if(!string.IsNullOrWhiteSpace(query.Query)) {
-            dbQuery = dbQuery.Where(x => x.Name.Contains(query.Query) || (x.Notes != null && x.Notes.Contains(query.Query)));
+#pragma warning disable CA1307 // Specify StringComparison for clarity
+            dbQuery = dbQuery.Where(x => x.Name.Contains(query.Query) || x.PreviousNames.Any(x => x.Name.Contains(query.Query)) || (x.Notes != null && x.Notes.Contains(query.Query)));
+#pragma warning restore CA1307 // Specify StringComparison for clarity
         }
 
         if(!query.ShowAll) {
