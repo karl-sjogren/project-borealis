@@ -150,6 +150,7 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
+builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
 builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
 builder.Services.AddHostedService<UpdatePlayersHostedService>();
 

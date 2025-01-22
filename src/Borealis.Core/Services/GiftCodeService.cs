@@ -105,6 +105,10 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             dbQuery = dbQuery.Where(x => x.Code.Contains(query.Query));
         }
 
+        if(query.IsExpired.HasValue) {
+            dbQuery = dbQuery.Where(x => x.IsExpired == query.IsExpired.Value);
+        }
+
         return base.AddSorting(dbQuery, query);
     }
 
@@ -193,6 +197,24 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .Where(x => x.PlayerId == playerId)
             .OrderByDescending(x => x.RedeemedAt)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Result<GiftCode>> UpdateAsync(GiftCode giftCode, CancellationToken cancellationToken) {
+        var existingGiftCode = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Id == giftCode.Id, cancellationToken);
+
+        if(existingGiftCode is null) {
+            return Results.NotFound<GiftCode>();
+        }
+
+        existingGiftCode.IsExpired = giftCode.IsExpired;
+
+        if(_context.Entry(existingGiftCode).State == EntityState.Modified) {
+            existingGiftCode.UpdatedAt = _timeProvider.GetUtcNow();
+        }
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Results.Success(existingGiftCode);
     }
 
     public async Task<Result> DeleteAsync(Guid giftCodeId, CancellationToken cancellationToken) {
