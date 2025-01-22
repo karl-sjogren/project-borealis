@@ -20,7 +20,7 @@ public class GiftCodeController : Controller {
     }
 
     [HttpGet]
-    public async Task<ActionResult<PlayersIndexViewModel>> IndexAsync([FromQuery] GiftCodeQuery giftCodeQuery, CancellationToken cancellationToken) {
+    public async Task<ActionResult<GiftCodeIndexViewModel>> IndexAsync([FromQuery] GiftCodeQuery giftCodeQuery, CancellationToken cancellationToken) {
         var result = await _giftCodeService.GetPagedAsync(giftCodeQuery, cancellationToken);
         var queueLength = await _giftCodeRedemptionQueue.GetQueueLengthAsync();
 

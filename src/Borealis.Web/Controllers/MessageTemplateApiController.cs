@@ -1,5 +1,4 @@
 using Borealis.Core.Contracts;
-using Borealis.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,7 +16,7 @@ public class MessageTemplateApiController : Controller {
     }
 
     [HttpDelete("{messageTemplateId:guid}")]
-    public async Task<ActionResult<PlayersIndexViewModel>> DeleteAsync(Guid messageTemplateId, CancellationToken cancellationToken) {
+    public async Task<IActionResult> DeleteAsync(Guid messageTemplateId, CancellationToken cancellationToken) {
         var result = await _messageTemplateService.DeleteAsync(messageTemplateId, cancellationToken);
 
         if(!result.Success) {

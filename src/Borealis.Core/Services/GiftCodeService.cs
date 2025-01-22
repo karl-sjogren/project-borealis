@@ -194,4 +194,17 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .OrderByDescending(x => x.RedeemedAt)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<Result> DeleteAsync(Guid giftCodeId, CancellationToken cancellationToken) {
+        var giftCode = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Id == giftCodeId, cancellationToken);
+
+        if(giftCode is null) {
+            return Results.NotFound();
+        }
+
+        _context.GiftCodes.Remove(giftCode);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Results.Success();
+    }
 }
