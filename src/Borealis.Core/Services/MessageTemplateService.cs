@@ -92,4 +92,17 @@ public class MessageTemplateService : QueryServiceBase<MessageTemplate>, IMessag
 
         return Results.Success(existingTemplate);
     }
+
+    public async Task<Result> DeleteAsync(Guid messageTemplateId, CancellationToken cancellationToken) {
+        var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(x => x.Id == messageTemplateId, cancellationToken);
+
+        if(messageTemplate is null) {
+            return Results.NotFound();
+        }
+
+        _context.MessageTemplates.Remove(messageTemplate);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Results.Success();
+    }
 }

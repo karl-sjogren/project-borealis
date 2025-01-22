@@ -8,4 +8,5 @@ public interface IMessageTemplateService {
     Task<PagedResult<MessageTemplate>> GetPagedAsync(MessageTemplateQuery query, CancellationToken cancellationToken);
     Task<Result<MessageTemplate>> CreateAsync(string name, string message, CancellationToken cancellationToken);
     Task<Result<MessageTemplate>> UpdateAsync(MessageTemplate messageTemplate, CancellationToken cancellationToken);
+    Task<Result> DeleteAsync(Guid messageTemplateId, CancellationToken cancellationToken);
 }
