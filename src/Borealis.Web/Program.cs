@@ -4,6 +4,7 @@ using System.Security.Claims;
 using AspNet.Security.OAuth.Discord;
 using Borealis.Core;
 using Borealis.Core.Contracts;
+using Borealis.Core.GiftCodeScanners;
 using Borealis.Core.HttpClients;
 using Borealis.Core.Options;
 using Borealis.Core.Services;
@@ -65,7 +66,8 @@ static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
         .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 }
 
-builder.Services.AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttpClient>()
+builder.Services
+    .AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttpClient>()
     .ConfigureHttpClient((serviceProvider, client) => {
         var options = serviceProvider.GetRequiredService<IOptions<WhiteoutSurvivalOptions>>().Value;
         client.BaseAddress = new Uri(options.BaseUrl);
@@ -149,7 +151,11 @@ builder.Services.AddScoped<IMessageTemplateService, MessageTemplateService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
+builder.Services.AddScoped<IGiftCodeScanner, DestructoidGiftCodeScanner>();
+builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
+
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
+builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
 builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
 builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
 builder.Services.AddHostedService<UpdatePlayersHostedService>();

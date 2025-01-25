@@ -12,8 +12,8 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<GiftCodeService> _logger;
 
-    protected override string DefaultSortProperty => nameof(Player.CreatedAt);
-    protected override bool DefaultSortAscending => false;
+    protected override string DefaultSortProperty => nameof(GiftCode.IsExpired);
+    protected override bool DefaultSortAscending => true;
 
     public GiftCodeService(
             BorealisContext context,
@@ -54,6 +54,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .OrderByDescending(x => x.ExternalId)
             .FirstOrDefaultAsync(cancellationToken);
 
+        var isExpired = false;
         if(player is not null) {
             var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken); // We need to "sign in" the player
             var redeemResult = await _whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
@@ -63,12 +64,13 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
                 case 40008: // Code already used
                 case 40011: // Code already used
                     break;
+                case 40007: // Code expired, we can't redeem it but we can remember it
+                    isExpired = true;
+                    break;
                 case 40014:
                     return Results.Failure("Gift code not found.");
                 case 40004:
                     return Results.Failure("Player not found.");
-                case 40007:
-                    return Results.Failure("Gift code expired.");
                 case 40009:
                     return Results.Failure("Player not logged in.");
                 default:
@@ -78,11 +80,16 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
 
         var newGiftCode = new GiftCode {
             Code = giftCode,
-            CreatedAt = _timeProvider.GetUtcNow()
+            CreatedAt = _timeProvider.GetUtcNow(),
+            IsExpired = isExpired
         };
 
         await _context.GiftCodes.AddAsync(newGiftCode, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+
+        if(newGiftCode.IsExpired) {
+            return Results.Failure("Gift code is expired.");
+        }
 
         await EnqueueGiftCodeAsync(newGiftCode.Id, cancellationToken);
 
