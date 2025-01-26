@@ -202,7 +202,7 @@ jobs:
     name: Build Docker image
     runs-on: ubuntu-latest
 
-    if: startsWith(github.ref, 'refs/heads/main')
+    if: startsWith(github.ref, 'refs/tags/')
 
     needs: [ net-test, frontend-test ]
 
