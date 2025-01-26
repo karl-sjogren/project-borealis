@@ -28,6 +28,8 @@ env:
   NUGET_CERT_REVOCATION_MODE: offline
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   PUBLISH_CODECOV: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/heads/main')
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   frontend-test:
@@ -226,27 +228,39 @@ jobs:
     name: .NET build
     runs-on: ubuntu-latest
 
+    if: startsWith(github.ref, 'refs/heads/develop')
+
     needs: [ net-test, frontend-test ]
 
     steps:
     - name: Checkout sources
       uses: actions/checkout@v4
 
-    - name: Install .NET
-      uses: actions/setup-dotnet@v4
+    - name: Log in to the Container registry
+      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
       with:
-        global-json-file: global.json
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Restore NuGet packages
-      run: dotnet restore --verbosity minimal
-
-    - name: Publish application
-      run: dotnet publish -o ./artifacts -c Release
-      working-directory: ./
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
       with:
-        name: publish-artifacts
-        path: ./artifacts/
-        if-no-files-found: error
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+    - name: Build and push Docker image
+      id: push
+      uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Generate artifact attestation
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+        subject-digest: ${{ steps.push.outputs.digest }}
+        push-to-registry: true
