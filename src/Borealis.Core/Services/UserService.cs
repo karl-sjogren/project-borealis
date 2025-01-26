@@ -48,7 +48,7 @@ public class UserService : QueryServiceBase<User>, IUserService {
 
     private IQueryable<User> BuildQuery(IQueryable<User> dbQuery, UserQuery query) {
         if(!string.IsNullOrWhiteSpace(query.Query)) {
-            dbQuery = dbQuery.Where(x => x.Name.Contains(query.Query));
+            dbQuery = dbQuery.Where(x => EF.Functions.Like(x.Name, $"%{query.Query}%"));
         }
 
         return base.AddSorting(dbQuery, query);

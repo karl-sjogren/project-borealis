@@ -1,4 +1,6 @@
 using System.IO.Abstractions;
+using Borealis.Core.Models;
+using Borealis.Core.Requests;
 using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -9,8 +11,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace Borealis.Core.Services;
 
-public abstract class LuceneIndexServiceBase<T> : IDisposable where T : class {
-    private const LuceneVersion _luceneVersion = LuceneVersion.LUCENE_48;
+public abstract class LuceneIndexServiceBase<T, TQuery> : IDisposable where T : class where TQuery : QueryBase {
     private readonly FSDirectory _indexDirectory;
     private readonly IndexWriter _indexWriter;
     private readonly CancellationTokenRegistration _shutdownRegistration;
@@ -22,9 +23,13 @@ public abstract class LuceneIndexServiceBase<T> : IDisposable where T : class {
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly ILogger _logger;
 
-    public abstract Analyzer DefaultAnalyzer { get; }
+    protected abstract Analyzer DefaultAnalyzer { get; }
 
-    protected LuceneIndexServiceBase(IFileSystem fileSystem, TimeProvider timeProvider, IHostApplicationLifetime hostApplicationLifetime, ILogger logger) {
+    protected LuceneIndexServiceBase(
+            IFileSystem fileSystem,
+            TimeProvider timeProvider,
+            IHostApplicationLifetime hostApplicationLifetime,
+            ILogger logger) {
         _fileSystem = fileSystem;
         _timeProvider = timeProvider;
         _hostApplicationLifetime = hostApplicationLifetime;
@@ -34,7 +39,7 @@ public abstract class LuceneIndexServiceBase<T> : IDisposable where T : class {
         var indexPath = fileSystem.Path.Combine(Environment.CurrentDirectory, indexName);
 
         _indexDirectory = FSDirectory.Open(indexPath);
-        _indexWriter = new IndexWriter(_indexDirectory, new IndexWriterConfig(_luceneVersion, DefaultAnalyzer));
+        _indexWriter = new IndexWriter(_indexDirectory, new IndexWriterConfig(LuceneVersion.LUCENE_48, DefaultAnalyzer));
 
         _shutdownRegistration = _hostApplicationLifetime.ApplicationStopping.Register(OnApplicationStopping);
 
@@ -57,7 +62,6 @@ public abstract class LuceneIndexServiceBase<T> : IDisposable where T : class {
                 _commitAtAbsolute = 0;
             }
 
-            // Task.Delay until we reach _commitAt or _commitAtAbsolute
             var delay = Math.Min(_commitAt - now, _commitAtAbsolute - now);
             if(delay > 0) {
                 await Task.Delay(TimeSpan.FromMilliseconds(delay), cancellationToken);
@@ -93,6 +97,7 @@ public abstract class LuceneIndexServiceBase<T> : IDisposable where T : class {
     }
 
     protected abstract Document GetIndexDocument(T item);
+    protected abstract Query GetQuery(TQuery query);
 
     private readonly System.Threading.Lock _lockObj = new();
     private readonly TimeSpan _commitDelay = TimeSpan.FromSeconds(2);
@@ -123,20 +128,37 @@ public abstract class LuceneIndexServiceBase<T> : IDisposable where T : class {
         CommitDelayed();
     }
 
-    public T? Read(T item) {
+    protected PagedResult<Guid> GetIdentifiers(TQuery query) {
         using var reader = _indexWriter.GetReader(applyAllDeletes: true);
         var searcher = new IndexSearcher(reader);
 
-        var identifierTerm = GetIdentifierTerm(item);
-        var query = new TermQuery(identifierTerm);
+        var luceneQuery = GetQuery(query);
 
-        var topDocs = searcher.Search(query, 1);
+        var topDocs = searcher.Search(luceneQuery, query.PageSize * (query.PageIndex + 1));
         if(topDocs.TotalHits == 0) {
-            return null;
+            return new PagedResult<Guid> {
+                Items = [],
+                TotalCount = 0,
+                PageIndex = query.PageIndex,
+                PageSize = query.PageSize,
+                Success = true
+            };
         }
 
-        var document = searcher.Doc(topDocs.ScoreDocs[0].Doc);
-        return null;
+        var identifiers = topDocs
+            .ScoreDocs
+            .Skip(query.PageSize * query.PageIndex)
+            .Take(query.PageSize)
+            .Select(x => Guid.Parse(searcher.Doc(x.Doc).Get("id")))
+            .ToList();
+
+        return new PagedResult<Guid> {
+            Items = identifiers,
+            TotalCount = topDocs.TotalHits,
+            PageIndex = query.PageIndex,
+            PageSize = query.PageSize,
+            Success = true
+        };
     }
 
     protected abstract Term GetIdentifierTerm(T item);

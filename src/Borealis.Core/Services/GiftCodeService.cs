@@ -109,7 +109,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
 
     private IQueryable<GiftCode> BuildQuery(IQueryable<GiftCode> dbQuery, GiftCodeQuery query) {
         if(!string.IsNullOrWhiteSpace(query.Query)) {
-            dbQuery = dbQuery.Where(x => x.Code.Contains(query.Query));
+            dbQuery = dbQuery.Where(x => EF.Functions.Like(x.Code, $"%{query.Query}%"));
         }
 
         if(query.IsExpired.HasValue) {

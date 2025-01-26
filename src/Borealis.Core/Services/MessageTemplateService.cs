@@ -48,7 +48,7 @@ public class MessageTemplateService : QueryServiceBase<MessageTemplate>, IMessag
 
     private IQueryable<MessageTemplate> BuildQuery(IQueryable<MessageTemplate> dbQuery, MessageTemplateQuery query) {
         if(!string.IsNullOrWhiteSpace(query.Query)) {
-            dbQuery = dbQuery.Where(x => x.Name.Contains(query.Query) || x.Message.Contains(query.Query));
+            dbQuery = dbQuery.Where(x => EF.Functions.Like(x.Name, $"%{query.Query}%") || EF.Functions.Like(x.Message, $"%{query.Query}%"));
         }
 
         return base.AddSorting(dbQuery, query);

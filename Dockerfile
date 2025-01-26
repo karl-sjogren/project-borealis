@@ -21,6 +21,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
 RUN mkdir -p Database
+RUN mkdir -p LuceneIndex
 RUN mkdir -p wwwroot
 RUN mkdir -p accounts
 
