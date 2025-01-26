@@ -19,6 +19,9 @@ permissions:
   contents: write
   pull-requests: write
   actions: read
+  packages: write
+  attestations: write
+  id-token: write
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -73,37 +76,6 @@ jobs:
         path: |
           ./src/Borealis.Frontend/test-results/junit.xml
           ./src/Borealis.Frontend/coverage/cobertura-coverage.xml
-
-  frontend-build:
-    name: Frontend build
-    runs-on: ubuntu-latest
-    needs: [ frontend-test ]
-
-    steps:
-    - name: Checkout sources
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-        check-latest: true
-
-    - name: Run Yarn
-      run: yarn --immutable --immutable-cache
-      working-directory: ./src/Borealis.Frontend/
-
-    - name: Build Frontend
-      run: yarn build
-      working-directory: ./src/Borealis.Frontend/
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-artifacts
-        path: ./src/Borealis.Web/wwwroot/
 
   net-test:
     name: .NET tests
