@@ -35,7 +35,7 @@ public class GiftCodeCheckDailyHostedService : DailyHostedService {
         var whiteoutSurvivalHttpClient = scope.ServiceProvider.GetRequiredService<IWhiteoutSurvivalHttpClient>();
 
         var playerResult = await whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken);
-        if(playerResult.Code == 0) {
+        if(playerResult.Code != 0) {
             _logger.LogWarning("Failed to get player info for player {ExternalId}.", player.ExternalId);
             return;
         }
