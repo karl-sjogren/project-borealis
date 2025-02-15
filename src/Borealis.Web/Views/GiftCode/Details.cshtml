@@ -65,6 +65,7 @@
                 <thead>
                     <tr>
                         <th>Player</th>
+                        <th>Is in alliance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -72,6 +73,7 @@
                     {
                         <tr>
                             <td><a asp-controller="Players" asp-action="Details" asp-route-id="@player.Id">@player.Name</a></td>
+                            <td>@(player.IsInAlliance ? "Yes" : "No")</td>
                         </tr>
                     }
                 </tbody>
