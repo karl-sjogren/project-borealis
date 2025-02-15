@@ -12,6 +12,8 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
 
     private readonly ConcurrentQueue<GiftCodeRedemptionQueueItem> _queue = new();
 
+    private GiftCodeRedemptionQueueItem? _currentItem = null;
+
     public GiftCodeRedemptionQueue(
             IServiceScopeFactory serviceScopeFactory,
             ILogger<GiftCodeRedemptionQueue> logger) {
@@ -43,8 +45,19 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
         });
     }
 
-    public Task<int> GetQueueLengthAsync() {
-        return Task.FromResult(_queue.Count);
+    public Task<IReadOnlyCollection<GiftCodeRedemptionQueueItem>> GetQueueAsync(CancellationToken cancellationToken) {
+        var queue = _queue.ToList();
+        if(_currentItem is not null) {
+            queue.Add(_currentItem);
+        }
+
+        return Task.FromResult<IReadOnlyCollection<GiftCodeRedemptionQueueItem>>(queue);
+    }
+
+    public async Task<int> GetQueueLengthAsync(CancellationToken cancellationToken) {
+        var queueItems = await GetQueueAsync(cancellationToken);
+
+        return queueItems.Count;
     }
 
     public async Task ProcessQueueAsync(CancellationToken cancellationToken) {
@@ -52,8 +65,10 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
         var giftCodeService = scope.ServiceProvider.GetRequiredService<IGiftCodeService>();
 
         while(_queue.TryDequeue(out var item)) {
+            _currentItem = item;
             if(cancellationToken.IsCancellationRequested) {
                 _queue.Enqueue(item);
+                _currentItem = null;
                 return;
             }
 
@@ -67,12 +82,8 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
                     await giftCodeService.UpdateAsync(item.GiftCode, cancellationToken);
                 }
             }
-        }
-    }
 
-    private class GiftCodeRedemptionQueueItem {
-        public required Player Player { get; set; }
-        public required GiftCode GiftCode { get; set; }
-        public required DateTimeOffset EnqueuedAt { get; set; }
+            _currentItem = null;
+        }
     }
 }

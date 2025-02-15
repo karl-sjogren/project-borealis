@@ -1,0 +1,81 @@
+@model GiftCodeDetailsViewModel
+
+@{
+    ViewData["Title"] = "Gift code details";
+}
+
+<h1 class="display-4">
+    @Model.Code.Code
+</h1>
+
+<a asp-action="Index" class="btn btn-primary btn-sm mb-3">Go back</a>
+
+<div class="row">
+    <div class="col-12 col-md-6">
+        <dl class="row">
+            <dt class="col-sm-3">Code</dt>
+            <dd class="col-sm-9">@Model.Code.Code</dd>
+
+            <dt class="col-sm-3">Expired</dt>
+            <dd class="col-sm-9">@(Model.Code.IsExpired ? "Yes" : "No")</dd>
+
+            <dt class="col-sm-3">Added at</dt>
+            <dd class="col-sm-9">@Model.Code.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+
+            @if(Model.Code.UpdatedAt == DateTimeOffset.MinValue) {
+                <dt class="col-sm-3">Updated at</dt>
+                <dd class="col-sm-9">@Model.Code.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+            }
+        </dl>
+    </div>
+
+    <h2>Redeemed for players</h2>
+
+    @if(!Model.Redemptions.Any()) {
+        <p>Not Redeemed for anyone</p>
+    } else {
+        <div class="table-responsive">
+            <table class="table table-responsive table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Redeemed at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var redemption in Model.Redemptions)
+                    {
+                        <tr>
+                            <td><a asp-controller="Players" asp-action="Details" asp-route-id="@redemption.Player.Id">@redemption.Player.Name</a></td>
+                            <td>@redemption.RedeemedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <h2>Not Redeemed for</h2>
+
+    @if(!Model.PlayersNotRedeemedFor.Any()) {
+        <p>Redeemed for everyone!</p>
+    } else {
+        <div class="table-responsive">
+            <table class="table table-responsive table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var player in Model.PlayersNotRedeemedFor)
+                    {
+                        <tr>
+                            <td><a asp-controller="Players" asp-action="Details" asp-route-id="@player.Id">@player.Name</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
