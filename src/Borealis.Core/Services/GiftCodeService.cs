@@ -156,6 +156,10 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.NotFound("Gift code not found.");
         }
 
+        if(giftCodeEntity.IsExpired) {
+            return Results.Failure("Gift code is expired.");
+        }
+
         var existingRedemption = await _context.GiftCodeRedemptions.FirstOrDefaultAsync(x => x.PlayerId == player.Id && x.GiftCodeId == giftCodeEntity.Id, cancellationToken);
 
         if(existingRedemption is not null) {

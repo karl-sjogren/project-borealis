@@ -21,7 +21,7 @@ public class UpdatePlayersHostedService : TimedHostedService {
         var playerService = scope.ServiceProvider.GetRequiredService<IPlayerService>();
 
         try {
-            var players = await playerService.GetPagedAsync(new PlayerQuery { PageIndex = 0, PageSize = 10_000 }, stoppingToken);
+            var players = await playerService.GetPagedAsync(new PlayerQuery { PageIndex = 0, PageSize = 10_000, ShowAll = true }, stoppingToken);
             foreach(var player in players.Items.OrderByDescending(x => x.UpdatedAt)) {
                 await playerService.SynchronizePlayerAsync(player.ExternalId, false, stoppingToken);
                 await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
