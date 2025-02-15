@@ -1,0 +1,38 @@
+@model GiftCodeQueueViewModel
+
+@{
+    ViewData["Title"] = "Gift code queue";
+}
+
+<h1 class="display-4">Gift code queue</h1>
+
+<a asp-action="Index" class="btn btn-primary btn-sm mb-3">Go back</a>
+
+@if(!Model.Items.Any()) {
+    <div class="alert alert-info" role="alert">
+        No gift codes in the queue
+    </div>
+} else {
+    <p>Items in queue: @Model.Items.Count</p>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Player</th>
+                    <th>Enqueued at</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in Model.Items) {
+                    <tr>
+                        <td>@item.GiftCode.Code</td>
+                        <td>@item.Player.Name</td>
+                        <td>@item.EnqueuedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

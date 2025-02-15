@@ -9,7 +9,8 @@ public interface IGiftCodeService {
     Task<Result> AddGiftCodeAsync(string giftCode, CancellationToken cancellationToken);
     Task<Result> RedeemGiftCodeAsync(int whiteoutSurvivalPlayerId, string giftCode, CancellationToken cancellationToken);
     Task<Result> EnqueueGiftCodeAsync(Guid giftCodeId, CancellationToken cancellationToken);
-    Task<ICollection<GiftCodeRedemption>> GetRedemptionsForPlayerAsync(Guid giftCodeId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<GiftCodeRedemption>> GetRedemptionsForGiftCodeAsync(Guid giftCodeId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<GiftCodeRedemption>> GetRedemptionsForPlayerAsync(Guid giftCodeId, CancellationToken cancellationToken);
     Task<Result<GiftCode>> UpdateAsync(GiftCode giftCode, CancellationToken cancellationToken);
     Task<Result> DeleteAsync(Guid giftCodeId, CancellationToken cancellationToken);
 }

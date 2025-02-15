@@ -78,9 +78,11 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             }
         }
 
+        var now = _timeProvider.GetUtcNow();
         var newGiftCode = new GiftCode {
             Code = giftCode,
-            CreatedAt = _timeProvider.GetUtcNow(),
+            CreatedAt = now,
+            UpdatedAt = now,
             IsExpired = isExpired
         };
 
@@ -199,7 +201,18 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         return Results.Success();
     }
 
-    public async Task<ICollection<GiftCodeRedemption>> GetRedemptionsForPlayerAsync(Guid playerId, CancellationToken cancellationToken) {
+    public async Task<IReadOnlyCollection<GiftCodeRedemption>> GetRedemptionsForGiftCodeAsync(Guid giftCodeId, CancellationToken cancellationToken) {
+        return await _context
+            .GiftCodeRedemptions
+            .Include(x => x.Player)
+            .Include(x => x.GiftCode)
+            .AsNoTracking()
+            .Where(x => x.GiftCodeId == giftCodeId)
+            .OrderByDescending(x => x.RedeemedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyCollection<GiftCodeRedemption>> GetRedemptionsForPlayerAsync(Guid playerId, CancellationToken cancellationToken) {
         return await _context
             .GiftCodeRedemptions
             .Include(x => x.Player)
