@@ -1,6 +1,6 @@
-using Borealis.Core.HttpClients.Models;
+using Borealis.WhiteoutSurvivalHttpClient.Models;
 
-namespace Borealis.Core.Contracts;
+namespace Borealis.WhiteoutSurvivalHttpClient;
 
 public interface IWhiteoutSurvivalHttpClient {
     Task<WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalPlayerResponse>> GetPlayerInfoAsync(int playerId, CancellationToken cancellationToken);

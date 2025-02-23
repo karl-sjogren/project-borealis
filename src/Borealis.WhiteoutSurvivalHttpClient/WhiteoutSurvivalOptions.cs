@@ -1,4 +1,4 @@
-namespace Borealis.Core.Options;
+namespace Borealis.WhiteoutSurvivalHttpClient;
 
 public class WhiteoutSurvivalOptions {
     public string BaseUrl { get; set; } = "https://wos-giftcode-api.centurygame.com/api/";

@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Borealis.Core.HttpClients.Models;
+using Borealis.WhiteoutSurvivalHttpClient.Models;
 
-namespace Borealis.Core.JsonConverters;
+namespace Borealis.WhiteoutSurvivalHttpClient.JsonConverters;
 
 internal class WhiteoutSurvivalPlayerResponseJsonConverter : JsonConverter<WhiteoutSurvivalPlayerResponse?> {
     private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web);
