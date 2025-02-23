@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Borealis.WhiteoutSurvivalHttpClient\Borealis.WhiteoutSurvivalHttpClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AngleSharp" />
     <PackageReference Include="Discord.Net" />
     <PackageReference Include="Lucene.Net" />

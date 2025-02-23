@@ -1,6 +1,7 @@
 
 using Borealis.Core.Contracts;
 using Borealis.Core.Requests;
+using Borealis.WhiteoutSurvivalHttpClient;
 
 namespace Borealis.Web.HostedServices;
 

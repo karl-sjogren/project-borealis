@@ -1,15 +1,14 @@
 using System.Globalization;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using AspNet.Security.OAuth.Discord;
 using Borealis.Core;
 using Borealis.Core.Contracts;
 using Borealis.Core.GiftCodeScanners;
-using Borealis.Core.HttpClients;
 using Borealis.Core.Options;
 using Borealis.Core.Services;
 using Borealis.Web.HostedServices;
 using Borealis.Web.Mvc;
+using Borealis.WhiteoutSurvivalHttpClient;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication;
@@ -20,8 +19,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using Polly;
-using Polly.Extensions.Http;
 using Shorthand.Vite;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,23 +58,7 @@ builder.Services.ConfigureApplicationCookie(options => {
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
 builder.Services.Configure<BorealisAuthenticationOptions>(builder.Configuration.GetSection("BorealisAuthentication"));
 
-static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
-    return HttpPolicyExtensions
-        .HandleTransientHttpError()
-        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-        .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-}
-
-builder.Services
-    .AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttpClient>()
-    .ConfigureHttpClient((serviceProvider, client) => {
-        var options = serviceProvider.GetRequiredService<IOptions<WhiteoutSurvivalOptions>>().Value;
-        client.BaseAddress = new Uri(options.BaseUrl);
-        client.DefaultRequestHeaders.Accept.Clear();
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        client.DefaultRequestHeaders.Add("Origin", options.OriginUrl);
-    })
-    .AddPolicyHandler(GetRetryPolicy());
+builder.Services.AddWhiteoutSurvivalHttpClient();
 
 builder.Services
     .AddAuthentication(options => {

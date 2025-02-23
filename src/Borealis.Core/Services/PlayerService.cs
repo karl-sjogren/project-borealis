@@ -1,7 +1,8 @@
 using Borealis.Core.Contracts;
-using Borealis.Core.HttpClients.Models;
 using Borealis.Core.Models;
 using Borealis.Core.Requests;
+using Borealis.WhiteoutSurvivalHttpClient;
+using Borealis.WhiteoutSurvivalHttpClient.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Core.Services;
