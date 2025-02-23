@@ -9,6 +9,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
     private readonly BorealisContext _context;
     private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
     private readonly IGiftCodeRedemptionQueue _giftCodeRedemptionQueue;
+    private readonly IDiscordBotService _discordBotService;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<GiftCodeService> _logger;
 
@@ -19,11 +20,13 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             BorealisContext context,
             IWhiteoutSurvivalHttpClient whiteoutSurvivalHttpClient,
             IGiftCodeRedemptionQueue giftCodeRedemptionQueue,
+            IDiscordBotService discordBotService,
             TimeProvider timeProvider,
             ILogger<GiftCodeService> logger) {
         _context = context;
         _whiteoutSurvivalHttpClient = whiteoutSurvivalHttpClient;
         _giftCodeRedemptionQueue = giftCodeRedemptionQueue;
+        _discordBotService = discordBotService;
         _timeProvider = timeProvider;
         _logger = logger;
     }
@@ -92,6 +95,8 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         if(newGiftCode.IsExpired) {
             return Results.Failure("Gift code is expired.");
         }
+
+        await _discordBotService.SendMessageAsync($"New gift code added: {newGiftCode.Code}", cancellationToken);
 
         await EnqueueGiftCodeAsync(newGiftCode.Id, cancellationToken);
 

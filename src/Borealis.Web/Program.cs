@@ -10,6 +10,8 @@ using Borealis.Core.Options;
 using Borealis.Core.Services;
 using Borealis.Web.HostedServices;
 using Borealis.Web.Mvc;
+using Discord;
+using Discord.WebSocket;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -159,6 +161,10 @@ builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
 builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
 builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
 builder.Services.AddHostedService<UpdatePlayersHostedService>();
+
+builder.Services.AddScoped<IDiscordBotService, DiscordBotService>();
+builder.Services.AddSingleton<IDiscordClient, DiscordSocketClient>();
+builder.Services.AddHostedService<DiscordBotInitializationService>();
 
 var app = builder.Build();
 

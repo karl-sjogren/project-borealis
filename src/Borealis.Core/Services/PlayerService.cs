@@ -9,6 +9,7 @@ namespace Borealis.Core.Services;
 public class PlayerService : QueryServiceBase<Player>, IPlayerService {
     private readonly BorealisContext _context;
     private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
+    private readonly IDiscordBotService _discordBotService;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<PlayerService> _logger;
 
@@ -18,10 +19,12 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
     public PlayerService(
             BorealisContext context,
             IWhiteoutSurvivalHttpClient whiteoutSurvivalHttpClient,
+            IDiscordBotService discordBotService,
             TimeProvider timeProvider,
             ILogger<PlayerService> logger) {
         _context = context;
         _whiteoutSurvivalHttpClient = whiteoutSurvivalHttpClient;
+        _discordBotService = discordBotService;
         _timeProvider = timeProvider;
         _logger = logger;
     }
@@ -106,6 +109,8 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
         } else {
             var now = _timeProvider.GetUtcNow();
             if(existingPlayer.Name != externalPlayer.Name) {
+                await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} changed their name to {externalPlayer.Name}.", cancellationToken);
+
                 existingPlayer.PreviousNames.Add(new WhiteoutSurvivalPlayerNameHistoryEntry {
                     Name = existingPlayer.Name,
                     Timestamp = now
