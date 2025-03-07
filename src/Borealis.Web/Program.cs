@@ -58,27 +58,7 @@ builder.Services.ConfigureApplicationCookie(options => {
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
 builder.Services.Configure<BorealisAuthenticationOptions>(builder.Configuration.GetSection("BorealisAuthentication"));
 
-<<<<<<< HEAD
 builder.Services.AddWhiteoutSurvivalHttpClient();
-=======
-static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
-    return HttpPolicyExtensions
-        .HandleTransientHttpError()
-        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-        .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-}
-
-builder.Services
-    .AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttpClient>()
-    .ConfigureHttpClient((serviceProvider, client) => {
-        var options = serviceProvider.GetRequiredService<IOptions<WhiteoutSurvivalOptions>>().Value;
-        client.BaseAddress = new Uri(options.BaseUrl);
-        client.DefaultRequestHeaders.Accept.Clear();
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        client.DefaultRequestHeaders.Add("Origin", options.OriginUrl);
-    })
-    .AddPolicyHandler(GetRetryPolicy());
->>>>>>> develop
 
 builder.Services
     .AddAuthentication(options => {
