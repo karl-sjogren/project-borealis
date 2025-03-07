@@ -124,7 +124,12 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             dbQuery = dbQuery.Where(x => x.IsExpired == query.IsExpired.Value);
         }
 
-        return base.AddSorting(dbQuery, query);
+        // If we requested a specific sort, use that
+        if(!string.IsNullOrWhiteSpace(query.SortField)) {
+            return base.AddSorting(dbQuery, query);
+        }
+
+        return dbQuery.OrderBy(x => x.IsExpired).ThenByDescending(x => x.CreatedAt);
     }
 
     public async Task<Result> EnqueueGiftCodeAsync(Guid giftCodeId, CancellationToken cancellationToken) {
@@ -141,7 +146,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         var players = await _context
             .Players
             .Where(x => x.IsInAlliance || x.ForceRedeemGiftCodes)
-            .OrderByDescending(x => x.ExternalId)
+            .OrderByDescending(x => x.FurnaceLevel)
             .ToListAsync(cancellationToken);
 
         foreach(var player in players) {
