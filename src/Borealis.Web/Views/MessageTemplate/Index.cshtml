@@ -35,7 +35,7 @@
                 @foreach (var messageTemplate in Model.MessageTemplates) {
                     <tr data-message-template-id="@messageTemplate.Id" class="message-template-row">
                         <td>@messageTemplate.Name</td>
-                        <td>@messageTemplate.UpdatedAt</td>
+                        <td>@messageTemplate.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
                         <td>
                             <div class="btn-group btn-group-sm" role="group" aria-label="Actions for @messageTemplate.Name">
                                 <a class="btn btn-primary" asp-action="Edit" asp-route-id="@messageTemplate.Id"><i class="bi bi-pencil"></i></a>

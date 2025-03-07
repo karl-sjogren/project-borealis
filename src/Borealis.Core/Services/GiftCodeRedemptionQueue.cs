@@ -77,7 +77,7 @@ public class GiftCodeRedemptionQueue : IGiftCodeRedemptionQueue {
             if(!result.Success) {
                 _logger.LogError("Failed to redeem gift code for player {PlayerId}. Reason: {Message}", item.Player.ExternalId, result.Message);
 
-                if(result.Message == "Gift code expired.") {
+                if(result.Message == "Gift code expired." || result.Message == "Claim limit reached.") {
                     item.GiftCode.IsExpired = true;
                     await giftCodeService.UpdateAsync(item.GiftCode, cancellationToken);
                 }

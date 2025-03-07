@@ -41,7 +41,7 @@
             <tbody>
                 @foreach (var giftCode in Model.GiftCodes) {
                     <tr data-gift-code-id="@giftCode.Id" class="gift-code-row">
-                        <td><a asp-action="Details" asp-route-id="@giftCode.Id">@giftCode.Code</a></td>
+                        <td>@giftCode.Code</td>
                         <td>@(giftCode.IsExpired ? "Yes" : "No")</td>
                         <td>@giftCode.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
                         <td>
