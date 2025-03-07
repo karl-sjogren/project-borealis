@@ -29,6 +29,7 @@ public record WhiteoutSurvivalResponseWrapper {
     /// - 20000: Code success
     /// - 40014: Code not found
     /// - 40004: Player not found
+    /// - 40005: Claim limit reached
     /// - 40007: Code expired
     /// - 40008: Code already used
     /// - 40009: Not logged in
