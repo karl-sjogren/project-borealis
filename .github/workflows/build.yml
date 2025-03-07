@@ -199,7 +199,7 @@ jobs:
         output_text_description_file: ./coverage-report/Summary.md
 
   net-package:
-    name: .NET build
+    name: .NET create client pacakge
     runs-on: ubuntu-latest
     needs: [ net-test ]
 
