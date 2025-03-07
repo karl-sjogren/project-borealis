@@ -1,5 +1,5 @@
 using System.Net;
-using Borealis.Core.Common;
+using Borealis.WhiteoutSurvivalHttpClient.Common;
 
 namespace Borealis.TestHelpers.Http;
 

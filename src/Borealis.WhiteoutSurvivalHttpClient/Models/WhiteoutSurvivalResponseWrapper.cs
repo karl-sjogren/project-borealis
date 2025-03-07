@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Borealis.Core.HttpClients.Models;
+namespace Borealis.WhiteoutSurvivalHttpClient.Models;
 
 public record WhiteoutSurvivalResponseWrapper {
     [JsonPropertyName("msg")]

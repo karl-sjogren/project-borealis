@@ -1,8 +1,8 @@
 using System.Net;
 
-[assembly: SuppressMessage("Readability", "RCS1194", Justification = "Exceptions inheriting from HttpExceptionBase needs a HttpStatusCode in their constructors.", Scope = "NamespaceAndDescendants", Target = "~N:Borealis.Core.Exceptions")]
+[assembly: SuppressMessage("Readability", "RCS1194", Justification = "Exceptions inheriting from HttpExceptionBase needs a HttpStatusCode in their constructors.", Scope = "NamespaceAndDescendants", Target = "~N:Borealis.WhiteoutSurvivalHttpClient.Exceptions")]
 
-namespace Borealis.Core.Exceptions;
+namespace Borealis.WhiteoutSurvivalHttpClient.Exceptions;
 
 [ExcludeFromCodeCoverage]
 public abstract class HttpExceptionBase : HttpRequestException {

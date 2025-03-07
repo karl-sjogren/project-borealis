@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Borealis.Core.Exceptions;
+namespace Borealis.WhiteoutSurvivalHttpClient.Exceptions;
 
 [ExcludeFromCodeCoverage]
 public class HttpInternalServerErrorException : HttpExceptionBase {

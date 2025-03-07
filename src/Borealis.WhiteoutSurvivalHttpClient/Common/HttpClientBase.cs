@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using Borealis.Core.Exceptions;
+using Borealis.WhiteoutSurvivalHttpClient.Exceptions;
 
-namespace Borealis.Core.Common;
+namespace Borealis.WhiteoutSurvivalHttpClient.Common;
 
 public abstract class HttpClientBase {
     private readonly ILogger _logger;

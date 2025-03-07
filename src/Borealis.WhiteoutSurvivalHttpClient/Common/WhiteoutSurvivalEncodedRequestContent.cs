@@ -1,9 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Borealis.Core.HttpClients;
+namespace Borealis.WhiteoutSurvivalHttpClient.Common;
 
-public class WhiteoutSurvivalEncodedRequestContent : FormUrlEncodedContent {
+internal class WhiteoutSurvivalEncodedRequestContent : FormUrlEncodedContent {
     public WhiteoutSurvivalEncodedRequestContent(string secret, IEnumerable<KeyValuePair<string, string>> nameValueCollection) : base(GetEncodedValues(secret, nameValueCollection)) {
     }
 
