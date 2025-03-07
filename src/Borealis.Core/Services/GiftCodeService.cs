@@ -68,6 +68,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
                 case 40008: // Code already used
                 case 40011: // Code already used
                     break;
+                case 40005: // Claim limit reached, we can't redeem it but we can remember it
                 case 40007: // Code expired, we can't redeem it but we can remember it
                     isExpired = true;
                     break;
@@ -185,6 +186,8 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
                 return Results.Failure("Gift code not found.");
             case 40004:
                 return Results.Failure("Player not found.");
+            case 40005:
+                return Results.Failure("Claim limit reached.");
             case 40007:
                 return Results.Failure("Gift code expired.");
             case 40009:
