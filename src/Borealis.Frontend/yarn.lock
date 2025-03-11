@@ -2688,7 +2688,7 @@ __metadata:
     vite: "npm:^6.2.1"
     vite-plugin-mkcert: "npm:^1.17.7"
     vitest: "npm:^3.0.8"
-    webdriverio: "npm:^9.11.0"
+    webdriverio: "npm:^9.12.0"
   languageName: unknown
   linkType: soft
 
@@ -8908,9 +8908,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webdriverio@npm:^9.11.0":
-  version: 9.11.0
-  resolution: "webdriverio@npm:9.11.0"
+"webdriverio@npm:^9.12.0":
+  version: 9.12.0
+  resolution: "webdriverio@npm:9.12.0"
   dependencies:
     "@types/node": "npm:^20.11.30"
     "@types/sinonjs__fake-timers": "npm:^8.1.5"
@@ -8942,7 +8942,7 @@ __metadata:
   peerDependenciesMeta:
     puppeteer-core:
       optional: true
-  checksum: 10/8813890dae14cd0e82fd342113f7605f0f065fa7500f23ad8699c56d3bf2e256b16b5193cfe832833f0c28e576a2ee4722418a88e331cc4513b0b3a9e34ec483
+  checksum: 10/369482c99b2429f100716267b36eb8319fc28e9619c18cce052c4656ccbdad2a80969b945b870e96ae808e811648fc5d566a4ac56b9cd8ff953b5158de4bbdbb
   languageName: node
   linkType: hard
 
