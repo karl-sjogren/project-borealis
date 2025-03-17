@@ -9,7 +9,8 @@ public class Player : EntityBase {
     public bool ForceRedeemGiftCodes { get; set; }
     public DateOnly? AwayUntil { get; set; }
     public string? Notes { get; set; }
-    public IList<WhiteoutSurvivalPlayerNameHistoryEntry> PreviousNames { get; set; } = [];
+    public IList<PlayerNameHistoryEntry> PreviousNames { get; set; } = [];
+    public IList<PlayerStateHistoryEntry> PreviousStates { get; set; } = [];
 
     public bool HasNotes => !string.IsNullOrWhiteSpace(Notes);
 
@@ -48,7 +49,12 @@ public class Player : EntityBase {
     }
 }
 
-public class WhiteoutSurvivalPlayerNameHistoryEntry {
+public class PlayerNameHistoryEntry {
     public required string Name { get; set; }
+    public required DateTimeOffset Timestamp { get; set; }
+}
+
+public class PlayerStateHistoryEntry {
+    public required int State { get; set; }
     public required DateTimeOffset Timestamp { get; set; }
 }
