@@ -1,6 +1,3 @@
-using System.Globalization;
-using System.Security.Claims;
-using AspNet.Security.OAuth.Discord;
 using Borealis.Core;
 using Borealis.Core.Contracts;
 using Borealis.Core.GiftCodeScanners;
