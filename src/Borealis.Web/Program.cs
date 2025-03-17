@@ -1,31 +1,29 @@
-using System.Globalization;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using AspNet.Security.OAuth.Discord;
 using Borealis.Core;
 using Borealis.Core.Contracts;
 using Borealis.Core.GiftCodeScanners;
-using Borealis.Core.HttpClients;
 using Borealis.Core.Options;
 using Borealis.Core.Services;
+using Borealis.Web.Extensions;
 using Borealis.Web.HostedServices;
 using Borealis.Web.Mvc;
 using Discord;
 using Discord.WebSocket;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using Polly;
-using Polly.Extensions.Http;
+using Serilog;
 using Shorthand.Vite;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/borealis-web.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Add services to the container.
@@ -47,100 +45,12 @@ if(builder.Environment.IsProduction()) {
     builder.Services.AddLettuceEncrypt();
 }
 
-builder.Services.ConfigureApplicationCookie(options => {
-    // Cookie settings
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.ExpireTimeSpan = TimeSpan.FromHours(8);
-    options.SlidingExpiration = true;
-
-    options.LoginPath = "/";
-    options.AccessDeniedPath = "/";
-});
-
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
 builder.Services.Configure<BorealisAuthenticationOptions>(builder.Configuration.GetSection("BorealisAuthentication"));
 
-static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
-    return HttpPolicyExtensions
-        .HandleTransientHttpError()
-        .OrResult(msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-        .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-}
+builder.Services.AddHttpClients();
 
-builder.Services
-    .AddHttpClient<IWhiteoutSurvivalHttpClient, WhiteoutSurvivalHttpClient>()
-    .ConfigureHttpClient((serviceProvider, client) => {
-        var options = serviceProvider.GetRequiredService<IOptions<WhiteoutSurvivalOptions>>().Value;
-        client.BaseAddress = new Uri(options.BaseUrl);
-        client.DefaultRequestHeaders.Accept.Clear();
-        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        client.DefaultRequestHeaders.Add("Origin", options.OriginUrl);
-    })
-    .AddPolicyHandler(GetRetryPolicy());
-
-builder.Services
-    .AddAuthentication(options => {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = DiscordAuthenticationDefaults.AuthenticationScheme;
-    })
-        .AddCookie(options => {
-            options.Cookie.IsEssential = true;
-            options.ExpireTimeSpan = TimeSpan.FromHours(48);
-            options.SlidingExpiration = true;
-        })
-        .AddDiscord(options => {
-            options.ClientId = builder.Configuration["DiscordClientId"] ?? throw new InvalidOperationException("DiscordClientId is not set in the configuration.");
-            options.ClientSecret = builder.Configuration["DiscordClientSecret"] ?? throw new InvalidOperationException("DiscordClientSecret is not set in the configuration.");
-
-            options.ClaimActions.MapCustomJson(ClaimTypes.Name, user => user.GetString("global_name"));
-            options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
-                string.Format(
-                    CultureInfo.InvariantCulture,
-                    "https://cdn.discordapp.com/avatars/{0}/{1}.{2}",
-                    user.GetString("id"),
-                    user.GetString("avatar"),
-                    user.GetString("avatar")?.StartsWith("a_", StringComparison.Ordinal) == true ? "gif" : "png"));
-
-            options.Events.OnCreatingTicket = async (ctx) => {
-                var options = ctx.HttpContext.RequestServices.GetRequiredService<IOptionsSnapshot<BorealisAuthenticationOptions>>();
-
-                var userIdentity = ctx.Principal?.Identity as ClaimsIdentity;
-
-                if(userIdentity == null) {
-                    return;
-                }
-
-                var externalId = userIdentity.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-                if(string.IsNullOrWhiteSpace(externalId)) {
-                    return;
-                }
-
-                var borealisContext = ctx.HttpContext.RequestServices.GetRequiredService<BorealisContext>();
-
-                var user = await borealisContext.Users.FirstOrDefaultAsync(x => x.ExternalId == externalId);
-
-                if(user?.IsLockedOut != false) {
-                    return;
-                }
-
-                userIdentity.RemoveClaim(userIdentity.FindFirst(ClaimTypes.Name));
-                userIdentity.AddClaim(new Claim(ClaimTypes.Name, user.Name));
-
-                if(user.IsApproved) {
-                    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "TrustedUser"));
-                } else {
-                    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "PendingApproval"));
-                }
-
-                if(user.IsAdmin) {
-                    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "AdminUser"));
-                }
-
-                ctx.Properties.IsPersistent = true;
-            };
-        });
+builder.Services.AddAppAuthentication(builder.Configuration);
 
 builder.Services.AddVite(options => {
     options.ManifestFileName = ".vite/manifest.json";
@@ -173,6 +83,8 @@ using(var scope = app.Services.CreateScope()) {
     var db = scope.ServiceProvider.GetRequiredService<BorealisContext>();
     await db.Database.MigrateAsync();
 }
+
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if(app.Environment.IsDevelopment()) {
