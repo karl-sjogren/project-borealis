@@ -1,13 +1,11 @@
 using System.Globalization;
 using System.Text.Json;
-using Borealis.Core.Common;
-using Borealis.Core.Contracts;
-using Borealis.Core.HttpClients.Models;
-using Borealis.Core.JsonConverters;
-using Borealis.Core.Options;
+using Borealis.WhiteoutSurvivalHttpClient.Common;
+using Borealis.WhiteoutSurvivalHttpClient.JsonConverters;
+using Borealis.WhiteoutSurvivalHttpClient.Models;
 using Microsoft.Extensions.Options;
 
-namespace Borealis.Core.HttpClients;
+namespace Borealis.WhiteoutSurvivalHttpClient;
 
 public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpClient {
     private readonly WhiteoutSurvivalOptions _options;

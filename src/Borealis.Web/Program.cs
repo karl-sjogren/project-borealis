@@ -6,6 +6,7 @@ using Borealis.Core.Services;
 using Borealis.Web.Extensions;
 using Borealis.Web.HostedServices;
 using Borealis.Web.Mvc;
+using Borealis.WhiteoutSurvivalHttpClient;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
