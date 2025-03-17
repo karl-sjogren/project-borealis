@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Borealis.Benchmarks/Borealis.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Borealis.Core/Borealis.Core.csproj" />
+    <Project Path="src/Borealis.Frontend/Borealis.Frontend.csproj" />
+    <Project Path="src/Borealis.Web/Borealis.Web.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Borealis.Core.Tests/Borealis.Core.Tests.csproj" />
+    <Project Path="test/Borealis.TestHelpers/Borealis.TestHelpers.csproj" />
+  </Folder>
+</Solution>
