@@ -117,4 +117,30 @@
         </div>
     }
 
+    <h2>Previous states</h2>
+
+    @if(!Model.Player.PreviousStates.Any()) {
+        <p>No previous states recorded</p>
+    } else {
+        <div class="table-responsive">
+            <table class="table table-responsive table-striped table-hover players-table">
+                <thead>
+                    <tr>
+                        <th class="code">Previous state</th>
+                        <th class="redeemed-at">Changed at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var previousState in Model.Player.PreviousStates)
+                    {
+                        <tr>
+                            <td>@previousState.State</td>
+                            <td>@previousState.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
 </div>

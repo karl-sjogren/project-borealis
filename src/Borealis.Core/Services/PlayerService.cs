@@ -111,15 +111,33 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             if(existingPlayer.Name != externalPlayer.Name) {
                 await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} changed their name to {externalPlayer.Name}.", cancellationToken);
 
-                existingPlayer.PreviousNames.Add(new WhiteoutSurvivalPlayerNameHistoryEntry {
+                existingPlayer.PreviousNames.Add(new PlayerNameHistoryEntry {
                     Name = existingPlayer.Name,
                     Timestamp = now
                 });
             }
 
+            if(existingPlayer.State != externalPlayer.State) {
+                await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} moved from state {existingPlayer.State} to {externalPlayer.State}.", cancellationToken);
+
+                existingPlayer.PreviousStates.Add(new PlayerStateHistoryEntry {
+                    State = existingPlayer.State,
+                    Timestamp = now
+                });
+            }
+
+            var hasUpdatedFurnaceLevel = false;
+            if(existingPlayer.FurnaceLevel != externalPlayer.FurnaceLevel) {
+                hasUpdatedFurnaceLevel = true;
+            }
+
             existingPlayer.Name = externalPlayer.Name;
             existingPlayer.FurnaceLevel = externalPlayer.FurnaceLevel;
             existingPlayer.State = externalPlayer.State;
+
+            if(hasUpdatedFurnaceLevel) {
+                await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} increased their furnace level to {existingPlayer.ExactFurnaceLevelString}.", cancellationToken);
+            }
 
             if(_context.Entry(existingPlayer).State == EntityState.Modified) {
                 existingPlayer.UpdatedAt = now;

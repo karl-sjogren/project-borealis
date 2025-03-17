@@ -15,7 +15,7 @@ namespace Borealis.Core.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.3");
 
             modelBuilder.Entity("Borealis.Core.Models.GiftCode", b =>
                 {
@@ -228,7 +228,7 @@ namespace Borealis.Core.Migrations
 
             modelBuilder.Entity("Borealis.Core.Models.Player", b =>
                 {
-                    b.OwnsMany("Borealis.Core.Models.WhiteoutSurvivalPlayerNameHistoryEntry", "PreviousNames", b1 =>
+                    b.OwnsMany("Borealis.Core.Models.PlayerNameHistoryEntry", "PreviousNames", b1 =>
                         {
                             b1.Property<Guid>("PlayerId")
                                 .HasColumnType("TEXT");
@@ -254,7 +254,34 @@ namespace Borealis.Core.Migrations
                                 .HasForeignKey("PlayerId");
                         });
 
+                    b.OwnsMany("Borealis.Core.Models.PlayerStateHistoryEntry", "PreviousStates", b1 =>
+                        {
+                            b1.Property<Guid>("PlayerId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAddOrUpdate()
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<int>("State")
+                                .HasColumnType("INTEGER");
+
+                            b1.Property<long>("Timestamp")
+                                .HasColumnType("INTEGER");
+
+                            b1.HasKey("PlayerId", "__synthesizedOrdinal");
+
+                            b1.ToTable("Players");
+
+                            b1.ToJson("PreviousStates");
+
+                            b1.WithOwner()
+                                .HasForeignKey("PlayerId");
+                        });
+
                     b.Navigation("PreviousNames");
+
+                    b.Navigation("PreviousStates");
                 });
 
             modelBuilder.Entity("Borealis.Core.Models.GiftCode", b =>
