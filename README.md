@@ -14,3 +14,12 @@ Alliance management tool for Whiteout Survival. Currently used by AFO in state
 * Save message templates that all leaders might want to send to all members such as bear formations or alliance event sign ups
 
 Project icon by [Freepik](https://www.flaticon.com/authors/freepik) from [Flaticon](https://www.flaticon.com/)
+
+## How it works
+
+When iPhone/iPad users get a gift code they can't redeem it in game and instead have to go to
+<https://wos-giftcode.centurygame.com/>. There they enter their PlayerId which is then verified
+by returning information such as the player name, furnace level and state via an HTTP endpoint.
+
+Since this is a public thing that any one can access it can also be used to automatically retrieve
+information about a specific PlayerId (and redeem gift codes for that player).
