@@ -20,13 +20,11 @@ public class ScanForGiftCodesHostedService : TimedHostedService {
         var giftCodeService = scope.ServiceProvider.GetRequiredService<IGiftCodeService>();
         var scanners = scope.ServiceProvider.GetRequiredService<IEnumerable<IGiftCodeScanner>>();
 
-        var giftCodes = new List<string>();
         try {
             foreach(var scanner in scanners) {
                 var scannerGiftCodes = await scanner.ScanGiftCodesAsync(stoppingToken);
-                giftCodes.AddRange(scannerGiftCodes);
 
-                foreach(var giftCode in giftCodes) {
+                foreach(var giftCode in scannerGiftCodes) {
                     var existsResult = await giftCodeService.GiftCodeExistsAsync(giftCode, stoppingToken);
                     if(existsResult.Data) {
                         continue;
