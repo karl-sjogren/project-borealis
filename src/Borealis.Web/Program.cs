@@ -65,6 +65,7 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IGiftCodeScanner, DestructoidGiftCodeScanner>();
+builder.Services.AddScoped<IGiftCodeScanner, WosLandGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
