@@ -15,6 +15,8 @@ public class GiftCodeConfiguration : IEntityTypeConfiguration<GiftCode> {
 
         builder.Property(b => b.IsExpired).IsRequired();
 
+        builder.Property(b => b.Source).HasMaxLength(128);
+
         builder.HasMany(b => b.Redemptions).WithOne();
     }
 }

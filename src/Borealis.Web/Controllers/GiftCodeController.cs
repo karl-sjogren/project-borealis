@@ -60,8 +60,13 @@ public class GiftCodeController : Controller {
             return View(viewModel);
         }
 
+        var user = User.Identity?.Name;
+        if(string.IsNullOrWhiteSpace(user)) {
+            user = "Manually added";
+        }
+
         var cleanedCode = viewModel.Code.Trim();
-        var result = await _giftCodeService.AddGiftCodeAsync(cleanedCode, cancellationToken);
+        var result = await _giftCodeService.AddGiftCodeAsync(cleanedCode, user, cancellationToken);
 
         if(result.Success) {
             viewModel.Success = true;

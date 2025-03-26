@@ -7,6 +7,8 @@ public class WosRewardsGiftCodeScanner : IGiftCodeScanner {
     private readonly HttpClient _httpClient;
     private readonly ILogger<WosRewardsGiftCodeScanner> _logger;
 
+    public string Name => "WOS Rewards";
+
     public WosRewardsGiftCodeScanner(HttpClient httpClient, ILogger<WosRewardsGiftCodeScanner> logger) {
         _httpClient = httpClient;
         _logger = logger;
