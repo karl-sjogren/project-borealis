@@ -7,6 +7,8 @@ public class DestructoidGiftCodeScanner : IGiftCodeScanner {
     private readonly HttpClient _httpClient;
     private readonly ILogger<DestructoidGiftCodeScanner> _logger;
 
+    public string Name => "Destructoid";
+
     public DestructoidGiftCodeScanner(HttpClient httpClient, ILogger<DestructoidGiftCodeScanner> logger) {
         _httpClient = httpClient;
         _logger = logger;
