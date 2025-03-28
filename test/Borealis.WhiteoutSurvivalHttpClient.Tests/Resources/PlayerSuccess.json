@@ -1,0 +1,14 @@
+{
+  "code": 0,
+  "data": {
+      "fid": 123744924,
+      "nickname": "Prototype",
+      "kid": 851,
+      "stove_lv": 60,
+      "stove_lv_content": "https:\/\/gof-formal-avatar.akamaized.net\/img\/icon\/stove_lv_6.png",
+      "avatar_image": "https:\/\/gof-formal-avatar.akamaized.net\/avatar\/2024\/02\/26\/jn61LR_1708941561.png",
+      "total_recharge_amount": 0
+  },
+  "msg": "success",
+  "err_code": ""
+}

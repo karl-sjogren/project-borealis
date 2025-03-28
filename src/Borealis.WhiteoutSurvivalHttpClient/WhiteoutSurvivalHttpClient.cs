@@ -29,7 +29,7 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, "player") {
-            Content = new WhiteoutSurvivalEncodedRequestContent(_options.Secret, data)
+            Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
         };
 
         var response = await HttpClient.SendAsync(request, cancellationToken);
@@ -49,7 +49,7 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, "gift_code") {
-            Content = new WhiteoutSurvivalEncodedRequestContent(_options.Secret, data)
+            Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
         };
 
         var response = await HttpClient.SendAsync(request, cancellationToken);
