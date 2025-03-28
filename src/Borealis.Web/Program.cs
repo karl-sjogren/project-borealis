@@ -27,6 +27,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
+builder.Services.Configure<WosLandOptions>(builder.Configuration.GetSection("WosLand"));
+
 // Add services to the container.
 var connectionStringBuilder = new SqliteConnectionStringBuilder {
     Mode = SqliteOpenMode.ReadWriteCreate,

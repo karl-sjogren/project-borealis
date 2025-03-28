@@ -1,30 +1,25 @@
-using System.Net.Http.Json;
 using Borealis.Core.Contracts;
+using Borealis.WhiteoutSurvivalHttpClient.Exceptions;
 
 namespace Borealis.Core.GiftCodeScanners;
 
 public class WosLandGiftCodeScanner : IGiftCodeScanner {
-    private readonly HttpClient _httpClient;
-    private readonly ILogger<WosRewardsGiftCodeScanner> _logger;
+    private readonly IWosLandHttpClient _httpClient;
+    private readonly ILogger<WosLandGiftCodeScanner> _logger;
 
     public string Name => "WOS Land";
 
-    public WosLandGiftCodeScanner(HttpClient httpClient, ILogger<WosRewardsGiftCodeScanner> logger) {
+    public WosLandGiftCodeScanner(IWosLandHttpClient httpClient, ILogger<WosLandGiftCodeScanner> logger) {
         _httpClient = httpClient;
         _logger = logger;
     }
 
     public async Task<ICollection<string>> ScanGiftCodesAsync(CancellationToken cancellationToken) {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://wosland.com/apidc/giftapi/giftcode_api.php");
-        request.Headers.Add("X-API-Key", "serioyun_gift_api_key_2024");
-
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-        var responseDTO = await response.Content.ReadFromJsonAsync<ResponseDTO>(cancellationToken);
-
-        var giftCodes = responseDTO?.codes.Select(x => x.Substring(0, x.IndexOf(" ", StringComparison.OrdinalIgnoreCase))).ToList();
-
-        return giftCodes ?? [];
+        try {
+            return await _httpClient.GetGiftCodesAsync(cancellationToken);
+        } catch(HttpUnauthorizedException ex) {
+            _logger.LogError(ex, "Failed to scan gift codes from WOS Land. Most likely due to an invalid API Key.");
+            return [];
+        }
     }
 }
-
-file record ResponseDTO(string[] codes);
