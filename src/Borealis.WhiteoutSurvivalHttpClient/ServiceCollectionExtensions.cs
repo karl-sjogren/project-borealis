@@ -11,19 +11,27 @@ public static class ServiceCollectionExtensions {
     private static readonly MediaTypeWithQualityHeaderValue _jsonMediaType = new("application/json");
 
     public static IServiceCollection AddWhiteoutSurvivalHttpClient(this IServiceCollection services) {
-        return services.AddWhiteoutSurvivalHttpClient(_ => { });
+        return services.AddWhiteoutSurvivalHttpClient(_ => { }, null, null);
     }
 
     public static IServiceCollection AddWhiteoutSurvivalHttpClient(this IServiceCollection services, Action<WhiteoutSurvivalOptions> configureOptions) {
+        return services.AddWhiteoutSurvivalHttpClient(configureOptions, null, null);
+    }
+
+    internal static IServiceCollection AddWhiteoutSurvivalHttpClient(
+            this IServiceCollection services,
+            Action<WhiteoutSurvivalOptions> configureOptions,
+            int? retryCount,
+            Func<int, TimeSpan>? sleepDurationProvider) {
         services.Configure(configureOptions);
 
         services.TryAddSingleton(TimeProvider.System);
 
-        static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
+        IAsyncPolicy<HttpResponseMessage> GetRetryPolicy() {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .OrResult(static msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                .WaitAndRetryAsync(10, static retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+                .WaitAndRetryAsync(retryCount ?? 10, sleepDurationProvider ?? (static retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
         }
 
         services
