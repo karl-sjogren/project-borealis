@@ -1,9 +1,8 @@
 using System.Net;
-using Borealis.WhiteoutSurvivalHttpClient.Common;
 
 namespace Borealis.TestHelpers.Http;
 
-public static class HttpClientActivator<T> where T : HttpClientBase {
+public static class HttpClientActivator<T> where T : Core.HttpClients.HttpClientBase {
     public static async Task<T> GetClientWithResourceResponseAsync(HttpStatusCode httpStatusCode, string resourceName, Func<HttpClient, T> createClient) {
         var responseJson = await Resources.GetStringAsync(resourceName);
         var dummyResponse = new HttpResponseMessage(httpStatusCode) { Content = new FakeHttpContent(responseJson) };
