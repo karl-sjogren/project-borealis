@@ -9,7 +9,7 @@ namespace Borealis.Core.Tests.GiftCodeScanners;
 
 public class WosGiftCodesGiftCodeScannerTests {
     [Fact]
-    public async Task ScanGiftCodes_WhenClientReturnsCodes_ShouldJustReturnCodesAsync() {
+    public async Task ScanGiftCodes_WhenClientReturnsExpectedFeedData_ShouldReturnItemTitlesAsync() {
         // Arrange
         var httpMessageHandler = new FakeHttpMessageHandler(async (request, cancellationToken) => {
             if(request.RequestUri?.PathAndQuery.EndsWith("/rss.php", StringComparison.Ordinal) == true) {

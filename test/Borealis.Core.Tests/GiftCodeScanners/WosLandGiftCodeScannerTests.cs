@@ -8,7 +8,7 @@ namespace Borealis.Core.Tests.GiftCodeScanners;
 
 public class WosLandGiftCodeScannerTests {
     [Fact]
-    public async Task ScanGiftCodes_WhenClientReturnsCodes_ShouldJustReturnCodesAsync() {
+    public async Task ScanGiftCodes_WhenClientReturnsExpectedFeedData_ShouldJustReturnCodesAsync() {
         // Arrange
         var httpClient = A.Fake<IWosLandHttpClient>();
 
