@@ -44,7 +44,8 @@ builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
 });
 
-if(builder.Environment.IsProduction()) {
+var enableLettuceEncrypt = builder.Configuration.GetValue<bool>("LettuceEncrypt:Enabled", false);
+if(builder.Environment.IsProduction() && enableLettuceEncrypt) {
     builder.Services.AddLettuceEncrypt();
 }
 
