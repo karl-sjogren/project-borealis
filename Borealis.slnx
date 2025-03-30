@@ -6,9 +6,11 @@
     <Project Path="src/Borealis.Core/Borealis.Core.csproj" />
     <Project Path="src/Borealis.Frontend/Borealis.Frontend.csproj" />
     <Project Path="src/Borealis.Web/Borealis.Web.csproj" />
+    <Project Path="src/Borealis.WhiteoutSurvivalHttpClient/Borealis.WhiteoutSurvivalHttpClient.csproj" />
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/Borealis.Core.Tests/Borealis.Core.Tests.csproj" />
     <Project Path="test/Borealis.TestHelpers/Borealis.TestHelpers.csproj" />
+    <Project Path="test/Borealis.WhiteoutSurvivalHttpClient.Tests/Borealis.WhiteoutSurvivalHttpClient.Tests.csproj" />
   </Folder>
 </Solution>

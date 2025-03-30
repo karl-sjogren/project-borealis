@@ -17,26 +17,25 @@ public class ScanForGiftCodesHostedService : TimedHostedService {
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         using var scope = _serviceScopeFactory.CreateScope();
+        var giftCodeService = scope.ServiceProvider.GetRequiredService<IGiftCodeService>();
         var scanners = scope.ServiceProvider.GetRequiredService<IEnumerable<IGiftCodeScanner>>();
 
-        var giftCodes = new List<string>();
         try {
             foreach(var scanner in scanners) {
                 var scannerGiftCodes = await scanner.ScanGiftCodesAsync(stoppingToken);
-                giftCodes.AddRange(scannerGiftCodes);
-            }
 
-            if(giftCodes.Count == 0) {
-                return;
-            }
+                foreach(var giftCode in scannerGiftCodes) {
+                    var existsResult = await giftCodeService.GiftCodeExistsAsync(giftCode, stoppingToken);
+                    if(existsResult.Data) {
+                        continue;
+                    }
 
-            var giftCodeService = scope.ServiceProvider.GetRequiredService<IGiftCodeService>();
-            foreach(var giftCode in giftCodes) {
-                _logger.LogInformation("Redeeming gift code {giftCode}.", giftCode);
-                await giftCodeService.AddGiftCodeAsync(giftCode, stoppingToken);
+                    _logger.LogInformation("Trying to add gift code {giftCode}.", giftCode);
+                    await giftCodeService.AddGiftCodeAsync(giftCode, scanner.Name, stoppingToken);
+                }
             }
         } catch(Exception ex) {
-            _logger.LogError(ex, "An error occurred while processing the gift code redemption queue.");
+            _logger.LogError(ex, "An error occurred while processing the gift code scanner queue.");
         }
     }
 }

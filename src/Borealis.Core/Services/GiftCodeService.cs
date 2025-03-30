@@ -1,6 +1,7 @@
 using Borealis.Core.Contracts;
 using Borealis.Core.Models;
 using Borealis.Core.Requests;
+using Borealis.WhiteoutSurvivalHttpClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Core.Services;
@@ -31,11 +32,11 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         _logger = logger;
     }
 
-    public async Task<Result<GiftCode>> GetByIdAsync(Guid playerId, CancellationToken cancellationToken) {
+    public async Task<Result<GiftCode>> GetByIdAsync(Guid giftCodeId, CancellationToken cancellationToken) {
         var entity = await _context
             .GiftCodes
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == playerId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == giftCodeId, cancellationToken);
 
         if(entity is null) {
             return Results.NotFound<GiftCode>();
@@ -44,11 +45,24 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         return Results.Success(entity);
     }
 
-    public async Task<Result> AddGiftCodeAsync(string giftCode, CancellationToken cancellationToken) {
-        var existingGiftCode = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Code == giftCode, cancellationToken);
+    public async Task<Result<bool>> GiftCodeExistsAsync(string giftCode, CancellationToken cancellationToken) {
+        var entity = await _context
+            .GiftCodes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Code == giftCode, cancellationToken);
+
+        if(entity is null) {
+            return Results.Success(false);
+        }
 
         // Gift codes are unfortunately case-sensitive
-        if(existingGiftCode?.Code.Equals(giftCode, StringComparison.Ordinal) == true) {
+        return Results.Success(entity.Code.Equals(giftCode, StringComparison.Ordinal));
+    }
+
+    public async Task<Result> AddGiftCodeAsync(string giftCode, string source, CancellationToken cancellationToken) {
+        var existsResult = await GiftCodeExistsAsync(giftCode, cancellationToken);
+
+        if(existsResult.Data) {
             return Results.Conflict("Gift code already exists.");
         }
 
@@ -87,7 +101,8 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             Code = giftCode,
             CreatedAt = now,
             UpdatedAt = now,
-            IsExpired = isExpired
+            IsExpired = isExpired,
+            Source = source
         };
 
         await _context.GiftCodes.AddAsync(newGiftCode, cancellationToken);

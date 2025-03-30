@@ -133,7 +133,7 @@ jobs:
         path: ./
 
     - name: Publish .NET tests
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v2
       with:
         name: 🧪 .NET test results
         path: ./**/*.trx
@@ -198,7 +198,34 @@ jobs:
         output: "{\"summary\":\"Summary of code coverage. For more detailed information, download the full artifact from the run.\"}"
         output_text_description_file: ./coverage-report/Summary.md
 
-  net-build:
+  net-package:
+    name: .NET create client pacakge
+    runs-on: ubuntu-latest
+    needs: [ net-test ]
+
+    steps:
+    - name: Checkout sources
+      uses: actions/checkout@v4
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
+    - name: Restore NuGet packages
+      run: dotnet restore --verbosity minimal
+
+    - name: Publish application
+      run: dotnet pack --configuration Release --output ./artifacts ./src/Borealis.WhiteoutSurvivalHttpClient/Borealis.WhiteoutSurvivalHttpClient.csproj
+      working-directory: ./
+
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages
+        path: artifacts/*.nupkg
+
+  docker-build:
     name: Build Docker image
     runs-on: ubuntu-latest
 
@@ -211,7 +238,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Log in to the Container registry
-      uses: docker/login-action@327cd5a69de6c009b9ce71bce8395f28e651bf99
+      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}

@@ -1,6 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Borealis.WhiteoutSurvivalHttpClient\Borealis.WhiteoutSurvivalHttpClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AngleSharp" />
     <PackageReference Include="Discord.Net" />
     <PackageReference Include="Lucene.Net" />
@@ -10,6 +14,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" />
+    <PackageReference Include="System.ServiceModel.Syndication" />
   </ItemGroup>
 
 </Project>

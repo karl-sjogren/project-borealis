@@ -6,6 +6,7 @@ using Borealis.Core.Services;
 using Borealis.Web.Extensions;
 using Borealis.Web.HostedServices;
 using Borealis.Web.Mvc;
+using Borealis.WhiteoutSurvivalHttpClient;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
@@ -26,6 +27,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
+builder.Services.Configure<WosLandOptions>(builder.Configuration.GetSection("WosLand"));
+
 // Add services to the container.
 var connectionStringBuilder = new SqliteConnectionStringBuilder {
     Mode = SqliteOpenMode.ReadWriteCreate,
@@ -41,7 +44,8 @@ builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
 });
 
-if(builder.Environment.IsProduction()) {
+var enableLettuceEncrypt = builder.Configuration.GetValue<bool>("LettuceEncrypt:Enabled", false);
+if(builder.Environment.IsProduction() && enableLettuceEncrypt) {
     builder.Services.AddLettuceEncrypt();
 }
 
@@ -64,6 +68,8 @@ builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IGiftCodeScanner, DestructoidGiftCodeScanner>();
+builder.Services.AddScoped<IGiftCodeScanner, WosGiftCodesGiftCodeScanner>();
+builder.Services.AddScoped<IGiftCodeScanner, WosLandGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
