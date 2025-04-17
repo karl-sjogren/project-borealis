@@ -20,9 +20,6 @@ const initTableButtons = pageElement => {
       return;
     }
 
-    event.stopPropagation();
-    event.preventDefault();
-
     /**
      * @type {HTMLButtonElement}
      */
@@ -33,6 +30,21 @@ const initTableButtons = pageElement => {
     if(!row) {
       return;
     }
+
+    const validButtonClasses = [
+      'add-to-alliance-button',
+      'remove-from-alliance-button',
+      'mute-button',
+      'unmute-button',
+      'delete-player-button'
+    ];
+
+    if(!validButtonClasses.some(className => button.classList.contains(className))) {
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
 
     let handled = false;
 
