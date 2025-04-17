@@ -1,5 +1,5 @@
 import { Dropdown } from 'bootstrap';
-import { firstAnscestorOrDefault } from '../utils/dom-utils.mjs';
+import { firstAncestorOrDefault } from '../utils/dom-utils.mjs';
 
 /**
  * @param {Element} rootElement
@@ -28,7 +28,7 @@ const initTableButtons = pageElement => {
      */
     const button = event.target;
 
-    const row = firstAnscestorOrDefault(button, element => element.classList.contains('player-row'));
+    const row = firstAncestorOrDefault(button, element => element.classList.contains('player-row'));
 
     if(!row) {
       return;

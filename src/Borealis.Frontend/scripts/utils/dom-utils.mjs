@@ -10,7 +10,7 @@
  * @param {boolean} includeSelf Include the starting element in the search
  * @returns {Element|null} The first ancestor that matches the predicate, or null if no match was found
  */
-export let firstAnscestorOrDefault = (element, predicate, includeSelf = false) => {
+export let firstAncestorOrDefault = (element, predicate, includeSelf = false) => {
   let parent = includeSelf ? element : element.parentElement;
 
   while(parent) {
