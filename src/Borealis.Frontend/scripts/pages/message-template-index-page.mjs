@@ -1,5 +1,5 @@
 import { Dropdown } from 'bootstrap';
-import { firstAnscestorOrDefault } from '../utils/dom-utils.mjs';
+import { firstAncestorOrDefault } from '../utils/dom-utils.mjs';
 
 /**
  * @param {Element} rootElement
@@ -36,7 +36,7 @@ const initTableButtons = pageElement => {
     event.stopPropagation();
     event.preventDefault();
 
-    const row = firstAnscestorOrDefault(button, element => element.classList.contains('message-template-row'));
+    const row = firstAncestorOrDefault(button, element => element.classList.contains('message-template-row'));
     const messageTemplateId = row.dataset.messageTemplateId;
 
     await deleteMessageTemplate(messageTemplateId);

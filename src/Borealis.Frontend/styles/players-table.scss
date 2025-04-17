@@ -42,5 +42,17 @@
         display: none;
       }
     }
+
+    &.is-muted {
+      .mute-list-item {
+        display: none;
+      }
+    }
+
+    &.is-not-muted {
+      .unmute-list-item {
+        display: none;
+      }
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { firstAnscestorOrDefault } from './dom-utils.mjs';
+import { firstAncestorOrDefault } from './dom-utils.mjs';
 
 describe('dom-utils', () => {
   describe('firstAnscestorOrDefault', () => {
@@ -19,7 +19,7 @@ describe('dom-utils', () => {
 
       const childElement = container.querySelector('.parent1');
 
-      const foundElement = firstAnscestorOrDefault(childElement, element => element.classList.contains('parent3'));
+      const foundElement = firstAncestorOrDefault(childElement, element => element.classList.contains('parent3'));
       expect(foundElement.classList.contains('parent3')).toBe(true);
     });
 
@@ -38,7 +38,7 @@ describe('dom-utils', () => {
 
       const childElement = container.querySelector('.parent1');
 
-      const foundElement = firstAnscestorOrDefault(childElement, element => element.classList.contains('parent'), true);
+      const foundElement = firstAncestorOrDefault(childElement, element => element.classList.contains('parent'), true);
       expect(foundElement.classList.contains('parent1')).toBe(true);
     });
 
@@ -57,7 +57,7 @@ describe('dom-utils', () => {
 
       const childElement = container.querySelector('.parent1');
 
-      const foundElement = firstAnscestorOrDefault(childElement, element => element.classList.contains('parent'));
+      const foundElement = firstAncestorOrDefault(childElement, element => element.classList.contains('parent'));
       expect(foundElement.classList.contains('parent2')).toBe(true);
     });
 
@@ -76,7 +76,7 @@ describe('dom-utils', () => {
 
       const childElement = container.querySelector('.parent1');
 
-      const foundElement = firstAnscestorOrDefault(childElement, element => element.classList.contains('parent4'));
+      const foundElement = firstAncestorOrDefault(childElement, element => element.classList.contains('parent4'));
       expect(foundElement).toBe(null);
     });
 

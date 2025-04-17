@@ -15,7 +15,7 @@ namespace Borealis.Core.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "9.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.4");
 
             modelBuilder.Entity("Borealis.Core.Models.GiftCode", b =>
                 {
@@ -119,6 +119,11 @@ namespace Borealis.Core.Migrations
 
                     b.Property<bool>("IsInAlliance")
                         .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsMuted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Name")
                         .IsRequired()
