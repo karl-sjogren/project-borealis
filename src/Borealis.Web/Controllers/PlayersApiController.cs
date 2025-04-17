@@ -68,4 +68,46 @@ public class PlayersAPIController : Controller {
 
         return NoContent();
     }
+
+    [HttpPut("{playerId:guid}/mute")]
+    public async Task<ActionResult<PlayersIndexViewModel>> MuteAsync(Guid playerId, CancellationToken cancellationToken) {
+        var result = await _playerService.GetByIdAsync(playerId, cancellationToken);
+
+        if(!result.Success) {
+            return NotFound();
+        }
+
+        var player = result.Data!;
+
+        player.IsMuted = true;
+
+        var updateResult = await _playerService.UpdateAsync(player, cancellationToken);
+
+        if(!updateResult.Success) {
+            return StatusCode(500);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPut("{playerId:guid}/unmute")]
+    public async Task<ActionResult<PlayersIndexViewModel>> UnmuteAsync(Guid playerId, CancellationToken cancellationToken) {
+        var result = await _playerService.GetByIdAsync(playerId, cancellationToken);
+
+        if(!result.Success) {
+            return NotFound();
+        }
+
+        var player = result.Data!;
+
+        player.IsMuted = false;
+
+        var updateResult = await _playerService.UpdateAsync(player, cancellationToken);
+
+        if(!updateResult.Success) {
+            return StatusCode(500);
+        }
+
+        return NoContent();
+    }
 }

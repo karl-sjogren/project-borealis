@@ -32,13 +32,14 @@
                     <th class="furnace-level">Level</th>
                     <th class="state">State</th>
                     <th class="in-alliance">In alliance</th>
+                    <th class="muted">Muted</th>
                     <th class="name">Name</th>
                     <th class="actions"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var player in Model.Players) {
-                    <tr data-player-id="@player.Id" class="player-row @(player.IsInAlliance ? "is-in-alliance" : "is-not-in-alliance")">
+                    <tr data-player-id="@player.Id" class="player-row @(player.IsInAlliance ? "is-in-alliance" : "is-not-in-alliance") @(player.IsMuted ? "is-muted" : "is-not-muted")">
                         <td>@player.ExternalId</td>
                         <td>
                             <span class="furnace-level level-@player.FurnaceLevelString.ToLowerInvariant()">
@@ -47,6 +48,7 @@
                         </td>
                         <td>@player.State</td>
                         <td class="in-alliance">@(player.IsInAlliance ? "Yes" : "No")</td>
+                        <td class="muted">@(player.IsMuted ? "Yes" : "No")</td>
                         <td>
                             @player.Name
                             @if(player.HasNotes) {
@@ -71,12 +73,13 @@
                                 <ul class="dropdown-menu">
                                     <li class="remove-from-alliance-list-item"><button class="dropdown-item remove-from-alliance-button"><i class="bi bi-person-dash"></i> Remove from alliance</button></li>
                                     <li class="add-to-alliance-list-item" ><button class="dropdown-item add-to-alliance-button"><i class="bi bi-person-add"></i> Add to alliance</button></li>
+                                    <li class="unmute-list-item"><button class="dropdown-item unmute-button"><i class="bi bi-volume-up"></i> Unmute</button></li>
+                                    <li class="mute-list-item" ><button class="dropdown-item mute-button"><i class="bi bi-volume-mute"></i> Mute</button></li>
                                     <!--
                                     <li><a class="dropdown-item" href="#"><i class="bi bi-arrow-clockwise"></i> Refresh</a></li>
                                     -->
                                     <li><button class="dropdown-item delete-player-button" href="#"><i class="bi bi-trash"></i> Delete</button></li>
                                 </ul>
-                            </div>
                             </div>
                         </td>
                     </tr>
