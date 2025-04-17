@@ -6,6 +6,7 @@ public class Player : EntityBase {
     public required int State { get; set; }
     public required int FurnaceLevel { get; set; }
     public required bool IsInAlliance { get; set; }
+    public required bool IsMuted { get; set; }
     public bool ForceRedeemGiftCodes { get; set; }
     public DateOnly? AwayUntil { get; set; }
     public string? Notes { get; set; }

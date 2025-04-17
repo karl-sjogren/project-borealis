@@ -1,5 +1,5 @@
 import { Dropdown } from 'bootstrap';
-import { firstAnscestorOrDefault } from '../utils/dom-utils.mjs';
+import { firstAncestorOrDefault } from '../utils/dom-utils.mjs';
 
 /**
  * @param {Element} rootElement
@@ -32,7 +32,7 @@ const initTableButtons = pageElement => {
     event.stopPropagation();
     event.preventDefault();
 
-    const row = firstAnscestorOrDefault(button, element => element.classList.contains('gift-code-row'));
+    const row = firstAncestorOrDefault(button, element => element.classList.contains('gift-code-row'));
     const giftCodeId = row.dataset.giftCodeId;
 
     await redeemGiftCode(giftCodeId);

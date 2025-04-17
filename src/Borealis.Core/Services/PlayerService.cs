@@ -102,6 +102,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
                 Name = externalPlayer.Name,
                 FurnaceLevel = externalPlayer.FurnaceLevel,
                 IsInAlliance = addAsInAlliance,
+                IsMuted = !addAsInAlliance,
                 State = externalPlayer.State,
                 UpdatedAt = now,
                 CreatedAt = now
@@ -110,7 +111,9 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
         } else {
             var now = _timeProvider.GetUtcNow();
             if(existingPlayer.Name != externalPlayer.Name) {
-                await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} changed their name to {externalPlayer.Name}.", cancellationToken);
+                if(!existingPlayer.IsMuted) {
+                    await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} changed their name to {externalPlayer.Name}.", cancellationToken);
+                }
 
                 existingPlayer.PreviousNames.Add(new PlayerNameHistoryEntry {
                     Name = existingPlayer.Name,
@@ -119,7 +122,9 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             }
 
             if(existingPlayer.State != externalPlayer.State) {
-                await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} moved from state {existingPlayer.State} to {externalPlayer.State}.", cancellationToken);
+                if(!existingPlayer.IsMuted) {
+                    await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} moved from state {existingPlayer.State} to {externalPlayer.State}.", cancellationToken);
+                }
 
                 existingPlayer.PreviousStates.Add(new PlayerStateHistoryEntry {
                     State = existingPlayer.State,
@@ -136,7 +141,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             existingPlayer.FurnaceLevel = externalPlayer.FurnaceLevel;
             existingPlayer.State = externalPlayer.State;
 
-            if(hasUpdatedFurnaceLevel) {
+            if(hasUpdatedFurnaceLevel && !existingPlayer.IsMuted) {
                 await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} increased their furnace level to {existingPlayer.ExactFurnaceLevelString}.", cancellationToken);
             }
 
@@ -159,6 +164,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
 
         existingPlayer.Notes = player.Notes?.Trim();
         existingPlayer.IsInAlliance = player.IsInAlliance;
+        existingPlayer.IsMuted = player.IsMuted;
         existingPlayer.AwayUntil = player.AwayUntil;
 
         if(_context.Entry(existingPlayer).State == EntityState.Modified) {
