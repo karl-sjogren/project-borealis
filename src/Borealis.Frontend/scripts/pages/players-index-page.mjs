@@ -34,18 +34,24 @@ const initTableButtons = pageElement => {
       return;
     }
 
+    let handled = false;
+
     if(button.classList.contains('add-to-alliance-button') || button.classList.contains('remove-from-alliance-button')) {
       await allianceButtonClickHandler(row, button);
-      closeDropdown(row, event);
+      handled = true;
     }
 
     if(button.classList.contains('mute-button') || button.classList.contains('unmute-button')) {
       await muteButtonClickHandler(row, button);
-      closeDropdown(row, event);
+      handled = true;
     }
 
     if(button.classList.contains('delete-player-button')) {
       await deletePlayerButtonClickHandler(row, button);
+      handled = true;
+    }
+
+    if(handled) {
       closeDropdown(row, event);
     }
   });
@@ -56,7 +62,7 @@ const closeDropdown = (row, event) => {
   dropdownToggle.hide();
 }
 
-const deleteButtonClickHandler = async(row, button) => {
+const deletePlayerButtonClickHandler = async(row, button) => {
   if(!confirm('Are you sure you want to delete this player?')) {
     return;
   }
