@@ -6,9 +6,9 @@ export class PlayersTable extends LitElement {
     return {
       /**
        * The players data array as JSON
-       * @type {Object}
+       * @type {Array}
        */
-      players: { type: Object }
+      players: { type: Array  }
     };
   }
 
