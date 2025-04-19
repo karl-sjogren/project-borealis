@@ -164,6 +164,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
 
         existingPlayer.Notes = player.Notes?.Trim();
         existingPlayer.IsInAlliance = player.IsInAlliance;
+        existingPlayer.ForceRedeemGiftCodes = player.ForceRedeemGiftCodes;
         existingPlayer.IsMuted = player.IsMuted;
         existingPlayer.AwayUntil = player.AwayUntil;
 
