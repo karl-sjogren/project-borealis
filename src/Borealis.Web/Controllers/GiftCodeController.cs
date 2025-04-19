@@ -89,7 +89,7 @@ public class GiftCodeController : Controller {
         var redemptions = await _giftCodeService.GetRedemptionsForGiftCodeAsync(id, cancellationToken);
         var players = await _playerService.GetPagedAsync(new PlayerQuery { PageIndex = 0, PageSize = 10_000, ShowAll = true }, cancellationToken);
 
-        var playersNotRedeemedFor = players.Items.Where(x => x.IsInAlliance && !redemptions.Any(y => y.PlayerId == x.Id)).ToList();
+        var playersNotRedeemedFor = players.Items.Where(x => (x.IsInAlliance || x.ForceRedeemGiftCodes) && !redemptions.Any(y => y.PlayerId == x.Id)).ToList();
 
         var viewModel = new GiftCodeDetailsViewModel {
             Code = result.Data!,
