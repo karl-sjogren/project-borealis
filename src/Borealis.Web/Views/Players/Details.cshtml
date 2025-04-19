@@ -31,6 +31,9 @@
             <dt class="col-sm-3">In alliance</dt>
             <dd class="col-sm-9">@(Model.Player.IsInAlliance ? "Yes" : "No")</dd>
 
+            <dt class="col-sm-3">Is muted</dt>
+            <dd class="col-sm-9">@(Model.Player.IsMuted ? "Yes" : "No")</dd>
+
             @if(!Model.Player.IsInAlliance) {
                 <dt class="col-sm-3">Redeem gift codes (even if not in alliance)</dt>
                 <dd class="col-sm-9">@(Model.Player.ForceRedeemGiftCodes ? "Yes" : "No")</dd>
