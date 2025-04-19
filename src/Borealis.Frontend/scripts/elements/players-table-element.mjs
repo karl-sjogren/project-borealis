@@ -66,8 +66,8 @@ export class PlayersTable extends LitElement {
               let forceRedeemIcon = null;
               if(!player.isInAlliance && player.forceRedeemGiftCodes) {
                 forceRedeemIcon = html`
-                  <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Force redeem gift codes" data-bs-content="Redeeming gift codes ${player.awayUntil} even if not in alliance">
-                    <span class="visually-hidden">Redeeming gift codes ${player.awayUntil} even if not in alliance</span>
+                  <button type="button" class="btn" data-bs-toggle="popover" data-bs-title="Force redeem gift codes" data-bs-content="Force redeeming gift codes for this player even though they are not in an alliance.">
+                    <span class="visually-hidden">Force redeeming gift codes for this player even though they are not in an alliance.</span>
                     <i class="bi bi-box2-heart"></i>
                   </button>
                 `;
