@@ -29,30 +29,4 @@
       }
     }
   }
-
-  .player-row {
-    &.is-in-alliance {
-      .add-to-alliance-list-item {
-        display: none;
-      }
-    }
-
-    &.is-not-in-alliance {
-      .remove-from-alliance-list-item {
-        display: none;
-      }
-    }
-
-    &.is-muted {
-      .mute-list-item {
-        display: none;
-      }
-    }
-
-    &.is-not-muted {
-      .unmute-list-item {
-        display: none;
-      }
-    }
-  }
 }
