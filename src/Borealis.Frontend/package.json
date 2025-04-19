@@ -40,6 +40,7 @@
     "jquery": "^3.7.1",
     "jsdom": "^26.1.0",
     "jsdom-testing-mocks": "^1.13.1",
+    "lit": "^3.3.0",
     "postcss": "^8.5.3",
     "postcss-scss": "^4.0.9",
     "rollup-plugin-copy": "^3.5.0",
