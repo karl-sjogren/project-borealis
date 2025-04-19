@@ -49,6 +49,19 @@ export default defineConfig({
       ]
     }
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        silenceDeprecations: [
+          'import',
+          'mixed-decls',
+          'color-functions',
+          'global-builtin',
+          'legacy-js-api',
+        ]
+      }
+    }
+  },
   server: {
     port: 5010,
     origin: `https://127.0.0.1:5010`,
