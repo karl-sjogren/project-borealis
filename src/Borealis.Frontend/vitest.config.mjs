@@ -1,12 +1,14 @@
 import { defineConfig } from 'vitest/config';
 
+/** @type {import('vitest').ViteUserConfig} */
 export default defineConfig({
   test: {
-    setupFiles: ['./scripts/test-setup.mjs'],
-    environment: 'jsdom',
     reporters: ['dot'],
     coverage: {
-      reporter: ['text', 'cobertura', 'html']
+      reporter: ['text', 'cobertura', 'html'],
+      include: [
+        'scripts/**/*.mjs'
+      ]
     }
   }
 });

@@ -8,7 +8,7 @@ export class PlayersTable extends LitElement {
        * The players data array as JSON
        * @type {Array}
        */
-      players: { type: Array  }
+      players: { type: Array }
     };
   }
 
@@ -28,6 +28,10 @@ export class PlayersTable extends LitElement {
   }
 
   render() {
+    if(!this.players || this.players.length === 0) {
+      return html`<div class="alert alert-warning">No players found</div>`;
+    }
+
     return html`
       <div class="table-responsive">
         <table class="table table-striped table-hover players-table">
