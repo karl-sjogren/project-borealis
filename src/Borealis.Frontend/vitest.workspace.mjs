@@ -1,6 +1,7 @@
-import { defineConfig } from 'vitest/config';
+import { defineWorkspace } from 'vitest/config';
 
-export default defineConfig([
+/** @type {import('vitest/node').UserWorkspaceConfig} */
+export default defineWorkspace([
   {
     test: {
       name: 'jsdom',
@@ -22,7 +23,7 @@ export default defineConfig([
         ]
       },
       extends: false,
-      include: ['**/*.browser.spec.mjs']
+      include: ['./scripts/**/*.browser.spec.mjs']
     }
   }
 ]);

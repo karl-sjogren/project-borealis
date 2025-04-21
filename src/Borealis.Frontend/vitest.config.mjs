@@ -1,10 +1,14 @@
 import { defineConfig } from 'vitest/config';
 
+/** @type {import('vitest').ViteUserConfig} */
 export default defineConfig({
   test: {
-    //reporters: ['dot'],
+    reporters: ['dot'],
     coverage: {
-      reporter: ['text', 'cobertura', 'html']
+      reporter: ['text', 'cobertura', 'html'],
+      include: [
+        'scripts/**/*.mjs'
+      ]
     }
   }
 });
