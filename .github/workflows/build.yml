@@ -62,7 +62,7 @@ jobs:
       working-directory: ./src/Borealis.Frontend/
 
     - name: Install Playwright browsers
-      run: yarn playwright install chromium
+      run: yarn playwright install chromium --with-deps --only-shell
       working-directory: ./src/Borealis.Frontend/
 
     - name: Run frontend linting
