@@ -8,8 +8,7 @@ export default defineWorkspace([
       environment: 'jsdom',
       exclude: ['**/node_modules/**', './scripts/**/*.browser.spec.mjs'],
       setupFiles: ['./scripts/test-setup.mjs'],
-    },
-    extends: true
+    }
   },
   {
     test: {
@@ -22,7 +21,6 @@ export default defineWorkspace([
           { browser: 'chromium' },
         ]
       },
-      extends: false,
       include: ['./scripts/**/*.browser.spec.mjs']
     }
   }
