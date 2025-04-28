@@ -27,6 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
+builder.Services.Configure<CapSolverOptions>(builder.Configuration.GetSection("CapSolver"));
 builder.Services.Configure<WosLandOptions>(builder.Configuration.GetSection("WosLand"));
 
 // Add services to the container.
@@ -66,6 +67,7 @@ builder.Services.AddScoped<IGiftCodeService, GiftCodeService>();
 builder.Services.AddScoped<IMessageTemplateService, MessageTemplateService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWhiteoutSurvivalService, WhiteoutSurvivalService>();
 
 builder.Services.AddScoped<IGiftCodeScanner, DestructoidGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosGiftCodesGiftCodeScanner>();
@@ -73,10 +75,10 @@ builder.Services.AddScoped<IGiftCodeScanner, WosLandGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
+builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
 if(builder.Environment.IsProduction()) {
     builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
     builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
-    builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
     builder.Services.AddHostedService<UpdatePlayersHostedService>();
 }
 

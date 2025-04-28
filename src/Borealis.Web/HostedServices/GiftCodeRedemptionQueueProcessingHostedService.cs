@@ -27,7 +27,7 @@ public class GiftCodeRedemptionQueueProcessingHostedService : BackgroundService 
                 _logger.LogError(ex, "An error occurred while processing the gift code redemption queue.");
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
         }
     }
 }

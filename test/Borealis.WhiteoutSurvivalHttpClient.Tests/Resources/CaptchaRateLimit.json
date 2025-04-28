@@ -1,0 +1,6 @@
+{
+  "code": 1,
+  "data": [],
+  "msg": "CAPTCHA GET TOO FREQUENT.",
+  "err_code": 40100
+}

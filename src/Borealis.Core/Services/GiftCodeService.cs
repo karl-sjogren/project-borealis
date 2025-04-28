@@ -1,14 +1,13 @@
 using Borealis.Core.Contracts;
 using Borealis.Core.Models;
 using Borealis.Core.Requests;
-using Borealis.WhiteoutSurvivalHttpClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Core.Services;
 
 public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
     private readonly BorealisContext _context;
-    private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
+    private readonly IWhiteoutSurvivalService _whiteoutSurvivalService;
     private readonly IGiftCodeRedemptionQueue _giftCodeRedemptionQueue;
     private readonly IDiscordBotService _discordBotService;
     private readonly TimeProvider _timeProvider;
@@ -19,13 +18,13 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
 
     public GiftCodeService(
             BorealisContext context,
-            IWhiteoutSurvivalHttpClient whiteoutSurvivalHttpClient,
+            IWhiteoutSurvivalService whiteoutSurvivalService,
             IGiftCodeRedemptionQueue giftCodeRedemptionQueue,
             IDiscordBotService discordBotService,
             TimeProvider timeProvider,
             ILogger<GiftCodeService> logger) {
         _context = context;
-        _whiteoutSurvivalHttpClient = whiteoutSurvivalHttpClient;
+        _whiteoutSurvivalService = whiteoutSurvivalService;
         _giftCodeRedemptionQueue = giftCodeRedemptionQueue;
         _discordBotService = discordBotService;
         _timeProvider = timeProvider;
@@ -73,26 +72,11 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
 
         var isExpired = false;
         if(player is not null) {
-            var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken); // We need to "sign in" the player
-            var redeemResult = await _whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
+            var redeemResult = await _whiteoutSurvivalService.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
 
-            switch(redeemResult.ErrorCode) {
-                case 20000: // Code success
-                case 40008: // Code already used
-                case 40011: // Code already used
-                    break;
-                case 40005: // Claim limit reached, we can't redeem it but we can remember it
-                case 40007: // Code expired, we can't redeem it but we can remember it
-                    isExpired = true;
-                    break;
-                case 40014:
-                    return Results.Failure("Gift code not found.");
-                case 40004:
-                    return Results.Failure("Player not found.");
-                case 40009:
-                    return Results.Failure("Player not logged in.");
-                default:
-                    return Results.Failure($"Unknown error code: {redeemResult.ErrorCode}, message: {redeemResult.Message}");
+            isExpired = redeemResult.Message == "Gift code expired.";
+            if(!redeemResult.Success && !isExpired) {
+                return redeemResult;
             }
         }
 
@@ -194,25 +178,10 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.Conflict("Gift code already redeemed.");
         }
 
-        var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken); // We need to "sign in" the player
-        var redeemResult = await _whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
+        var redeemResult = await _whiteoutSurvivalService.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
 
-        switch(redeemResult.ErrorCode) {
-            case 20000: // Code success
-            case 40008: // Code already used
-                break;
-            case 40014:
-                return Results.Failure("Gift code not found.");
-            case 40004:
-                return Results.Failure("Player not found.");
-            case 40005:
-                return Results.Failure("Claim limit reached.");
-            case 40007:
-                return Results.Failure("Gift code expired.");
-            case 40009:
-                return Results.Failure("Player not logged in.");
-            default:
-                return Results.Failure($"Unknown error code: {redeemResult.ErrorCode}, message: {redeemResult.Message}");
+        if(!redeemResult.Success) {
+            return redeemResult;
         }
 
         var newRedemption = new GiftCodeRedemption {

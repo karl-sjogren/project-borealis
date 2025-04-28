@@ -72,7 +72,7 @@ public class WhiteoutSurvivalHttpClientTests {
             throw new Exception("Unexpected uri was called during test. " + request.RequestUri?.PathAndQuery);
         }, CreateClient);
 
-        var result = await httpClient.RedeemGiftCodeAsync(123, "sassy-zebra", TestCancellationToken);
+        var result = await httpClient.RedeemGiftCodeAsync(123, "sassy-zebra", "oompa-loompa", TestCancellationToken);
 
         result.ShouldNotBeNull();
         result.Code.ShouldBe(expectedCode);

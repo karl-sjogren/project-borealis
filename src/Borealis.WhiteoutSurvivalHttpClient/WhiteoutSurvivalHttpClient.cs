@@ -12,7 +12,11 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
     private readonly TimeProvider _timeProvider;
 
     private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web) {
-        Converters = { new WhiteoutSurvivalPlayerResponseJsonConverter() }
+        Converters = {
+            new WhiteoutSurvivalCaptchaResponseJsonConverter(),
+            new WhiteoutSurvivalPlayerResponseJsonConverter(),
+            new NumberToStringConverter()
+        }
     };
 
     protected override JsonSerializerOptions SerializerOptions => _serializerOptions;
@@ -41,10 +45,31 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
         return result!;
     }
 
-    public async Task<WhiteoutSurvivalResponseWrapper> RedeemGiftCodeAsync(int playerId, string giftCode, CancellationToken cancellationToken) {
+    public async Task<WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalCaptchaResponse>> GetCaptchaAsync(int playerId, CancellationToken cancellationToken) {
+        var data = new Dictionary<string, string>() {
+            { "fid", playerId.ToString(CultureInfo.InvariantCulture) },
+            { "time", _timeProvider.GetUtcNow().ToUnixTimeSeconds().ToString() },
+            { "init", "0" },
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "captcha") {
+            Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
+        };
+
+        var response = await HttpClient.SendAsync(request, cancellationToken);
+
+        await EnsureSuccessStatusCodeAsync(response, cancellationToken);
+
+        var result = await DeserializeResponseAsync<WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalCaptchaResponse>>(response, cancellationToken);
+
+        return result!;
+    }
+
+    public async Task<WhiteoutSurvivalResponseWrapper> RedeemGiftCodeAsync(int playerId, string giftCode, string captchaCode, CancellationToken cancellationToken) {
         var data = new Dictionary<string, string>() {
             { "fid", playerId.ToString(CultureInfo.InvariantCulture) },
             { "cdk", giftCode },
+            { "captcha_code", captchaCode },
             { "time", _timeProvider.GetUtcNow().ToUnixTimeSeconds().ToString() }
         };
 

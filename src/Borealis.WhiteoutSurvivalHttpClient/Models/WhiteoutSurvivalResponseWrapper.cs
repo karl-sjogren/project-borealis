@@ -34,6 +34,8 @@ public record WhiteoutSurvivalResponseWrapper {
     /// - 40008: Code already used
     /// - 40009: Not logged in
     /// - 40011: Currently unknown
+    /// - 40100: Captcha requested too frequently
+    /// - 40103: Captcha failed
     /// </summary>
     [JsonIgnore]
     public int ErrorCode { get; set; }

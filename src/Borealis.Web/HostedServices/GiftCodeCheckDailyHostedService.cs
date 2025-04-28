@@ -1,7 +1,6 @@
 
 using Borealis.Core.Contracts;
 using Borealis.Core.Requests;
-using Borealis.WhiteoutSurvivalHttpClient;
 
 namespace Borealis.Web.HostedServices;
 
@@ -33,20 +32,19 @@ public class GiftCodeCheckDailyHostedService : DailyHostedService {
 
         var player = players.Items.First();
 
-        var whiteoutSurvivalHttpClient = scope.ServiceProvider.GetRequiredService<IWhiteoutSurvivalHttpClient>();
+        var whiteoutSurvivalService = scope.ServiceProvider.GetRequiredService<IWhiteoutSurvivalService>();
 
-        var playerResult = await whiteoutSurvivalHttpClient.GetPlayerInfoAsync(player.ExternalId, cancellationToken);
-        if(playerResult.Code != 0) {
+        var playerResult = await whiteoutSurvivalService.GetPlayerInfoAsync(player.ExternalId, cancellationToken);
+        if(playerResult is null) {
             _logger.LogWarning("Failed to get player info for player {ExternalId}.", player.ExternalId);
             return;
         }
 
         foreach(var giftCode in giftCodes.Items) {
-            var redeemResult = await whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(player.ExternalId, giftCode.Code, cancellationToken);
+            var redeemResult = await whiteoutSurvivalService.RedeemGiftCodeAsync(player.ExternalId, giftCode.Code, cancellationToken);
 
-            var isExpired = redeemResult.ErrorCode == 40007;
-
-            if(!isExpired) {
+            var isExpired = redeemResult.Message == "Gift code expired.";
+            if(!redeemResult.Success && !isExpired) {
                 continue;
             }
 
