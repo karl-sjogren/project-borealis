@@ -27,6 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
+builder.Services.Configure<CapSolverOptions>(builder.Configuration.GetSection("CapSolver"));
 builder.Services.Configure<WosLandOptions>(builder.Configuration.GetSection("WosLand"));
 
 // Add services to the container.

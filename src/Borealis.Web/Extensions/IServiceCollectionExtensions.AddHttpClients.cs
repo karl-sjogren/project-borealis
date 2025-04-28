@@ -16,6 +16,9 @@ public static partial class IServiceCollectionExtensions {
                 client.DefaultRequestHeaders.Add("X-API-Key", options.ApiKey ?? string.Empty);
             });
 
+        services.AddHttpClient<ICapSolverHttpClient, CapSolverHttpClient>((provider, client) => {
+        });
+
         services.AddWhiteoutSurvivalHttpClient();
 
         return services;
