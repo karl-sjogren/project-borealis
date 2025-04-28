@@ -75,10 +75,10 @@ builder.Services.AddScoped<IGiftCodeScanner, WosLandGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
-builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
 if(builder.Environment.IsProduction()) {
-    builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
+    builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
     builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
+    builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
     builder.Services.AddHostedService<UpdatePlayersHostedService>();
 }
 
