@@ -39,6 +39,13 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
             var captchaResult = await _whiteoutSurvivalHttpClient.GetCaptchaAsync(playerId, cancellationToken);
 
+            if(captchaResult.ErrorCode == 40100) {
+                _logger.LogWarning("Captcha requested too frequently, waiting longer... (attempt {Attempt})", captchaRetries);
+
+                await Task.Delay(TimeSpan.FromSeconds(20), cancellationToken);
+                break;
+            }
+
             var captchaImage = GetCaptchaImageBytes(captchaResult.Data);
             if(captchaImage == null) {
                 return Results.Failure("Failed to get captcha image bytes.");
@@ -59,14 +66,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
                 _logger.LogWarning("Captcha failed, retrying... (attempt {Attempt})", captchaRetries);
 
-                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
-            }
-
-            if(redeemResult.ErrorCode == 40100) {
-                _logger.LogWarning("Captcha requested too frequently, waiting longer... (attempt {Attempt})", captchaRetries);
-
-                await Task.Delay(TimeSpan.FromSeconds(15), cancellationToken);
-                break;
+                await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             }
         }
 
