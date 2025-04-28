@@ -31,7 +31,7 @@ public static class ServiceCollectionExtensions {
             return HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .OrResult(static msg => msg.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                .WaitAndRetryAsync(retryCount ?? 10, sleepDurationProvider ?? (static retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+                .WaitAndRetryAsync(retryCount ?? 10, sleepDurationProvider ?? (static retryAttempt => TimeSpan.FromSeconds(10 + Math.Pow(2, retryAttempt))));
         }
 
         services
