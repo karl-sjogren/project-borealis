@@ -12,7 +12,7 @@ public record CapSolverImageToTextRequest {
 
 public record CapSolverImageToTextTask {
     [JsonPropertyName("type")]
-    public readonly string Type = "ImageToTextTask";
+    public string Type { get; } = "ImageToTextTask";
 
     [JsonPropertyName("body")]
     public required string Body { get; set; }

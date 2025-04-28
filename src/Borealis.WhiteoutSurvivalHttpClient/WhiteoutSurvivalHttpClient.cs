@@ -12,7 +12,11 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
     private readonly TimeProvider _timeProvider;
 
     private static readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web) {
-        Converters = { new WhiteoutSurvivalPlayerResponseJsonConverter() }
+        Converters = {
+            new WhiteoutSurvivalCaptchaResponseJsonConverter(),
+            new WhiteoutSurvivalPlayerResponseJsonConverter(),
+            new NumberToStringConverter()
+        }
     };
 
     protected override JsonSerializerOptions SerializerOptions => _serializerOptions;
@@ -69,7 +73,7 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
             { "time", _timeProvider.GetUtcNow().ToUnixTimeSeconds().ToString() }
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "captcha") {
+        var request = new HttpRequestMessage(HttpMethod.Post, "gift_code") {
             Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
         };
 

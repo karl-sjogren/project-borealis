@@ -9,7 +9,7 @@ namespace Borealis.Core.HttpClients;
 public class CapSolverHttpClient : HttpClientBase, ICapSolverHttpClient {
     private readonly CapSolverOptions _options;
 
-    public CapSolverHttpClient(HttpClient httpClient, IOptions<CapSolverOptions> options, ILogger logger) : base(httpClient, logger) {
+    public CapSolverHttpClient(HttpClient httpClient, IOptions<CapSolverOptions> options, ILogger<CapSolverHttpClient> logger) : base(httpClient, logger) {
         _options = options.Value;
     }
 

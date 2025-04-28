@@ -17,6 +17,7 @@ public static partial class IServiceCollectionExtensions {
             });
 
         services.AddHttpClient<ICapSolverHttpClient, CapSolverHttpClient>((provider, client) => {
+            client.BaseAddress = new Uri("https://api.capsolver.com/");
         });
 
         services.AddWhiteoutSurvivalHttpClient();
