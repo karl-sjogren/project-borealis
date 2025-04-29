@@ -43,7 +43,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
                 _logger.LogWarning("Captcha requested too frequently, waiting longer... (attempt {Attempt})", captchaRetries);
 
                 await Task.Delay(TimeSpan.FromSeconds(20), cancellationToken);
-                break;
+                continue;
             }
 
             var captchaImage = GetCaptchaImageBytes(captchaResult.Data);
