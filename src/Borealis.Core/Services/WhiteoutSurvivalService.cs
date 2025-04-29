@@ -68,6 +68,9 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
             }
+
+            // Captcha didn't fail, break out of the loop
+            break;
         }
 
         if(redeemResult == null) {
