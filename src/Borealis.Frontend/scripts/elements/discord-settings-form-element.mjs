@@ -42,7 +42,7 @@ export class DiscordSettingsForm extends LitElement {
         <div class="mb-3">
           <label for="guildId" class="form-label">Guild</label>
           <select class="form-select" id="guildId" name="guildId" @input=${this.guildChanged}>
-            <option value="" selected @input=${this.guildChanged}>Select a guild</option>
+            <option value="">Select a guild</option>
             ${this.guilds.map(guild => html`
               <option value="${guild.guildId}" ?selected="${guild.guildId === this.selectedGuildId}">${guild.name}</option>
             `)}
@@ -52,7 +52,7 @@ export class DiscordSettingsForm extends LitElement {
         <div class="mb-3">
           <label for="giftCodeChannelId" class="form-label">Gift code channel</label>
           <select class="form-select" id="giftCodeChannelId" name="giftCodeChannelId" @input=${this.channelChanged}>
-            <option value="" selected>Select a channel</option>
+            <option value="">Select a channel</option>
             ${this.channels.map(channel => html`
               <option value="${channel.channelId}" ?selected="${channel.channelId === this.selectedGiftCodeChannelId}">${channel.name}</option>
             `)}
@@ -62,7 +62,7 @@ export class DiscordSettingsForm extends LitElement {
         <div class="mb-3">
           <label for="playerRenameChannelId" class="form-label">Player rename channel</label>
           <select class="form-select" id="playerRenameChannelId" name="playerRenameChannelId" @input=${this.channelChanged}>
-            <option value="" selected>Select a channel</option>
+            <option value="">Select a channel</option>
             ${this.channels.map(channel => html`
               <option value="${channel.channelId}" ?selected="${channel.channelId === this.selectedPlayerRenamedChannelId}">${channel.name}</option>
             `)}
@@ -72,7 +72,7 @@ export class DiscordSettingsForm extends LitElement {
         <div class="mb-3">
           <label for="playerFurnaceLevelChannelId" class="form-label">Player furnace level channel</label>
           <select class="form-select" id="playerFurnaceLevelChannelId" name="playerFurnaceLevelChannelId" @input=${this.channelChanged}>
-            <option value="" selected>Select a channel</option>
+            <option value="">Select a channel</option>
             ${this.channels.map(channel => html`
               <option value="${channel.channelId}" ?selected="${channel.channelId === this.selectedPlayerFurnaceLevelChannelId}">${channel.name}</option>
             `)}
@@ -82,7 +82,7 @@ export class DiscordSettingsForm extends LitElement {
         <div class="mb-3">
           <label for="playerMovedStateChannelId" class="form-label">Player moved state channel</label>
           <select class="form-select" id="playerMovedStateChannelId" name="playerMovedStateChannelId" @input=${this.channelChanged}>
-            <option value="" selected>Select a channel</option>
+            <option value="">Select a channel</option>
             ${this.channels.map(channel => html`
               <option value="${channel.channelId}" ?selected="${channel.channelId === this.selectedPlayerMoveStateChannelId}">${channel.name}</option>
             `)}
