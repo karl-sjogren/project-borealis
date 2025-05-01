@@ -8,15 +8,12 @@ namespace Borealis.Web.Controllers;
 [Authorize(Roles = "AdminUser")]
 public class TestController : Controller {
     private readonly IEnumerable<IGiftCodeScanner> _giftCodeScanners;
-    private readonly IDiscordBotService _discordBotService;
     private readonly ILogger<TestController> _logger;
 
     public TestController(
             IEnumerable<IGiftCodeScanner> giftCodeScanners,
-            IDiscordBotService discordBotService,
             ILogger<TestController> logger) {
         _giftCodeScanners = giftCodeScanners;
-        _discordBotService = discordBotService;
         _logger = logger;
     }
 
@@ -29,12 +26,5 @@ public class TestController : Controller {
         }
 
         return Ok(giftCodes);
-    }
-
-    [HttpGet("discord/message")]
-    public async Task<ActionResult> SendMessageAsync([FromQuery] string message) {
-        await _discordBotService.SendMessageAsync(message, CancellationToken.None);
-
-        return Ok();
     }
 }

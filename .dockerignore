@@ -9,3 +9,4 @@
 Dockerfile*
 **/*.md
 start-docker-container.sh
+start-docker-dyndns.sh

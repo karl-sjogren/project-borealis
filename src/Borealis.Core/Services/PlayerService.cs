@@ -112,7 +112,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             var now = _timeProvider.GetUtcNow();
             if(existingPlayer.Name != externalPlayer.Name) {
                 if(!existingPlayer.IsMuted) {
-                    await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} changed their name to {externalPlayer.Name}.", cancellationToken);
+                    await _discordBotService.SendPlayerChangedNameMessageAsync(existingPlayer, externalPlayer.Name, existingPlayer.Name, cancellationToken);
                 }
 
                 existingPlayer.PreviousNames.Add(new PlayerNameHistoryEntry {
@@ -122,9 +122,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             }
 
             if(existingPlayer.State != externalPlayer.State) {
-                if(!existingPlayer.IsMuted) {
-                    await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} moved from state {existingPlayer.State} to {externalPlayer.State}.", cancellationToken);
-                }
+                await _discordBotService.SendPlayerChangedStateMessageAsync(existingPlayer, existingPlayer.State, externalPlayer.State, cancellationToken);
 
                 existingPlayer.PreviousStates.Add(new PlayerStateHistoryEntry {
                     State = existingPlayer.State,
@@ -141,8 +139,8 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             existingPlayer.FurnaceLevel = externalPlayer.FurnaceLevel;
             existingPlayer.State = externalPlayer.State;
 
-            if(hasUpdatedFurnaceLevel && !existingPlayer.IsMuted) {
-                await _discordBotService.SendMessageAsync($"Player {existingPlayer.Name} increased their furnace level to {existingPlayer.ExactFurnaceLevelString}.", cancellationToken);
+            if(hasUpdatedFurnaceLevel) {
+                await _discordBotService.SendPlayerChangedFurnaceLevelMessageAsync(existingPlayer, existingPlayer.ExactFurnaceLevelString, cancellationToken);
             }
 
             if(_context.Entry(existingPlayer).State == EntityState.Modified) {

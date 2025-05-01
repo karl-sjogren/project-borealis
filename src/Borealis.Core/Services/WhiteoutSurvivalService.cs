@@ -27,7 +27,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
     public async Task<Result> RedeemGiftCodeAsync(int playerId, string giftCode, CancellationToken cancellationToken) {
         var captchaRetries = 0;
-        const int maxCaptchaRetries = 3;
+        const int maxCaptchaRetries = 10;
 
         WhiteoutSurvivalResponseWrapper? redeemResult = null;
 
@@ -67,6 +67,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
                 _logger.LogWarning("Captcha failed, retrying... (attempt {Attempt})", captchaRetries);
 
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                continue;
             }
 
             // Captcha didn't fail, break out of the loop
