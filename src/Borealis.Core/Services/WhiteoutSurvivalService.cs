@@ -31,7 +31,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
         WhiteoutSurvivalResponseWrapper? redeemResult = null;
 
-        while(captchaRetries <= maxCaptchaRetries) {
+        while(captchaRetries < maxCaptchaRetries) {
             var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(playerId, cancellationToken); // We need to "sign in" the player
             if(playerResult.ErrorCode != 0) {
                 return Results.Failure($"Failed to get player info: {playerResult.ErrorCode}, message: {playerResult.Message}");
