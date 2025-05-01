@@ -47,7 +47,7 @@ public class DiscordBotService : IDiscordBotService {
             return Task.CompletedTask;
         }
 
-        var message = $"Player {oldName} changed their name from {oldName} to {newName}.";
+        var message = $"Player {oldName} changed their name to {newName}.";
         return SendMessageAsync(message, cancellationToken);
     }
 
