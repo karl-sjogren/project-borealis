@@ -38,7 +38,7 @@ public class DiscordBotService : IDiscordBotService {
     }
 
     public Task SendGiftCodeAddedMessageAsync(GiftCode giftCode, CancellationToken cancellationToken) {
-        var message = $"New gift code found: {giftCode.Code} ";
+        var message = $"New gift code found: {giftCode.Code}";
         return SendMessageAsync(message, cancellationToken);
     }
 
