@@ -162,7 +162,9 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.NotFound("Player not found.");
         }
 
-        var giftCodeEntity = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Code == giftCode, cancellationToken);
+        var giftCodeEntity = await _context
+            .GiftCodes
+            .FirstOrDefaultAsync(x => x.Code == giftCode, cancellationToken);
 
         if(giftCodeEntity is null) {
             return Results.NotFound("Gift code not found.");
@@ -172,7 +174,9 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.Failure("Gift code is expired.");
         }
 
-        var existingRedemption = await _context.GiftCodeRedemptions.FirstOrDefaultAsync(x => x.PlayerId == player.Id && x.GiftCodeId == giftCodeEntity.Id, cancellationToken);
+        var existingRedemption = await _context
+            .GiftCodeRedemptions
+            .FirstOrDefaultAsync(x => x.PlayerId == player.Id && x.GiftCodeId == giftCodeEntity.Id, cancellationToken);
 
         if(existingRedemption is not null) {
             return Results.Conflict("Gift code already redeemed.");

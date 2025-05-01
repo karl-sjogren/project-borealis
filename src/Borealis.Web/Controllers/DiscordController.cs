@@ -1,33 +1,34 @@
-using Borealis.Core.Contracts;
+using Borealis.Core;
+using Borealis.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Web.Controllers;
 
-[Route("api/discord")]
+[Route("discord")]
 [Authorize(Roles = "AdminUser")]
 public class DiscordController : Controller {
-    private readonly IDiscordBotService _discordBotService;
+    private readonly BorealisContext _borealisContext;
     private readonly ILogger<DiscordController> _logger;
 
     public DiscordController(
-            IDiscordBotService discordBotService,
+            BorealisContext borealisContext,
             ILogger<DiscordController> logger) {
-        _discordBotService = discordBotService;
+        _borealisContext = borealisContext;
         _logger = logger;
     }
 
-    [HttpGet("guilds")]
-    public async Task<ActionResult> ListGuildsAsync(CancellationToken cancellationToken) {
-        var guilds = await _discordBotService.GetGuildsAsync(cancellationToken);
+    [HttpGet]
+    public ActionResult Index() {
+        var settings = _borealisContext.DiscordNotificationSettings
+            .AsNoTracking()
+            .FirstOrDefault();
 
-        return Ok(guilds);
-    }
+        var viewModel = new DiscordIndexViewModel {
+            Settings = settings
+        };
 
-    [HttpGet("guilds/{guildId}/channels")]
-    public async Task<ActionResult> ListChannelsAsync(ulong guildId, CancellationToken cancellationToken) {
-        var channels = await _discordBotService.GetChannelsAsync(guildId, cancellationToken);
-
-        return Ok(channels);
+        return View(viewModel);
     }
 }

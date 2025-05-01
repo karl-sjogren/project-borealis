@@ -67,6 +67,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
                 _logger.LogWarning("Captcha failed, retrying... (attempt {Attempt})", captchaRetries);
 
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                continue;
             }
 
             // Captcha didn't fail, break out of the loop

@@ -1,91 +1,123 @@
+using System.Globalization;
 using Borealis.Core.Contracts;
 using Borealis.Core.Models;
 using Discord;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Core.Services;
 
 public class DiscordBotService : IDiscordBotService {
+    private readonly BorealisContext _borealisContext;
     private readonly IDiscordClient _discordClient;
-    private readonly IConfiguration _configuration;
+    private readonly ILogger<DiscordBotService> _logger;
 
-    public DiscordBotService(IDiscordClient discordClient, IConfiguration configuration) {
+    public DiscordBotService(BorealisContext borealisContext, IDiscordClient discordClient, ILogger<DiscordBotService> logger) {
+        _borealisContext = borealisContext;
         _discordClient = discordClient;
-        _configuration = configuration;
+        _logger = logger;
     }
 
-    private ulong GetChannelId() {
-        var channelId = _configuration["DiscordBotChannelId"];
-        if(channelId == null) {
-            throw new InvalidOperationException("DiscordBotChannelId is not set in the configuration.");
+    private async Task<DiscordNotificationSettings?> GetSettingsAsync(CancellationToken cancellationToken) {
+        var settings = await _borealisContext
+            .DiscordNotificationSettings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if(settings is null) {
+            _logger.LogWarning("Discord notification settings not found. Setup required from web interface.");
         }
 
-        if(!ulong.TryParse(channelId, out var result)) {
-            throw new InvalidOperationException("DiscordBotChannelId is not a valid number.");
-        }
-
-        return result;
+        return settings;
     }
 
-    public async Task SendMessageAsync(string message, CancellationToken cancellationToken) {
-        var channelId = GetChannelId();
-        var channel = await _discordClient.GetChannelAsync(channelId) as IMessageChannel;
+    public async Task SendMessageAsync(string? channelId, string message, CancellationToken cancellationToken) {
+        if(!ulong.TryParse(channelId, out var parseChannelId)) {
+            _logger.LogWarning("Invalid channel ID: {ChannelId}", channelId);
+            return;
+        }
+
+        var channel = await _discordClient.GetChannelAsync(parseChannelId) as ITextChannel;
         if(channel is null) {
-            throw new InvalidOperationException($"Channel {channelId} is not a valid message channel.");
+            throw new InvalidOperationException($"Channel {parseChannelId} is not a valid message channel.");
         }
 
         await channel.SendMessageAsync(message);
     }
 
-    public Task SendGiftCodeAddedMessageAsync(GiftCode giftCode, CancellationToken cancellationToken) {
+    public async Task SendGiftCodeAddedMessageAsync(GiftCode giftCode, CancellationToken cancellationToken) {
+        var settings = await GetSettingsAsync(cancellationToken);
+        if(settings is null) {
+            return;
+        }
+
         var message = $"New gift code found: {giftCode.Code}";
-        return SendMessageAsync(message, cancellationToken);
+        await SendMessageAsync(settings.GiftCodeChannelId, message, cancellationToken);
     }
 
-    public Task SendPlayerChangedNameMessageAsync(Player player, string newName, string oldName, CancellationToken cancellationToken) {
+    public async Task SendPlayerChangedNameMessageAsync(Player player, string newName, string oldName, CancellationToken cancellationToken) {
         if(player.IsMuted) {
-            return Task.CompletedTask;
+            return;
+        }
+
+        var settings = await GetSettingsAsync(cancellationToken);
+        if(settings is null) {
+            return;
         }
 
         var message = $"Player {oldName} changed their name to {newName}.";
-        return SendMessageAsync(message, cancellationToken);
+        await SendMessageAsync(settings.PlayerRenameChannelId, message, cancellationToken);
     }
 
-    public Task SendPlayerChangedFurnaceLevelMessageAsync(Player player, string furnaceLevel, CancellationToken cancellationToken) {
+    public async Task SendPlayerChangedFurnaceLevelMessageAsync(Player player, string furnaceLevel, CancellationToken cancellationToken) {
         if(player.IsMuted) {
-            return Task.CompletedTask;
+            return;
+        }
+
+        var settings = await GetSettingsAsync(cancellationToken);
+        if(settings is null) {
+            return;
         }
 
         var message = $"Player {player.Name} increased their furnace level to {furnaceLevel}.";
-        return SendMessageAsync(message, cancellationToken);
+        await SendMessageAsync(settings.PlayerFurnaceLevelChannelId, message, cancellationToken);
     }
 
-    public Task SendPlayerChangedStateMessageAsync(Player player, int newState, int oldState, CancellationToken cancellationToken) {
+    public async Task SendPlayerChangedStateMessageAsync(Player player, int newState, int oldState, CancellationToken cancellationToken) {
         if(player.IsMuted) {
-            return Task.CompletedTask;
+            return;
+        }
+
+        var settings = await GetSettingsAsync(cancellationToken);
+        if(settings is null) {
+            return;
         }
 
         var message = $"Player {player.Name} moved state from {oldState} to {newState}.";
-        return SendMessageAsync(message, cancellationToken);
+        await SendMessageAsync(settings.PlayerMovedStateChannelId, message, cancellationToken);
     }
 
     public async Task<IReadOnlyCollection<DiscordGuild>> GetGuildsAsync(CancellationToken cancellationToken) {
         var guilds = await _discordClient.GetGuildsAsync();
 
-        return [.. guilds.Select(guild => new DiscordGuild {
-            GuildId = guild.Id,
-            Name = guild.Name
-        })];
+        return [.. guilds
+            .Select(guild => new DiscordGuild {
+                GuildId = guild.Id.ToString(CultureInfo.InvariantCulture),
+                Name = guild.Name
+            })
+        ];
     }
 
-    public async Task<IReadOnlyCollection<DiscordChannel>> GetChannelsAsync(ulong guildId, CancellationToken cancellationToken) {
-        var guild = await _discordClient.GetGuildAsync(guildId);
+    public async Task<IReadOnlyCollection<DiscordChannel>> GetChannelsAsync(string guildId, CancellationToken cancellationToken) {
+        var guild = await _discordClient.GetGuildAsync(ulong.Parse(guildId, CultureInfo.InvariantCulture));
         var channels = await guild.GetChannelsAsync();
 
-        return [.. channels.Select(channel => new DiscordChannel {
-            GuildId = channel.GuildId,
-            ChannelId = channel.Id,
-            Name = channel.Name
-        })];
+        return [.. channels
+            .Where(channel => channel is ITextChannel)
+            .Select(channel => new DiscordChannel {
+                GuildId = channel.GuildId.ToString(CultureInfo.InvariantCulture),
+                ChannelId = channel.Id.ToString(CultureInfo.InvariantCulture),
+                Name = channel.Name
+            })
+        ];
     }
 }
