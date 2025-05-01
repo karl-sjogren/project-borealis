@@ -27,7 +27,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
     public async Task<Result> RedeemGiftCodeAsync(int playerId, string giftCode, CancellationToken cancellationToken) {
         var captchaRetries = 0;
-        const int maxCaptchaRetries = 3;
+        const int maxCaptchaRetries = 10;
 
         WhiteoutSurvivalResponseWrapper? redeemResult = null;
 
