@@ -96,7 +96,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             return Results.Failure("Gift code is expired.");
         }
 
-        await _discordBotService.SendMessageAsync($"New gift code added: {newGiftCode.Code}", cancellationToken);
+        await _discordBotService.SendGiftCodeAddedMessageAsync(newGiftCode, cancellationToken);
 
         await EnqueueGiftCodeAsync(newGiftCode.Id, cancellationToken);
 
