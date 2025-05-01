@@ -1,4 +1,4 @@
-
+@model DiscordIndexViewModel
 @{
     ViewData["Title"] = "Discord";
 }
@@ -8,5 +8,11 @@
         <h1 class="display-4">Discord channel settings</h1>
     </div>
 
-    <discord-settings-form></discord-settings-form>
+    <discord-settings-form
+      selectedguildid="@Model.Settings?.GuildId"
+      selectedgiftcodechannelid="@Model.Settings?.GiftCodeChannelId"
+      selectedplayerrenamedchannelid="@Model.Settings?.PlayerRenameChannelId"
+      selectedplayerfurnacelevelchannelid="@Model.Settings?.PlayerFurnaceLevelChannelId"
+      selectedplayermovestatechannelid="@Model.Settings?.PlayerMovedStateChannelId"
+    ></discord-settings-form>
 </div>

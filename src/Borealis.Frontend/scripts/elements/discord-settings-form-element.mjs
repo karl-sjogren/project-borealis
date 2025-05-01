@@ -8,7 +8,10 @@ export class DiscordSettingsForm extends LitElement {
       guilds: { type: Array },
       channels: { type: Array },
       selectedGuildId: { type: String },
-      selectedChannelId: { type: String }
+      selectedGiftCodeChannelId: { type: String },
+      selectedPlayerRenamedChannelId: { type: String },
+      selectedPlayerFurnaceLevelChannelId: { type: String },
+      selectedPlayerMoveStateChannelId: { type: String }
     };
   }
 
@@ -94,15 +97,16 @@ export class DiscordSettingsForm extends LitElement {
   async handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const data = Object.fromEntries(formData.entries());
 
-    console.log(data);
+    await fetch('/api/discord/settings', {
+      method: 'PUT',
+      body: formData
+    });
   }
 
   async guildChanged(event) {
     const selectedGuildId = event.target.value;
     this.selectedGuildId = selectedGuildId;
-    //this.selectedChannelId = null;
 
     if (selectedGuildId) {
       await this.loadChannels(selectedGuildId);
@@ -125,6 +129,14 @@ export class DiscordSettingsForm extends LitElement {
       console.error('Error fetching guilds:', error);
     } finally {
       this.loading = false;
+    }
+
+    if(this.guilds.length === 1 && !this.selectedGuildId) {
+      this.selectedGuildId = this.guilds[0].guildId;
+    }
+
+    if(this.selectedGuildId) {
+      await this.loadChannels(this.selectedGuildId);
     }
   }
 
