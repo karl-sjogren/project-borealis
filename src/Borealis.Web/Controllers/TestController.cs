@@ -31,10 +31,17 @@ public class TestController : Controller {
         return Ok(giftCodes);
     }
 
-    [HttpGet("discord/message")]
-    public async Task<ActionResult> SendMessageAsync([FromQuery] string message) {
-        await _discordBotService.SendMessageAsync(message, CancellationToken.None);
+    [HttpGet("discord/guilds")]
+    public async Task<ActionResult> ListGuildsAsync(CancellationToken cancellationToken) {
+        var guilds = await _discordBotService.GetGuildsAsync(cancellationToken);
 
-        return Ok();
+        return Ok(guilds);
+    }
+
+    [HttpGet("discord/guilds/{guildId}/channels")]
+    public async Task<ActionResult> ListChannelsAsync(ulong guildId, CancellationToken cancellationToken) {
+        var channels = await _discordBotService.GetChannelsAsync(guildId, cancellationToken);
+
+        return Ok(channels);
     }
 }
