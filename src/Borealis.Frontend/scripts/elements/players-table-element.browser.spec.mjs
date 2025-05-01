@@ -24,7 +24,7 @@ describe('players-table-element', async () => {
     document.body.appendChild(element);
 
     server = new Pretender(function() {
-      this.put('/api/songs/99', request => [404, {}, '']);
+      this.put('/api/player', request => [404, {}, '']);
     });
   });
 

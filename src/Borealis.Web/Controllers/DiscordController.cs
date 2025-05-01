@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Borealis.Web.Controllers;
 
-[Route("api/discord")]
+[Route("discord")]
 [Authorize(Roles = "AdminUser")]
 public class DiscordController : Controller {
     private readonly IDiscordBotService _discordBotService;
@@ -17,17 +17,8 @@ public class DiscordController : Controller {
         _logger = logger;
     }
 
-    [HttpGet("guilds")]
-    public async Task<ActionResult> ListGuildsAsync(CancellationToken cancellationToken) {
-        var guilds = await _discordBotService.GetGuildsAsync(cancellationToken);
-
-        return Ok(guilds);
-    }
-
-    [HttpGet("guilds/{guildId}/channels")]
-    public async Task<ActionResult> ListChannelsAsync(ulong guildId, CancellationToken cancellationToken) {
-        var channels = await _discordBotService.GetChannelsAsync(guildId, cancellationToken);
-
-        return Ok(channels);
+    [HttpGet]
+    public ActionResult Index() {
+        return View();
     }
 }

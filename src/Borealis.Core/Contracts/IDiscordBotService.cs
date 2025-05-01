@@ -8,5 +8,5 @@ public interface IDiscordBotService {
     Task SendPlayerChangedFurnaceLevelMessageAsync(Player player, string furnaceLevel, CancellationToken cancellationToken);
     Task SendPlayerChangedStateMessageAsync(Player player, int newState, int oldState, CancellationToken cancellationToken);
     Task<IReadOnlyCollection<DiscordGuild>> GetGuildsAsync(CancellationToken cancellationToken);
-    Task<IReadOnlyCollection<DiscordChannel>> GetChannelsAsync(ulong guildId, CancellationToken cancellationToken);
+    Task<IReadOnlyCollection<DiscordChannel>> GetChannelsAsync(string guildId, CancellationToken cancellationToken);
 }

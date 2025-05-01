@@ -1,3 +1,4 @@
+using System.Globalization;
 using Borealis.Core.Contracts;
 using Borealis.Core.Models;
 using Discord;
@@ -72,20 +73,25 @@ public class DiscordBotService : IDiscordBotService {
     public async Task<IReadOnlyCollection<DiscordGuild>> GetGuildsAsync(CancellationToken cancellationToken) {
         var guilds = await _discordClient.GetGuildsAsync();
 
-        return [.. guilds.Select(guild => new DiscordGuild {
-            GuildId = guild.Id,
-            Name = guild.Name
-        })];
+        return [.. guilds
+            .Select(guild => new DiscordGuild {
+                GuildId = guild.Id.ToString(CultureInfo.InvariantCulture),
+                Name = guild.Name
+            })
+        ];
     }
 
-    public async Task<IReadOnlyCollection<DiscordChannel>> GetChannelsAsync(ulong guildId, CancellationToken cancellationToken) {
-        var guild = await _discordClient.GetGuildAsync(guildId);
+    public async Task<IReadOnlyCollection<DiscordChannel>> GetChannelsAsync(string guildId, CancellationToken cancellationToken) {
+        var guild = await _discordClient.GetGuildAsync(ulong.Parse(guildId, CultureInfo.InvariantCulture));
         var channels = await guild.GetChannelsAsync();
 
-        return [.. channels.Select(channel => new DiscordChannel {
-            GuildId = channel.GuildId,
-            ChannelId = channel.Id,
-            Name = channel.Name
-        })];
+        return [.. channels
+            .Where(channel => channel is ITextChannel)
+            .Select(channel => new DiscordChannel {
+                GuildId = channel.GuildId.ToString(CultureInfo.InvariantCulture),
+                ChannelId = channel.Id.ToString(CultureInfo.InvariantCulture),
+                Name = channel.Name
+            })
+        ];
     }
 }
