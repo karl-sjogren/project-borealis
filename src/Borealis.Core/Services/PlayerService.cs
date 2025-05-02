@@ -122,7 +122,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             }
 
             if(existingPlayer.State != externalPlayer.State) {
-                await _discordBotService.SendPlayerChangedStateMessageAsync(existingPlayer, existingPlayer.State, externalPlayer.State, cancellationToken);
+                await _discordBotService.SendPlayerChangedStateMessageAsync(existingPlayer, externalPlayer.State, existingPlayer.State, cancellationToken);
 
                 existingPlayer.PreviousStates.Add(new PlayerStateHistoryEntry {
                     State = existingPlayer.State,
