@@ -104,6 +104,7 @@ public class DiscordBotService : IDiscordBotService {
                 GuildId = guild.Id.ToString(CultureInfo.InvariantCulture),
                 Name = guild.Name
             })
+            .OrderBy(guild => guild.Name, StringComparer.OrdinalIgnoreCase)
         ];
     }
 
@@ -118,6 +119,7 @@ public class DiscordBotService : IDiscordBotService {
                 ChannelId = channel.Id.ToString(CultureInfo.InvariantCulture),
                 Name = channel.Name
             })
+            .OrderBy(guild => guild.Name, StringComparer.OrdinalIgnoreCase)
         ];
     }
 }
