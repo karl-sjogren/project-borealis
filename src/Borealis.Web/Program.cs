@@ -45,7 +45,7 @@ builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
 });
 
-var enableLettuceEncrypt = builder.Configuration.GetValue<bool>("LettuceEncrypt:Enabled", false);
+var enableLettuceEncrypt = builder.Configuration.GetValue("LettuceEncrypt:Enabled", false);
 if(builder.Environment.IsProduction() && enableLettuceEncrypt) {
     builder.Services.AddLettuceEncrypt();
 }
@@ -110,7 +110,10 @@ if(app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+var useHttpsRedirection = builder.Configuration.GetValue("Borealis:UseHttpRedirection", false);
+if(useHttpsRedirection) {
+    app.UseHttpsRedirection();
+}
 
 app.UseRouting();
 
