@@ -67,7 +67,8 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
 
         var player = await _context
             .Players
-            .OrderByDescending(x => x.ExternalId)
+            .Where(x => x.IsInAlliance || x.ForceRedeemGiftCodes)
+            .OrderByDescending(x => EF.Functions.Random())
             .FirstOrDefaultAsync(cancellationToken);
 
         var isExpired = false;
