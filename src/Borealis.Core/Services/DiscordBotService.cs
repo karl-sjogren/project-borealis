@@ -1,19 +1,27 @@
 using System.Globalization;
 using Borealis.Core.Contracts;
 using Borealis.Core.Models;
+using Borealis.Core.Options;
 using Discord;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Borealis.Core.Services;
 
 public class DiscordBotService : IDiscordBotService {
     private readonly BorealisContext _borealisContext;
     private readonly IDiscordClient _discordClient;
+    private readonly IOptions<BorealisOptions> _borealisOptions;
     private readonly ILogger<DiscordBotService> _logger;
 
-    public DiscordBotService(BorealisContext borealisContext, IDiscordClient discordClient, ILogger<DiscordBotService> logger) {
+    public DiscordBotService(
+            BorealisContext borealisContext,
+            IDiscordClient discordClient,
+            IOptions<BorealisOptions> borealisOptions,
+            ILogger<DiscordBotService> logger) {
         _borealisContext = borealisContext;
         _discordClient = discordClient;
+        _borealisOptions = borealisOptions;
         _logger = logger;
     }
 
@@ -30,7 +38,23 @@ public class DiscordBotService : IDiscordBotService {
         return settings;
     }
 
-    public async Task SendMessageAsync(string? channelId, string message, CancellationToken cancellationToken) {
+    private async Task SendPlayerMessageAsync(string? channelId, string message, Player player) {
+        var options = _borealisOptions.Value;
+
+        var builder = new ComponentBuilder();
+
+        // TODO Add containers and stuff when supported
+
+        if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
+            builder.AddRow(new ActionRowBuilder()
+                .WithButton("View player", style: ButtonStyle.Link, url: $"{options.ApplicationUrl}players/{player.Id}")
+            );
+        }
+
+        await SendMessageAsync(channelId, message, builder.Build());
+    }
+
+    public async Task SendMessageAsync(string? channelId, string message, MessageComponent? messageComponent = null) {
         if(!ulong.TryParse(channelId, out var parseChannelId)) {
             _logger.LogWarning("Invalid channel ID: {ChannelId}", channelId);
             return;
@@ -41,7 +65,7 @@ public class DiscordBotService : IDiscordBotService {
             throw new InvalidOperationException($"Channel {parseChannelId} is not a valid message channel.");
         }
 
-        await channel.SendMessageAsync(message);
+        await channel.SendMessageAsync(message, components: messageComponent);
     }
 
     public async Task SendGiftCodeAddedMessageAsync(GiftCode giftCode, CancellationToken cancellationToken) {
@@ -50,8 +74,18 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
+        var options = _borealisOptions.Value;
+
+        var builder = new ComponentBuilder();
+
+        if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
+            builder.AddRow(new ActionRowBuilder()
+                .WithButton("View gift code", style: ButtonStyle.Link, url: $"{options.ApplicationUrl}gift-codes/{giftCode.Id}")
+            );
+        }
+
         var message = $"New gift code found: {giftCode.Code}";
-        await SendMessageAsync(settings.GiftCodeChannelId, message, cancellationToken);
+        await SendMessageAsync(settings.GiftCodeChannelId, message, builder.Build());
     }
 
     public async Task SendPlayerChangedNameMessageAsync(Player player, string newName, string oldName, CancellationToken cancellationToken) {
@@ -64,8 +98,18 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
-        var message = $"Player {oldName} changed their name to {newName}.";
-        await SendMessageAsync(settings.PlayerRenameChannelId, message, cancellationToken);
+        var previousNames = player.PreviousNames
+            .Select(x => x.Name)
+            .Except([newName, oldName])
+            .Distinct()
+            .ToList();
+
+        var message = $"Player {oldName} (#{player.State}) changed their name to {newName}.";
+        if(previousNames.Count > 0) {
+            message += $" Previous names: {string.Join(", ", previousNames)}.";
+        }
+
+        await SendPlayerMessageAsync(settings.PlayerRenameChannelId, message, player);
     }
 
     public async Task SendPlayerChangedFurnaceLevelMessageAsync(Player player, string furnaceLevel, CancellationToken cancellationToken) {
@@ -78,8 +122,8 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
-        var message = $"Player {player.Name} increased their furnace level to {furnaceLevel}.";
-        await SendMessageAsync(settings.PlayerFurnaceLevelChannelId, message, cancellationToken);
+        var message = $"Player {player.Name} (#{player.State}) increased their furnace level to {furnaceLevel}.";
+        await SendPlayerMessageAsync(settings.PlayerFurnaceLevelChannelId, message, player);
     }
 
     public async Task SendPlayerChangedStateMessageAsync(Player player, int newState, int oldState, CancellationToken cancellationToken) {
@@ -93,7 +137,7 @@ public class DiscordBotService : IDiscordBotService {
         }
 
         var message = $"Player {player.Name} moved state from {oldState} to {newState}.";
-        await SendMessageAsync(settings.PlayerMovedStateChannelId, message, cancellationToken);
+        await SendPlayerMessageAsync(settings.PlayerMovedStateChannelId, message, player);
     }
 
     public async Task<IReadOnlyCollection<DiscordGuild>> GetGuildsAsync(CancellationToken cancellationToken) {
@@ -104,6 +148,7 @@ public class DiscordBotService : IDiscordBotService {
                 GuildId = guild.Id.ToString(CultureInfo.InvariantCulture),
                 Name = guild.Name
             })
+            .OrderBy(guild => guild.Name, StringComparer.OrdinalIgnoreCase)
         ];
     }
 
@@ -118,6 +163,7 @@ public class DiscordBotService : IDiscordBotService {
                 ChannelId = channel.Id.ToString(CultureInfo.InvariantCulture),
                 Name = channel.Name
             })
+            .OrderBy(guild => guild.Name, StringComparer.OrdinalIgnoreCase)
         ];
     }
 }

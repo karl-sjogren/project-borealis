@@ -2,11 +2,9 @@ using System.Globalization;
 using System.Security.Claims;
 using AspNet.Security.OAuth.Discord;
 using Borealis.Core;
-using Borealis.Core.Options;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace Borealis.Web.Extensions;
 
@@ -47,8 +45,6 @@ public static partial class IServiceCollectionExtensions {
                         user.GetString("avatar")?.StartsWith("a_", StringComparison.Ordinal) == true ? "gif" : "png"));
 
                 options.Events.OnCreatingTicket = async (ctx) => {
-                    var options = ctx.HttpContext.RequestServices.GetRequiredService<IOptionsSnapshot<BorealisAuthenticationOptions>>();
-
                     var userIdentity = ctx.Principal?.Identity as ClaimsIdentity;
 
                     if(userIdentity == null) {
