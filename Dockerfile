@@ -9,7 +9,7 @@ RUN dotnet restore -a $TARGETARCH
 RUN dotnet publish ./src/Borealis.Web/Borealis.Web.csproj -a $TARGETARCH --no-restore -o /app
 
 # Build frontend
-FROM node:22 AS frontend
+FROM node:23-slim AS frontend
 WORKDIR /source
 
 COPY --link ./src/Borealis.Frontend .
@@ -29,9 +29,6 @@ COPY --link --from=build /app .
 COPY --link --from=frontend /source/artifacts ./wwwroot
 
 USER $APP_UID
-
-ENV ASPNETCORE_HTTP_PORTS=80;8080
-ENV ASPNETCORE_HTTPS_PORTS=443;8081
 
 EXPOSE 8080/tcp
 EXPOSE 8081/tcp
