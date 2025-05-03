@@ -74,8 +74,18 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
+        var options = _borealisOptions.Value;
+
+        var builder = new ComponentBuilder();
+
+        if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
+            builder.AddRow(new ActionRowBuilder()
+                .WithButton("View gift code", style: ButtonStyle.Link, url: $"{options.ApplicationUrl}gift-codes/{giftCode.Id}")
+            );
+        }
+
         var message = $"New gift code found: {giftCode.Code}";
-        await SendMessageAsync(settings.GiftCodeChannelId, message);
+        await SendMessageAsync(settings.GiftCodeChannelId, message, builder.Build());
     }
 
     public async Task SendPlayerChangedNameMessageAsync(Player player, string newName, string oldName, CancellationToken cancellationToken) {
