@@ -51,7 +51,7 @@ if(builder.Environment.IsProduction() && enableLettuceEncrypt) {
 }
 
 builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
-builder.Services.Configure<BorealisAuthenticationOptions>(builder.Configuration.GetSection("BorealisAuthentication"));
+builder.Services.Configure<BorealisOptions>(builder.Configuration.GetSection("Borealis"));
 
 builder.Services.AddHttpClients();
 
@@ -83,7 +83,13 @@ if(builder.Environment.IsProduction()) {
 }
 
 builder.Services.AddScoped<IDiscordBotService, DiscordBotService>();
-builder.Services.AddSingleton<IDiscordClient, DiscordSocketClient>();
+builder.Services.AddSingleton<IDiscordClient>(_ => {
+    var discordClient = new DiscordSocketClient(new DiscordSocketConfig {
+        GatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildScheduledEvents & ~GatewayIntents.GuildInvites
+    });
+
+    return discordClient;
+});
 builder.Services.AddHostedService<DiscordBotInitializationService>();
 
 var app = builder.Build();
