@@ -1,19 +1,23 @@
 
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 
 namespace Borealis.Web.HostedServices;
 
 public class DiscordBotInitializationService : IHostedService {
     private readonly IDiscordClient _discordClient;
+    private readonly InteractionService _interactionService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<DiscordBotInitializationService> _logger;
 
     public DiscordBotInitializationService(
             IDiscordClient discordClient,
+            InteractionService interactionService,
             IConfiguration configuration,
             ILogger<DiscordBotInitializationService> logger) {
         _discordClient = discordClient;
+        _interactionService = interactionService;
         _configuration = configuration;
         _logger = logger;
     }
@@ -45,6 +49,14 @@ public class DiscordBotInitializationService : IHostedService {
             }
 
             return Task.CompletedTask;
+        };
+
+        client.Ready += async () => {
+            _logger.LogInformation("Discord bot is ready.");
+
+            await _interactionService.RegisterCommandsGloballyAsync();
+
+            _logger.LogInformation("Discord commands registered.");
         };
 
         await client.LoginAsync(TokenType.Bot, token);

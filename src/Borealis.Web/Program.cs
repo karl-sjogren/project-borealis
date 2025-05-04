@@ -8,6 +8,7 @@ using Borealis.Web.HostedServices;
 using Borealis.Web.Mvc;
 using Borealis.WhiteoutSurvivalHttpClient;
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.StaticFiles;
@@ -90,6 +91,10 @@ builder.Services.AddSingleton<IDiscordClient>(_ => {
 
     return discordClient;
 });
+
+builder.Services.AddSingleton(x => x.GetRequiredService<DiscordSocketClient>());
+builder.Services.AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()));
+builder.Services.AddSingleton<DiscordInteractionService>();
 builder.Services.AddHostedService<DiscordBotInitializationService>();
 
 var app = builder.Build();
