@@ -4,12 +4,19 @@ using AspNet.Security.OAuth.Discord;
 using Borealis.Core;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 namespace Borealis.Web.Extensions;
 
 public static partial class IServiceCollectionExtensions {
     public static IServiceCollection AddAppAuthentication(this IServiceCollection services, IConfiguration configuration) {
+        services.Configure<ForwardedHeadersOptions>(options => {
+            options.ForwardedHeaders = ForwardedHeaders.All;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
         services.ConfigureApplicationCookie(options => {
             // Cookie settings
             options.Cookie.HttpOnly = true;
