@@ -107,6 +107,7 @@ if(app.Environment.IsDevelopment()) {
     app.UseMigrationsEndPoint();
 } else {
     app.UseExceptionHandler("/Error");
+    app.UseForwardedHeaders();
     app.UseHsts();
 }
 
