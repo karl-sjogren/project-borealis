@@ -54,6 +54,7 @@ builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSec
 builder.Services.Configure<BorealisOptions>(builder.Configuration.GetSection("Borealis"));
 
 builder.Services.AddHttpClients();
+builder.Services.AddCaptchaServices();
 
 builder.Services.AddAppAuthentication(builder.Configuration);
 
