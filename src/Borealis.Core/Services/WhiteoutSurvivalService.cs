@@ -7,15 +7,15 @@ namespace Borealis.Core.Services;
 
 public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
     private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
-    private readonly ICapSolverHttpClient _capSolverHttpClient;
+    private readonly ICaptchaSolver _captchaSolver;
     private readonly ILogger<WhiteoutSurvivalService> _logger;
 
     public WhiteoutSurvivalService(
             IWhiteoutSurvivalHttpClient whiteoutSurvivalHttpClient,
-            ICapSolverHttpClient capSolverHttpClient,
+            ICaptchaSolver captchaSolver,
             ILogger<WhiteoutSurvivalService> logger) {
         _whiteoutSurvivalHttpClient = whiteoutSurvivalHttpClient;
-        _capSolverHttpClient = capSolverHttpClient;
+        _captchaSolver = captchaSolver;
         _logger = logger;
     }
 
@@ -51,9 +51,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
                 return Results.Failure("Failed to get captcha image bytes.");
             }
 
-            var captchaResponse = await _capSolverHttpClient.ImageToTextAsync(captchaImage, cancellationToken);
-
-            var captchaSolution = captchaResponse?.Solution?.Text;
+            var captchaSolution = await _captchaSolver.SolveCaptchaAsync(captchaImage, cancellationToken);
             if(string.IsNullOrEmpty(captchaSolution)) {
                 return Results.Failure("Failed to solve captcha.");
             }
@@ -76,6 +74,12 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
         if(redeemResult == null) {
             return Results.Failure("Failed to even try redeeming gift code.");
+        }
+
+        // This is a special case that seems to happen sometimes
+        // while the error code is 0, the message is "Sign Error"
+        if(redeemResult.Message == "Sign Error") {
+            return Results.Failure("Sign error. This usually means the gift code is invalid.");
         }
 
         return redeemResult.ErrorCode switch {
