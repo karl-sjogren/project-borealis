@@ -76,6 +76,12 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
             return Results.Failure("Failed to even try redeeming gift code.");
         }
 
+        // This is a special case that seems to happen sometimes
+        // while the error code is 0, the message is "Sign Error"
+        if(redeemResult.Message == "Sign Error") {
+            return Results.Failure("Sign error. This usually means the gift code is invalid.");
+        }
+
         return redeemResult.ErrorCode switch {
             // Code success
             0 or 20000 or 40008 or 40011 => Results.Success("Gift code redeemed or was already redeemed."),

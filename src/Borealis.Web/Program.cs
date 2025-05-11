@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Serilog;
 using Shorthand.Vite;
@@ -27,8 +28,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
-builder.Services.Configure<CapSolverOptions>(builder.Configuration.GetSection("CapSolver"));
-builder.Services.Configure<WosLandOptions>(builder.Configuration.GetSection("WosLand"));
+builder.Services.AddOptions<CapSolverOptions>().Bind(builder.Configuration.GetSection("CapSolver")).ValidateOnStart();
+builder.Services.AddOptions<WosLandOptions>().Bind(builder.Configuration.GetSection("WosLand")).ValidateOnStart();
+builder.Services.AddOptions<WhiteoutSurvivalOptions>().Bind(builder.Configuration.GetSection("WhiteoutSurvival")).ValidateOnStart();
+
+builder.Services.AddOptions<BorealisOptions>().Bind(builder.Configuration.GetSection("Borealis")).ValidateOnStart();
+builder.Services.AddSingleton<IValidateOptions<BorealisOptions>, BorealisOptionsValidator>();
 
 // Add services to the container.
 var connectionStringBuilder = new SqliteConnectionStringBuilder {
@@ -49,9 +54,6 @@ var enableLettuceEncrypt = builder.Configuration.GetValue("LettuceEncrypt:Enable
 if(builder.Environment.IsProduction() && enableLettuceEncrypt) {
     builder.Services.AddLettuceEncrypt();
 }
-
-builder.Services.Configure<WhiteoutSurvivalOptions>(builder.Configuration.GetSection("WhiteoutSurvival"));
-builder.Services.Configure<BorealisOptions>(builder.Configuration.GetSection("Borealis"));
 
 builder.Services.AddHttpClients();
 builder.Services.AddCaptchaServices();
