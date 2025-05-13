@@ -2472,10 +2472,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap-icons@npm:^1.13.0":
-  version: 1.13.0
-  resolution: "bootstrap-icons@npm:1.13.0"
-  checksum: 10/1b6e28b640d794dfc0af6f10604bc2937f2ee2577667430a1ae105200a5a038b45c2df0be2eb3642494c362781bb331409bb882f0b9a9d1681b263642598de10
+"bootstrap-icons@npm:^1.13.1":
+  version: 1.13.1
+  resolution: "bootstrap-icons@npm:1.13.1"
+  checksum: 10/d6a3bb69268c5132acd4b4a3ca40c46c4548f7c8cbb33154d2d5fa4668c42e0b60a2e55abcd08aca9b1e6871ce5b18ce5f7789031486e8807cc552cc52f88dee
   languageName: node
   linkType: hard
 
@@ -2502,7 +2502,7 @@ __metadata:
     "@vitest/ui": "npm:^3.1.3"
     autoprefixer: "npm:^10.4.21"
     bootstrap: "npm:^5.3.6"
-    bootstrap-icons: "npm:^1.13.0"
+    bootstrap-icons: "npm:^1.13.1"
     browserslist: "npm:^4.24.5"
     cssnano: "npm:^7.0.7"
     esbuild: "npm:^0.25.4"
