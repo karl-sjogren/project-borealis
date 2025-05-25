@@ -22,7 +22,7 @@ export class PlayersAddForm extends LitElement {
   constructor() {
     super();
 
-    this.playerIdsString = '33820023, 123';
+    this.playerIdsString = '';
     this.addAsInAlliance = false;
   }
 
