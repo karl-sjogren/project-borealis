@@ -17,9 +17,14 @@ public class PlayersAPIController : Controller {
         _logger = logger;
     }
 
+    public class PlayerAddRequest {
+        public required int PlayerId { get; set; }
+        public required bool AddAsInAlliance { get; set; }
+    }
+
     [HttpPost]
-    public async Task<ActionResult<Result<Player?>>> AddAsync([FromBody] int playerId, bool addAsInAlliance, CancellationToken cancellationToken) {
-        var existingPlayer = await _playerService.GetByExternalIdAsync(playerId, cancellationToken);
+    public async Task<ActionResult<Result<Player?>>> AddAsync([FromBody] PlayerAddRequest playerAddRequest, CancellationToken cancellationToken) {
+        var existingPlayer = await _playerService.GetByExternalIdAsync(playerAddRequest.PlayerId, cancellationToken);
         if(existingPlayer?.Data is not null) {
             return Ok(new Result<Player?> {
                 Success = true,
@@ -28,7 +33,7 @@ public class PlayersAPIController : Controller {
             });
         }
 
-        var playerResult = await _playerService.SynchronizePlayerAsync(playerId, addAsInAlliance, cancellationToken);
+        var playerResult = await _playerService.SynchronizePlayerAsync(playerAddRequest.PlayerId, playerAddRequest.AddAsInAlliance, cancellationToken);
 
         if(!playerResult.Success) {
             return StatusCode(500, playerResult);
