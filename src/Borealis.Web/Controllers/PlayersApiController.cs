@@ -17,6 +17,35 @@ public class PlayersAPIController : Controller {
         _logger = logger;
     }
 
+    public class PlayerAddRequest {
+        public required int PlayerId { get; set; }
+        public required bool AddAsInAlliance { get; set; }
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Result<Player?>>> AddAsync([FromBody] PlayerAddRequest playerAddRequest, CancellationToken cancellationToken) {
+        var existingPlayer = await _playerService.GetByExternalIdAsync(playerAddRequest.PlayerId, cancellationToken);
+        if(existingPlayer?.Data is not null) {
+            return Ok(new Result<Player?> {
+                Success = true,
+                Message = "Player already exists.",
+                Data = existingPlayer.Data
+            });
+        }
+
+        var playerResult = await _playerService.SynchronizePlayerAsync(playerAddRequest.PlayerId, playerAddRequest.AddAsInAlliance, cancellationToken);
+
+        if(!playerResult.Success) {
+            return StatusCode(500, playerResult);
+        }
+
+        return Ok(new Result<Player?> {
+            Success = true,
+            Message = "Player added successfully.",
+            Data = playerResult.Data
+        });
+    }
+
     [HttpDelete("{playerId:guid}")]
     public async Task<ActionResult<PlayersIndexViewModel>> DeleteAsync(Guid playerId, CancellationToken cancellationToken) {
         var result = await _playerService.DeleteAsync(playerId, cancellationToken);
