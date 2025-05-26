@@ -2481,7 +2481,7 @@ __metadata:
     browserslist: "npm:^4.24.5"
     cssnano: "npm:^7.0.7"
     esbuild: "npm:^0.25.4"
-    esbuild-plugin-browserslist: "npm:^1.0.0"
+    esbuild-plugin-browserslist: "npm:^1.0.1"
     eslint: "npm:^9.27.0"
     eslint-plugin-compat: "npm:^6.0.2"
     eslint-plugin-jsdoc: "npm:^50.6.17"
@@ -3146,6 +3146,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"debug@npm:^4.4.1":
+  version: 4.4.1
+  resolution: "debug@npm:4.4.1"
+  dependencies:
+    ms: "npm:^2.1.3"
+  peerDependenciesMeta:
+    supports-color:
+      optional: true
+  checksum: 10/8e2709b2144f03c7950f8804d01ccb3786373df01e406a0f66928e47001cf2d336cbed9ee137261d4f90d68d8679468c755e3548ed83ddacdc82b194d2468afe
+  languageName: node
+  linkType: hard
+
 "decimal.js@npm:^10.5.0":
   version: 10.5.0
   resolution: "decimal.js@npm:10.5.0"
@@ -3367,16 +3379,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild-plugin-browserslist@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "esbuild-plugin-browserslist@npm:1.0.0"
+"esbuild-plugin-browserslist@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "esbuild-plugin-browserslist@npm:1.0.1"
   dependencies:
-    debug: "npm:^4.4.0"
-    zod: "npm:^3.24.2"
+    debug: "npm:^4.4.1"
+    zod: "npm:^3.25.3"
   peerDependencies:
     browserslist: ^4.21.8
-    esbuild: ~0.25.1
-  checksum: 10/f9bd6a15f5b6e7931614d8351e9ab07755c8ef9c513b8806a2ee3096866e875266f96e9fdbbdee5611831269aa9774c593f7bc139d8b9e712f4e4f726db9f36f
+    esbuild: ~0.25.4
+  checksum: 10/86fdd203b9335f79a1f37eab17b9826baa08b3ce2072430a37b4958a4537c55089905b76b9093d596b98d6e3fd161f1368f8b5facf328c29bcdc1eff50a1d4c5
   languageName: node
   linkType: hard
 
@@ -7862,9 +7874,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.24.2":
-  version: 3.24.2
-  resolution: "zod@npm:3.24.2"
-  checksum: 10/604c62a8cf8e330d78b106a557f4b44f5d14845d20b1360a423ccc09b58cb8525ccf7e4b40cf1bd4852d22393d2c67774b5817ec5a2fedab25f543b36ed15943
+"zod@npm:^3.25.3":
+  version: 3.25.29
+  resolution: "zod@npm:3.25.29"
+  checksum: 10/2ba6379a3b89b01a74b05b2391d4a925f64cab3863c98621aa369df4e227894f60a48fafe635523406a52879ae068d8905ea37eb723048cfa05a432477690e3a
   languageName: node
   linkType: hard
