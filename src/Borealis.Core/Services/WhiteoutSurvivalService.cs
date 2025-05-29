@@ -34,7 +34,7 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
         while(captchaRetries < maxCaptchaRetries) {
             var playerResult = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(playerId, cancellationToken); // We need to "sign in" the player
             if(playerResult.ErrorCode != 0) {
-                return Results.Failure($"Failed to get player info: {playerResult.ErrorCode}, message: {playerResult.Message}");
+                return Results.Failure(new GiftCodePlayerErrorMessage(playerId, playerResult.ErrorCode, playerResult.Message));
             }
 
             var captchaResult = await _whiteoutSurvivalHttpClient.GetCaptchaAsync(playerId, cancellationToken);
@@ -48,12 +48,12 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
 
             var captchaImage = GetCaptchaImageBytes(captchaResult.Data);
             if(captchaImage == null) {
-                return Results.Failure("Failed to get captcha image bytes.");
+                return Results.Failure(new FailedToGetCaptchaMessage());
             }
 
             var captchaSolution = await _captchaSolver.SolveCaptchaAsync(captchaImage, cancellationToken);
             if(string.IsNullOrEmpty(captchaSolution)) {
-                return Results.Failure("Failed to solve captcha.");
+                return Results.Failure(new FailedToSolveCaptchaMessage());
             }
 
             redeemResult = await _whiteoutSurvivalHttpClient.RedeemGiftCodeAsync(playerId, giftCode, captchaSolution, cancellationToken);
@@ -73,25 +73,29 @@ public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
         }
 
         if(redeemResult == null) {
-            return Results.Failure("Failed to even try redeeming gift code.");
+            return Results.Failure(new WhiteoutSurvivalMessage("UnknownGiftCodeError", "Redeem result is null after captcha retries."));
+        }
+
+        if(captchaRetries >= maxCaptchaRetries) {
+            return Results.Failure(new WhiteoutSurvivalMessage("RedeemGiftCodeFailed", "Failed to redeem gift code after {0} attempts.", maxCaptchaRetries));
         }
 
         // This is a special case that seems to happen sometimes
         // while the error code is 0, the message is "Sign Error"
         if(redeemResult.Message == "Sign Error") {
-            return Results.Failure("Sign error. This usually means the gift code is invalid.");
+            return Results.Failure(new GiftCodeSignErrorMessage());
         }
 
         return redeemResult.ErrorCode switch {
             // Code success
-            0 or 20000 or 40008 or 40011 => Results.Success("Gift code redeemed or was already redeemed."),
-            // Claim limit reached, we can't redeem it but we can remember it
-            40005 or 40007 => Results.Failure("Gift code expired."),
-            40014 => Results.Failure("Gift code not found."),
-            40004 => Results.Failure("Player not found."),
-            40009 => Results.Failure("Player not logged in."),
-            40100 or 40103 => Results.Failure("Captcha failed."),
-            _ => Results.Failure($"Unknown error code: {redeemResult.ErrorCode}, message: {redeemResult.Message}"),
+            0 or 20000 or 40008 or 40011 => Results.Success(new GiftCodeRedeemedMessage(giftCode)),
+            40005 => Results.Failure(new GiftCodeRedeemLimitReachedMessage(giftCode)),
+            40007 => Results.Failure(new GiftCodeExpiredMessage(giftCode)),
+            40014 => Results.Failure(new GiftCodeNotFoundMessage(giftCode)),
+            40004 => Results.Failure(new GiftCodePlayerNotFoundMessage(playerId)),
+            40009 => Results.Failure(new GiftCodePlayerNotLoggedInMessage(playerId)),
+            40100 or 40103 => Results.Failure(new GiftCodeCaptchaFailedMessage(giftCode)),
+            _ => Results.Failure(new WhiteoutSurvivalMessage("UnknownGiftCodeError", "Unknown error code: {0}, message: {1}", redeemResult.ErrorCode, redeemResult.Message)),
         };
     }
 

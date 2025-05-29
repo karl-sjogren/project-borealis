@@ -5,7 +5,7 @@ namespace Borealis.Core.Contracts;
 
 public interface IGiftCodeService {
     Task<Result<GiftCode>> GetByIdAsync(Guid giftCodeId, CancellationToken cancellationToken);
-    Task<Result<bool>> GiftCodeExistsAsync(string giftCode, CancellationToken cancellationToken);
+    Task<Result> GiftCodeExistsAsync(string giftCode, CancellationToken cancellationToken);
     Task<PagedResult<GiftCode>> GetPagedAsync(GiftCodeQuery query, CancellationToken cancellationToken);
     Task<Result> AddGiftCodeAsync(string giftCode, string source, CancellationToken cancellationToken);
     Task<Result> RedeemGiftCodeAsync(int whiteoutSurvivalPlayerId, string giftCode, CancellationToken cancellationToken);

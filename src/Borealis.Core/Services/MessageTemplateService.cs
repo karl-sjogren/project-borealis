@@ -29,7 +29,7 @@ public class MessageTemplateService : QueryServiceBase<MessageTemplate>, IMessag
             .FirstOrDefaultAsync(x => x.Id == messageTemplateId, cancellationToken);
 
         if(entity is null) {
-            return Results.NotFound<MessageTemplate>();
+            return Results.NotFound<MessageTemplate>(messageTemplateId);
         }
 
         return Results.Success(entity);
@@ -75,7 +75,7 @@ public class MessageTemplateService : QueryServiceBase<MessageTemplate>, IMessag
         var existingTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(x => x.Id == messageTemplate.Id, cancellationToken);
 
         if(existingTemplate is null) {
-            return Results.NotFound<MessageTemplate>();
+            return Results.NotFound<MessageTemplate>(messageTemplate.Id);
         }
 
         var historyEntry = new MessageTemplateHistoryEntry {
@@ -97,7 +97,7 @@ public class MessageTemplateService : QueryServiceBase<MessageTemplate>, IMessag
         var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(x => x.Id == messageTemplateId, cancellationToken);
 
         if(messageTemplate is null) {
-            return Results.NotFound();
+            return Results.NotFound(messageTemplateId);
         }
 
         _context.MessageTemplates.Remove(messageTemplate);
