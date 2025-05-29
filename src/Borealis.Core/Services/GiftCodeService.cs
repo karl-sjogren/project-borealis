@@ -38,31 +38,35 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .FirstOrDefaultAsync(x => x.Id == giftCodeId, cancellationToken);
 
         if(entity is null) {
-            return Results.NotFound<GiftCode>();
+            return Results.Failure<GiftCode>(new NotFoundMessage(giftCodeId.ToString(), "Gift code not found."));
         }
 
         return Results.Success(entity);
     }
 
-    public async Task<Result<bool>> GiftCodeExistsAsync(string giftCode, CancellationToken cancellationToken) {
+    public async Task<Result> GiftCodeExistsAsync(string giftCode, CancellationToken cancellationToken) {
         var entity = await _context
             .GiftCodes
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Code == giftCode, cancellationToken);
 
         if(entity is null) {
-            return Results.Success(false);
+            return Results.Failure(new NotFoundMessage(giftCode));
         }
 
         // Gift codes are unfortunately case-sensitive
-        return Results.Success(entity.Code.Equals(giftCode, StringComparison.Ordinal));
+        if(entity.Code.Equals(giftCode, StringComparison.Ordinal)) {
+            return Results.Success();
+        } else {
+            return Results.Failure(new NotFoundMessage(giftCode, "The gift code exists but the case does not match."));
+        }
     }
 
     public async Task<Result> AddGiftCodeAsync(string giftCode, string source, CancellationToken cancellationToken) {
         var existsResult = await GiftCodeExistsAsync(giftCode, cancellationToken);
 
-        if(existsResult.Data) {
-            return Results.Conflict("Gift code already exists.");
+        if(existsResult.Success) {
+            return Results.Failure(new ConflictMessage($"Gift code '{giftCode}' already exists."));
         }
 
         var player = await _context
@@ -75,7 +79,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         if(player is not null) {
             var redeemResult = await _whiteoutSurvivalService.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
 
-            isExpired = redeemResult.Message == "Gift code expired.";
+            isExpired = redeemResult.Message.Key is "GiftCodeExpired";
             if(!redeemResult.Success && !isExpired) {
                 return redeemResult;
             }
@@ -94,7 +98,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         await _context.SaveChangesAsync(cancellationToken);
 
         if(newGiftCode.IsExpired) {
-            return Results.Failure("Gift code is expired.");
+            return Results.Failure(new GiftCodeExpiredMessage(giftCode));
         }
 
         await _discordBotService.SendGiftCodeAddedMessageAsync(newGiftCode, cancellationToken);
@@ -136,11 +140,11 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         var giftCode = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Id == giftCodeId, cancellationToken);
 
         if(giftCode is null) {
-            return Results.NotFound("Gift code not found.");
+            return Results.Failure(new NotFoundMessage(giftCodeId.ToString(), "Gift code not found."));
         }
 
         if(giftCode.IsExpired) {
-            return Results.Failure("Gift code is expired.");
+            return Results.Failure(new GiftCodeExpiredMessage(giftCode.Code));
         }
 
         var players = await _context
@@ -160,7 +164,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         var player = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
 
         if(player is null) {
-            return Results.NotFound("Player not found.");
+            return Results.Failure(new NotFoundMessage(whiteoutSurvivalPlayerId.ToString(), "Player not found."));
         }
 
         var giftCodeEntity = await _context
@@ -168,11 +172,11 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .FirstOrDefaultAsync(x => x.Code == giftCode, cancellationToken);
 
         if(giftCodeEntity is null) {
-            return Results.NotFound("Gift code not found.");
+            return Results.Failure(new GiftCodeNotFoundMessage(giftCode));
         }
 
         if(giftCodeEntity.IsExpired) {
-            return Results.Failure("Gift code is expired.");
+            return Results.Failure(new GiftCodeExpiredMessage(giftCode));
         }
 
         var existingRedemption = await _context
@@ -180,7 +184,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
             .FirstOrDefaultAsync(x => x.PlayerId == player.Id && x.GiftCodeId == giftCodeEntity.Id, cancellationToken);
 
         if(existingRedemption is not null) {
-            return Results.Conflict("Gift code already redeemed.");
+            return Results.Failure(new GiftCodeAlreadyRedeemedMessage(giftCode, player.ExternalId, player.Name));
         }
 
         var redeemResult = await _whiteoutSurvivalService.RedeemGiftCodeAsync(player.ExternalId, giftCode, cancellationToken);
@@ -229,7 +233,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         var existingGiftCode = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Id == giftCode.Id, cancellationToken);
 
         if(existingGiftCode is null) {
-            return Results.NotFound<GiftCode>();
+            return Results.Failure<GiftCode>(new NotFoundMessage(giftCode.Id, "Gift code not found."));
         }
 
         existingGiftCode.IsExpired = giftCode.IsExpired;
@@ -247,7 +251,7 @@ public class GiftCodeService : QueryServiceBase<GiftCode>, IGiftCodeService {
         var giftCode = await _context.GiftCodes.FirstOrDefaultAsync(x => x.Id == giftCodeId, cancellationToken);
 
         if(giftCode is null) {
-            return Results.NotFound();
+            return Results.Failure<GiftCode>(new NotFoundMessage(giftCodeId, "Gift code not found."));
         }
 
         _context.GiftCodes.Remove(giftCode);

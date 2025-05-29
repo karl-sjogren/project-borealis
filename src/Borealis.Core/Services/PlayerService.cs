@@ -85,7 +85,7 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             response = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(whiteoutSurvivalPlayerId, cancellationToken);
         } catch(Exception ex) {
             _logger.LogError(ex, "Failed to synchronize player {PlayerId}", whiteoutSurvivalPlayerId);
-            return Results.Failure<Player>("Failed to synchronize player.");
+            return Results.Failure<Player>(new FailedToSynchronizePlayerMessage(whiteoutSurvivalPlayerId));
         }
 
         if(response.Code != 0 || response.Data is null) {

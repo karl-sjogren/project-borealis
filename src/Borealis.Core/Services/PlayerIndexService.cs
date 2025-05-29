@@ -73,8 +73,7 @@ public class PlayerIndexService : LuceneIndexServiceBase<Player, PlayerQuery> {
                 Items = [],
                 TotalCount = 0,
                 PageIndex = query.PageIndex,
-                PageSize = query.PageSize,
-                Success = true
+                PageSize = query.PageSize
             };
         }
 
@@ -89,8 +88,7 @@ public class PlayerIndexService : LuceneIndexServiceBase<Player, PlayerQuery> {
             Items = [.. players.OrderByDescending(x => identifiers.IndexOf(x.Id))],
             TotalCount = identifiersResult.TotalCount,
             PageIndex = query.PageIndex,
-            PageSize = query.PageSize,
-            Success = true
+            PageSize = query.PageSize
         };
     }
 }
