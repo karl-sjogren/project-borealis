@@ -4,6 +4,7 @@
     <PackageReference Include="AspNet.Security.OAuth.Discord" />
     <PackageReference Include="LettuceEncrypt" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Shorthand.Vite" />
   </ItemGroup>
