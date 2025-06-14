@@ -23,14 +23,10 @@ public class PlayersAPIController : Controller {
     }
 
     [HttpPost]
-    public async Task<ActionResult<Result<Player?>>> AddAsync([FromBody] PlayerAddRequest playerAddRequest, CancellationToken cancellationToken) {
+    public async Task<ActionResult<Result<Player>>> AddAsync([FromBody] PlayerAddRequest playerAddRequest, CancellationToken cancellationToken) {
         var existingPlayer = await _playerService.GetByExternalIdAsync(playerAddRequest.PlayerId, cancellationToken);
-        if(existingPlayer?.Data is not null) {
-            return Ok(new Result<Player?> {
-                Success = true,
-                Message = "Player already exists.",
-                Data = existingPlayer.Data
-            });
+        if(existingPlayer.Object is not null) {
+            return Ok(existingPlayer);
         }
 
         var playerResult = await _playerService.SynchronizePlayerAsync(playerAddRequest.PlayerId, playerAddRequest.AddAsInAlliance, cancellationToken);
@@ -39,11 +35,7 @@ public class PlayersAPIController : Controller {
             return StatusCode(500, playerResult);
         }
 
-        return Ok(new Result<Player?> {
-            Success = true,
-            Message = "Player added successfully.",
-            Data = playerResult.Data
-        });
+        return Ok(playerResult);
     }
 
     [HttpDelete("{playerId:guid}")]
@@ -90,11 +82,11 @@ public class PlayersAPIController : Controller {
     private async Task<ActionResult<PlayersIndexViewModel>> UpdatePlayerActionAsync(Guid playerId, Action<Player> updateAction, CancellationToken cancellationToken) {
         var result = await _playerService.GetByIdAsync(playerId, cancellationToken);
 
-        if(!result.Success || result.Data is null) {
+        if(!result.Success || result.Object is null) {
             return NotFound();
         }
 
-        var player = result.Data;
+        var player = result.Object;
 
         updateAction(player);
 

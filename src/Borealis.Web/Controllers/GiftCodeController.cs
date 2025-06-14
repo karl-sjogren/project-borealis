@@ -73,7 +73,7 @@ public class GiftCodeController : Controller {
             viewModel.ResultString = "Gift code added. Started redemption.";
         } else {
             viewModel.Success = false;
-            viewModel.ResultString = result.Message;
+            viewModel.ResultString = result.Message.ToString();
         }
 
         return View(viewModel);
@@ -92,7 +92,7 @@ public class GiftCodeController : Controller {
         var playersNotRedeemedFor = players.Items.Where(x => (x.IsInAlliance || x.ForceRedeemGiftCodes) && !redemptions.Any(y => y.PlayerId == x.Id)).ToList();
 
         var viewModel = new GiftCodeDetailsViewModel {
-            Code = result.Data!,
+            Code = result.Object!,
             Redemptions = redemptions,
             PlayersNotRedeemedFor = playersNotRedeemedFor
         };

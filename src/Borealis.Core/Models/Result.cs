@@ -4,7 +4,7 @@ namespace Borealis.Core.Models;
 
 public record Result {
     public bool Success { get; }
-    public ResultMessage Message { get; }
+    public ResultMessage Message { get; init; }
 
     public Result(bool success, ResultMessage message) {
         Success = success;

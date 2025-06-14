@@ -45,7 +45,7 @@ public class MessageTemplateController : Controller {
         }
 
         var viewModel = new MessageTemplateEditViewModel {
-            MessageTemplate = createResult.Data!
+            MessageTemplate = createResult.Object!
         };
 
         return RedirectToAction("Edit", new { id = viewModel.MessageTemplate.Id });
@@ -59,7 +59,7 @@ public class MessageTemplateController : Controller {
         }
 
         var viewModel = new MessageTemplateEditViewModel {
-            MessageTemplate = result.Data!
+            MessageTemplate = result.Object!
         };
 
         return View(viewModel);
@@ -72,7 +72,7 @@ public class MessageTemplateController : Controller {
             return NotFound();
         }
 
-        var messageTemplate = messageTemplateResult.Data!;
+        var messageTemplate = messageTemplateResult.Object!;
         messageTemplate.Name = name;
         messageTemplate.Message = message;
 
@@ -82,7 +82,7 @@ public class MessageTemplateController : Controller {
         }
 
         var viewModel = new MessageTemplateEditViewModel {
-            MessageTemplate = updateResult.Data!
+            MessageTemplate = updateResult.Object!
         };
 
         return View("Edit", viewModel);

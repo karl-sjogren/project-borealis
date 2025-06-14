@@ -43,7 +43,7 @@ public class GiftCodeCheckDailyHostedService : DailyHostedService {
         foreach(var giftCode in giftCodes.Items) {
             var redeemResult = await whiteoutSurvivalService.RedeemGiftCodeAsync(player.ExternalId, giftCode.Code, cancellationToken);
 
-            var isExpired = redeemResult.Message == "Gift code expired.";
+            var isExpired = redeemResult.Message.Key is "GiftCodeExpired" or "GiftCodeNotFound";
             if(!redeemResult.Success && !isExpired) {
                 continue;
             }
