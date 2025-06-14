@@ -140,8 +140,7 @@ public abstract class LuceneIndexServiceBase<T, TQuery> : IDisposable where T : 
                 Items = [],
                 TotalCount = 0,
                 PageIndex = query.PageIndex,
-                PageSize = query.PageSize,
-                Success = true
+                PageSize = query.PageSize
             };
         }
 
@@ -156,8 +155,7 @@ public abstract class LuceneIndexServiceBase<T, TQuery> : IDisposable where T : 
             Items = identifiers,
             TotalCount = topDocs.TotalHits,
             PageIndex = query.PageIndex,
-            PageSize = query.PageSize,
-            Success = true
+            PageSize = query.PageSize
         };
     }
 
