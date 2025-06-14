@@ -73,7 +73,7 @@ public class GiftCodeController : Controller {
             viewModel.ResultString = "Gift code added. Started redemption.";
         } else {
             viewModel.Success = false;
-            viewModel.ResultString = result.Message.ToString();
+            viewModel.ResultString = result.Message.Message;
         }
 
         return View(viewModel);
