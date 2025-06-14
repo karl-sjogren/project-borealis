@@ -26,7 +26,7 @@ public class ScanForGiftCodesHostedService : TimedHostedService {
 
                 foreach(var giftCode in scannerGiftCodes) {
                     var existsResult = await giftCodeService.GiftCodeExistsAsync(giftCode, stoppingToken);
-                    if(existsResult.Data) {
+                    if(existsResult.Success) {
                         continue;
                     }
 

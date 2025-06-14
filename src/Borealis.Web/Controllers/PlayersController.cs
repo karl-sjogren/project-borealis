@@ -44,9 +44,9 @@ public class PlayersController : Controller {
         }
 
         var viewModel = new PlayersDetailsViewModel {
-            Player = result.Data!,
-            Notes = result.Data!.Notes,
-            AwayUntil = result.Data!.AwayUntil,
+            Player = result.Object!,
+            Notes = result.Object!.Notes,
+            AwayUntil = result.Object!.AwayUntil,
             RedeemedGiftCodes = await _giftCodeService.GetRedemptionsForPlayerAsync(id, cancellationToken)
         };
 
@@ -60,7 +60,7 @@ public class PlayersController : Controller {
             return NotFound();
         }
 
-        var player = playerResult.Data!;
+        var player = playerResult.Object!;
         player.Notes = viewModel.Notes?.Trim();
         player.AwayUntil = viewModel.AwayUntil;
 
@@ -70,9 +70,9 @@ public class PlayersController : Controller {
         }
 
         viewModel = new PlayersDetailsViewModel {
-            Player = updateResult.Data!,
-            Notes = updateResult.Data!.Notes,
-            AwayUntil = updateResult.Data!.AwayUntil,
+            Player = updateResult.Object!,
+            Notes = updateResult.Object!.Notes,
+            AwayUntil = updateResult.Object!.AwayUntil,
             RedeemedGiftCodes = await _giftCodeService.GetRedemptionsForPlayerAsync(id, cancellationToken)
         };
 
@@ -106,14 +106,14 @@ public class PlayersController : Controller {
         var result = new Dictionary<string, Player?>();
         foreach(var playerId in playerIds) {
             var existingPlayer = await _playerService.GetByExternalIdAsync(playerId, cancellationToken);
-            if(existingPlayer?.Data is not null) {
-                result.Add(playerId.ToString(), existingPlayer.Data);
+            if(existingPlayer.Object is not null) {
+                result.Add(playerId.ToString(), existingPlayer.Object);
                 continue;
             }
 
             var playerResult = await _playerService.SynchronizePlayerAsync(playerId, viewModel.AddAsInAlliance, cancellationToken);
 
-            result.Add(playerId.ToString(), playerResult?.Data);
+            result.Add(playerId.ToString(), playerResult.Object);
         }
 
         viewModel.Results = result;

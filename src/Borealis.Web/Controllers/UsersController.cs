@@ -39,7 +39,7 @@ public class UsersController : Controller {
             return NotFound();
         }
 
-        var user = result.Data!;
+        var user = result.Object!;
         var viewModel = new UsersDetailsViewModel {
             User = user,
             IsAdmin = user.IsAdmin,
@@ -57,7 +57,7 @@ public class UsersController : Controller {
             return NotFound();
         }
 
-        var user = userResult.Data!;
+        var user = userResult.Object!;
         user.IsAdmin = viewModel.IsAdmin;
         user.IsApproved = viewModel.IsApproved;
         user.IsLockedOut = viewModel.IsLockedOut;
@@ -67,7 +67,7 @@ public class UsersController : Controller {
             throw new Exception("Failed to set player notes.");
         }
 
-        user = updateResult.Data!;
+        user = updateResult.Object!;
         viewModel = new UsersDetailsViewModel {
             User = user,
             IsAdmin = user.IsAdmin,
