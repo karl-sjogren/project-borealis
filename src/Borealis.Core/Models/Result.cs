@@ -72,7 +72,7 @@ public record OperationFailedMessage : ResultMessage {
 
 public record GenericExceptionMessage : ResultMessage {
     [DebuggerStepThrough]
-    public GenericExceptionMessage(string message) : base("GenericException", "An exception occured with the following message: {0}", message) { }
+    public GenericExceptionMessage(string message) : base("GenericException", "An exception occurred with the following message: {0}", message) { }
 }
 
 public record BadRequestMessage : ResultMessage {
