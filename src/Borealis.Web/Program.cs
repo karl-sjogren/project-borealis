@@ -11,7 +11,6 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
@@ -24,6 +23,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
 
 builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -35,14 +35,7 @@ builder.Services.AddOptions<WhiteoutSurvivalOptions>().Bind(builder.Configuratio
 builder.Services.AddOptions<BorealisOptions>().Bind(builder.Configuration.GetSection("Borealis")).ValidateOnStart();
 builder.Services.AddSingleton<IValidateOptions<BorealisOptions>, BorealisOptionsValidator>();
 
-// Add services to the container.
-var connectionStringBuilder = new SqliteConnectionStringBuilder {
-    Mode = SqliteOpenMode.ReadWriteCreate,
-    DataSource = builder.Configuration["SqlitePath"]
-};
-
-builder.Services.AddDbContext<BorealisContext>(options =>
-    options.UseSqlite(connectionStringBuilder.ConnectionString));
+builder.AddNpgsqlDbContext<BorealisContext>("PostgresDb");
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -96,12 +89,6 @@ builder.Services.AddSingleton<IDiscordClient>(_ => {
 builder.Services.AddHostedService<DiscordBotInitializationService>();
 
 var app = builder.Build();
-
-// Apply migrations
-using(var scope = app.Services.CreateScope()) {
-    var db = scope.ServiceProvider.GetRequiredService<BorealisContext>();
-    await db.Database.MigrateAsync();
-}
 
 app.UseSerilogRequestLogging();
 
