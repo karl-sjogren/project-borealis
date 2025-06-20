@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Borealis.Core\Borealis.Core.csproj" />
+    <ProjectReference Include="..\Borealis.ServiceDefaults\Borealis.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Borealis.WhiteoutSurvivalHttpClient\Borealis.WhiteoutSurvivalHttpClient.csproj" />
   </ItemGroup>
 

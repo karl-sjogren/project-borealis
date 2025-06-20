@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Borealis.Core\Borealis.Core.csproj" />
+    <ProjectReference Include="..\Borealis.ServiceDefaults\Borealis.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>
