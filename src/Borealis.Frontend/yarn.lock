@@ -2358,7 +2358,7 @@ __metadata:
     esbuild-plugin-browserslist: "npm:^1.0.1"
     eslint: "npm:^9.29.0"
     eslint-plugin-compat: "npm:^6.0.2"
-    eslint-plugin-jsdoc: "npm:^51.0.3"
+    eslint-plugin-jsdoc: "npm:^51.0.4"
     eslint-plugin-testing-library: "npm:^7.5.3"
     eslint-plugin-vitest: "npm:^0.5.4"
     jquery: "npm:^3.7.1"
@@ -3479,9 +3479,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^51.0.3":
-  version: 51.0.3
-  resolution: "eslint-plugin-jsdoc@npm:51.0.3"
+"eslint-plugin-jsdoc@npm:^51.0.4":
+  version: 51.0.4
+  resolution: "eslint-plugin-jsdoc@npm:51.0.4"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.50.2"
     are-docs-informative: "npm:^0.0.2"
@@ -3495,7 +3495,7 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10/4d57d28de2ce336f70cc842487bf9603b1f40ea0405aec9229602bacf90728e27a3b33a7770fd28ae3434ba43a6534deb9f84ab030eaa0edc3e2444e1efdabc5
+  checksum: 10/59ed6ccbc907b1335e2b5f0972c5cce9a86006c91a9bc26745cbb5f2911b30922d506b1b72e5c2ca02705b17767732bbf4d5909e44f47a3cf9457ecd0b7be02a
   languageName: node
   linkType: hard
 
