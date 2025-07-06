@@ -401,3 +401,4 @@ FodyWeavers.xsd
 .DS_Store
 start-docker-container.sh
 start-docker-dyndns.sh
+Borealis.db*

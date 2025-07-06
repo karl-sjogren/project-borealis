@@ -9,7 +9,7 @@ RUN dotnet restore -a $TARGETARCH
 RUN dotnet publish ./src/Borealis.Web/Borealis.Web.csproj -a $TARGETARCH --no-restore -o /app
 
 # Build frontend
-FROM node:23-slim AS frontend
+FROM node:24-slim AS frontend
 WORKDIR /source
 
 COPY --link ./src/Borealis.Frontend .
