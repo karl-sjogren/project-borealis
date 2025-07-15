@@ -2203,7 +2203,7 @@ __metadata:
     jquery: "npm:^3.7.1"
     jsdom: "npm:^26.1.0"
     jsdom-testing-mocks: "npm:^1.13.1"
-    lit: "npm:^3.3.0"
+    lit: "npm:^3.3.1"
     playwright: "npm:^1.54.1"
     postcss: "npm:^8.5.6"
     postcss-scss: "npm:^4.0.9"
@@ -4600,14 +4600,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lit@npm:^3.3.0":
-  version: 3.3.0
-  resolution: "lit@npm:3.3.0"
+"lit@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "lit@npm:3.3.1"
   dependencies:
     "@lit/reactive-element": "npm:^2.1.0"
     lit-element: "npm:^4.2.0"
     lit-html: "npm:^3.3.0"
-  checksum: 10/442b8eabd5d1b4aee0ab34db0b67d5c07a988f30d345f4a68263275acf826816ba30937bb8d5d331dc260c2127cd8953f332dcc45edbf080d61c21291cb06330
+  checksum: 10/ec70ff33db610537fd7cfc608cc7728126ecfae2d5593aa94844c614d2f6840448f1b995a58aeba593b0bf0e8169af5988036c11d3c5b55313fe8e722417c17d
   languageName: node
   linkType: hard
 
