@@ -26,7 +26,6 @@ jobs:
         shell: bash
 
       - name: JSON List
-        if: false
         env:
           MY_LIST: |
             '[
