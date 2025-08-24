@@ -51,7 +51,7 @@ jobs:
         git config --global core.eol crlf
 
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup Node.js environment
       uses: actions/setup-node@v4
@@ -91,7 +91,7 @@ jobs:
 
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Cache NuGet packages
       uses: actions/cache@v4
@@ -130,10 +130,10 @@ jobs:
     # While we don't use sources directly in this job the test reporter wants to check
     # some files through git so we need the sources.
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Download .NET tests results
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v5
       with:
         name: net-test-results
         path: ./
@@ -211,7 +211,7 @@ jobs:
 
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install .NET
       uses: actions/setup-dotnet@v4
@@ -242,7 +242,7 @@ jobs:
 
     steps:
     - name: Checkout sources
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Install .NET
       uses: actions/setup-dotnet@v4
@@ -250,7 +250,7 @@ jobs:
         global-json-file: global.json
 
     - name: Log in to the Container registry
-      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
+      uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
@@ -258,7 +258,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for migration image
       id: meta-migration
-      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
       with:
         images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_MIGRATION }}
         tags: |
@@ -268,7 +268,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for pgloader image
       id: meta-pgloader
-      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
       with:
         images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_PGLOADER }}
         tags: |
@@ -278,7 +278,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for web image
       id: meta-web
-      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
       with:
         images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_WEB }}
         tags: |
