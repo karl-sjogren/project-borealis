@@ -39,8 +39,8 @@ public static partial class IServiceCollectionExtensions {
                 options.SlidingExpiration = true;
             })
             .AddDiscord(options => {
-                options.ClientId = configuration["DiscordClientId"] ?? throw new InvalidOperationException("DiscordClientId is not set in the configuration.");
-                options.ClientSecret = configuration["DiscordClientSecret"] ?? throw new InvalidOperationException("DiscordClientSecret is not set in the configuration.");
+                options.ClientId = configuration["Discord:ClientId"] ?? throw new InvalidOperationException("Discord:ClientId is not set in the configuration.");
+                options.ClientSecret = configuration["Discord:ClientSecret"] ?? throw new InvalidOperationException("Discord:ClientSecret is not set in the configuration.");
 
                 options.ClaimActions.MapCustomJson(ClaimTypes.Name, user => user.GetString("global_name"));
                 options.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
