@@ -20,6 +20,9 @@ public class WhiteoutBotGiftCodeScanner : IGiftCodeScanner {
         } catch(HttpForbiddenException ex) {
             _logger.LogError(ex, "Failed to scan gift codes from Whiteout Bot. Most likely due to an invalid API Key.");
             return [];
+        } catch(HttpStatusCodeException ex) when(ex.StatusCode == System.Net.HttpStatusCode.TooManyRequests) {
+            _logger.LogError(ex, "Too many requests made to Whiteout Bot.");
+            return [];
         }
     }
 }
