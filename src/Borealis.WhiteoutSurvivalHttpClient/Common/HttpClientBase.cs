@@ -32,6 +32,10 @@ public abstract class HttpClientBase {
             throw new HttpUnauthorizedException(errorMessage, $"401 Unauthorized was returned for call to {response.RequestMessage?.RequestUri}.");
         }
 
+        if(response.StatusCode == HttpStatusCode.Forbidden) {
+            throw new HttpForbiddenException(errorMessage, $"403 Forbidden was returned for call to {response.RequestMessage?.RequestUri}.");
+        }
+
         if(response.StatusCode == HttpStatusCode.NotFound) {
             throw new HttpNotFoundException(errorMessage, $"404 Not Found was returned for call to {response.RequestMessage?.RequestUri}.");
         }

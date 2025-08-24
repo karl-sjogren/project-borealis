@@ -29,7 +29,7 @@ builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddOptions<CapSolverOptions>().Bind(builder.Configuration.GetSection("CapSolver")).ValidateOnStart();
-builder.Services.AddOptions<WosLandOptions>().Bind(builder.Configuration.GetSection("WosLand")).ValidateOnStart();
+builder.Services.AddOptions<WhiteoutBotOptions>().Bind(builder.Configuration.GetSection("WosLand")).ValidateOnStart();
 builder.Services.AddOptions<WhiteoutSurvivalOptions>().Bind(builder.Configuration.GetSection("WhiteoutSurvival")).ValidateOnStart();
 
 builder.Services.AddOptions<BorealisOptions>().Bind(builder.Configuration.GetSection("Borealis")).ValidateOnStart();
@@ -62,7 +62,7 @@ builder.Services.AddScoped<IWhiteoutSurvivalService, WhiteoutSurvivalService>();
 
 builder.Services.AddScoped<IGiftCodeScanner, DestructoidGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosGiftCodesGiftCodeScanner>();
-builder.Services.AddScoped<IGiftCodeScanner, WosLandGiftCodeScanner>();
+builder.Services.AddScoped<IGiftCodeScanner, WhiteoutBotGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();

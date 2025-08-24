@@ -10,13 +10,13 @@ public static partial class IServiceCollectionExtensions {
     public static IServiceCollection AddHttpClients(this IServiceCollection services) {
         services
             .AddHttpClient()
-            .AddHttpClient<IWosLandHttpClient, WosLandHttpClient>((provider, client) => {
-                var options = provider.GetRequiredService<IOptions<WosLandOptions>>().Value;
+            .AddHttpClient<IWhiteoutBotHttpClient, WhiteoutBotHttpClient>((provider, client) => {
+                var options = provider.GetRequiredService<IOptions<WhiteoutBotOptions>>().Value;
 
                 client.DefaultRequestHeaders.Add("X-API-Key", options.ApiKey ?? string.Empty);
             });
 
-        services.AddHttpClient<ICapSolverHttpClient, CapSolverHttpClient>((provider, client) => {
+        services.AddHttpClient<ICapSolverHttpClient, CapSolverHttpClient>((_, client) => {
             client.BaseAddress = new Uri("https://api.capsolver.com/");
         });
 
