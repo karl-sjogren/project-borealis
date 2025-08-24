@@ -1,4 +1,4 @@
-# Script to migreate old sqlite database to postgres
+# Script to migrate old sqlite database to postgres
 FROM dimitri/pgloader:latest AS pgloader
 WORKDIR /sqlite
 

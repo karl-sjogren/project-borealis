@@ -1,12 +1,13 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-builder.AddDockerComposeEnvironment("docker-compose");
+builder.AddDockerComposeEnvironment("project-borealis")
+    .WithDashboard();
 
 var username = builder.AddParameter("postgres-user", "postgres");
 var password = builder.AddParameter("postgres-password", "postgres");
 
 var postgres = builder
-    .AddPostgres("borealis-postgres2", username, password)
+    .AddPostgres("borealis-postgres", username, password)
     .WithPassword(password)
     .WithDataVolume(isReadOnly: false)
     .WithPgAdmin(pgAdmin => pgAdmin.WithHostPort(5050).WithImageTag("latest"))
@@ -34,21 +35,17 @@ var pgLoader = builder.AddDockerfile("borealis-pgloader", "docker/pgloader")
     .WithReference(postgresdb, "PostgresDb")
     .WithBindMount(source: "./docker/pgloader/db", "/sqlite/db")
     .WaitFor(postgresdb)
-    .WaitFor(migrations);
-
-var eventHubs = builder.AddAzureEventHubs("borealis-event-hubs")
-    .RunAsEmulator();
-
-eventHubs.AddHub("messages");
+    .WaitFor(migrations)
+    .PublishAsDockerComposeService((_, service) => {
+        service.Restart = "no";
+    });
 
 var web = builder
     .AddProject<Projects.Borealis_Web>("borealis-web")
     .WithExternalHttpEndpoints()
     .WithReference(postgresdb, "PostgresDb")
-    .WithReference(eventHubs)
     .WaitFor(migrations)
     .WaitFor(postgresdb)
-    .WaitFor(eventHubs)
     .PublishAsDockerComposeService((_, service) => {
         service.Restart = "unless-stopped";
     });

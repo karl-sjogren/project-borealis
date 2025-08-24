@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Borealis.Core;
 using Microsoft.EntityFrameworkCore;
-using OpenTelemetry.Trace;
 
 namespace Borealis.MigrationService;
 
@@ -25,7 +24,7 @@ public class MigrationWorker : BackgroundService {
 
             await RunMigrationAsync(context, cancellationToken);
         } catch(Exception ex) {
-            activity?.RecordException(ex);
+            activity?.AddException(ex);
             throw;
         }
 
