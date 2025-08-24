@@ -292,17 +292,17 @@ jobs:
 
         # Tag borealis-migrations image with all tags
         echo '${{ steps.meta-migration.outputs.json }}' | jq -c '.tags[]' | while read i; do
-          docker image tag borealis-migrations "$i"
+          docker image tag borealis-migrations $i
         done
 
         # Tag borealis-pgloader image with all tags
         echo '${{ steps.meta-pgloader.outputs.json }}' | jq -c '.tags[]' | while read i; do
-          docker image tag borealis-pgloader "$i"
+          docker image tag borealis-pgloader $i
         done
 
         # Tag borealis-web image with all tags
         echo '${{ steps.meta-web.outputs.json }}' | jq -c '.tags[]' | while read i; do
-          docker image tag borealis-web "$i"
+          docker image tag borealis-web $i
         done
     - name: Push Docker images
       run: |
