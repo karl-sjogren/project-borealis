@@ -34,7 +34,9 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   PUBLISH_CODECOV: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/heads/main')
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME_MIGRATION: borealis-migrations
+  IMAGE_NAME_PGLOADER: borealis-pgloader
+  IMAGE_NAME_WEB: borealis-web
 
 jobs:
   frontend-test:
@@ -254,11 +256,31 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
+    - name: Extract metadata (tags, labels) for migration image
+      id: meta-migration
       uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATION }}
+        tags: |
+          type=raw,value=latest,enable=true
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+
+    - name: Extract metadata (tags, labels) for pgloader image
+      id: meta-pgloader
+      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PGLOADER }}
+        tags: |
+          type=raw,value=latest,enable=true
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+
+    - name: Extract metadata (tags, labels) for web image
+      id: meta-web
+      uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_WEB }}
         tags: |
           type=raw,value=latest,enable=true
           type=semver,pattern={{version}}
@@ -268,16 +290,14 @@ jobs:
       run: |
         dotnet tool install -g Aspire.Cli
         aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
-        docker image tag borealis-migrations ${{ steps.meta.outputs.tags }}
-        docker image tag borealis-pgloader ${{ steps.meta.outputs.tags }}
-        docker image tag borealis-web ${{ steps.meta.outputs.tags }}
-
-
+        docker image tag borealis-migrations ${{ steps.meta-migration.outputs.tags }}
+        docker image tag borealis-pgloader ${{ steps.meta-pgloader.outputs.tags }}
+        docker image tag borealis-web ${{ steps.meta-web.outputs.tags }}
     - name: Push Docker images
       run: |
-        docker push borealis-migrations
-        docker push borealis-pgloader
-        docker push borealis-web
+        docker push ghcr.io/karl-sjogren/borealis-migrations
+        docker push ghcr.io/karl-sjogren/borealis-pgloader
+        docker push ghcr.io/karl-sjogren/borealis-web
 
     - name: Build and push Docker image
       id: push
