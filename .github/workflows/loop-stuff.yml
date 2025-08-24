@@ -12,19 +12,19 @@ jobs:
     steps:
       - name: Print List
         env:
-          MY_LIST: |
-            "a"
-            "b"
-            "c"
+          MY_LIST: "
+            a
+            b
+            c"
         run: |
           echo "$MY_LIST"
         shell: bash
       - name: Loop List
         env:
-          MY_LIST: |
-            "a"
-            "b"
-            "c"
+          MY_LIST: "
+            a
+            b
+            c"
         run: |
           for tag in "${{ env.MY_LIST }}"; do
             echo "$tag"
