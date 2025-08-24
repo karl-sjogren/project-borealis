@@ -1,10 +1,4 @@
-using Microsoft.Extensions.Configuration;
-
 var builder = DistributedApplication.CreateBuilder(args);
-
-builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?> {
-    ["AppHost:BrowserToken"] = "",
-});
 
 builder.AddDockerComposeEnvironment("project-borealis")
     .WithDashboard(options => {
