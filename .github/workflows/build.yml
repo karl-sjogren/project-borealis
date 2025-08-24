@@ -260,7 +260,7 @@ jobs:
       id: meta-migration
       uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_MIGRATION }}
+        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_MIGRATION }}
         tags: |
           type=raw,value=latest,enable=true
           type=semver,pattern={{version}}
@@ -270,7 +270,7 @@ jobs:
       id: meta-pgloader
       uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_PGLOADER }}
+        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_PGLOADER }}
         tags: |
           type=raw,value=latest,enable=true
           type=semver,pattern={{version}}
@@ -280,7 +280,7 @@ jobs:
       id: meta-web
       uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_WEB }}
+        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_WEB }}
         tags: |
           type=raw,value=latest,enable=true
           type=semver,pattern={{version}}
