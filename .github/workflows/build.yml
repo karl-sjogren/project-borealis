@@ -303,15 +303,9 @@ jobs:
         done
     - name: Push Docker images
       run: |
-        for tag in ${{ steps.meta-migration.outputs.tags }}; do
-          docker push "$tag"
-        done
-        for tag in ${{ steps.meta-pgloader.outputs.tags }}; do
-          docker push "$tag"
-        done
-        for tag in ${{ steps.meta-web.outputs.tags }}; do
-          docker push "$tag"
-        done
+        docker push --all-tags ghcr.io/karl-sjogren/borealis-migrations
+        docker push --all-tags ghcr.io/karl-sjogren/borealis-pgloader
+        docker push --all-tags ghcr.io/karl-sjogren/borealis-web
     - name: Upload docker-compose
       uses: actions/upload-artifact@v4
       with:
