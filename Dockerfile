@@ -9,7 +9,7 @@ RUN dotnet restore -a $TARGETARCH
 RUN dotnet publish ./src/Borealis.Web/Borealis.Web.csproj -a $TARGETARCH --no-restore -o /app
 
 # Build frontend
-FROM node:24-slim AS frontend
+FROM node:24-alpine AS frontend
 WORKDIR /source
 
 COPY --link ./src/Borealis.Frontend .
@@ -20,7 +20,6 @@ RUN yarn build
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 
-RUN mkdir -p Database
 RUN mkdir -p LuceneIndex
 RUN mkdir -p wwwroot
 RUN mkdir -p accounts
@@ -31,6 +30,5 @@ COPY --link --from=frontend /source/artifacts ./wwwroot
 USER $APP_UID
 
 EXPOSE 8080/tcp
-EXPOSE 8081/tcp
 
 ENTRYPOINT ["./Borealis.Web"]

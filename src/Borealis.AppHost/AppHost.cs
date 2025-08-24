@@ -1,14 +1,22 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 builder.AddDockerComposeEnvironment("project-borealis")
-    .WithDashboard();
+    .WithDashboard(options => {
+        options.WithExternalHttpEndpoints();
+    });
 
-var username = builder.AddParameter("postgres-user", "postgres");
-var password = builder.AddParameter("postgres-password", "postgres");
+var discordBotToken = builder.AddParameter("discord-bot-token");
+var discordClientSecret = builder.AddParameter("discord-client-secret");
+var discordClientId = builder.AddParameter("discord-client-id");
+
+var borealisApplicationUrl = builder.AddParameter("borealis-application-url");
+
+var postgresUsername = builder.AddParameter("postgres-user", "postgres");
+var postgresPassword = builder.AddParameter("postgres-password", "postgres");
 
 var postgres = builder
-    .AddPostgres("borealis-postgres", username, password)
-    .WithPassword(password)
+    .AddPostgres("borealis-postgres", postgresUsername, postgresPassword)
+    .WithPassword(postgresPassword)
     .WithDataVolume(isReadOnly: false)
     .WithPgAdmin(pgAdmin => pgAdmin.WithHostPort(5050).WithImageTag("latest"))
     .PublishAsDockerComposeService((_, service) => {
@@ -28,14 +36,14 @@ var migrations = builder.AddProject<Projects.Borealis_MigrationService>("boreali
     .WithReference(postgresdb, "PostgresDb")
     .WaitFor(postgresdb)
     .PublishAsDockerComposeService((_, service) => {
-        service.Restart = "unless-stopped";
+        service.Restart = "no";
     });
 
 var pgLoader = builder.AddDockerfile("borealis-pgloader", "docker/pgloader")
     .WithReference(postgresdb, "PostgresDb")
     .WithBindMount(source: "./docker/pgloader/db", "/sqlite/db")
     .WaitFor(postgresdb)
-    .WaitFor(migrations)
+    .WaitForCompletion(migrations)
     .PublishAsDockerComposeService((_, service) => {
         service.Restart = "no";
     });
@@ -43,9 +51,16 @@ var pgLoader = builder.AddDockerfile("borealis-pgloader", "docker/pgloader")
 var web = builder
     .AddProject<Projects.Borealis_Web>("borealis-web")
     .WithExternalHttpEndpoints()
+    .WithEnvironment("Discord__BotToken", discordBotToken)
+    .WithEnvironment("Discord__ClientSecret", discordClientSecret)
+    .WithEnvironment("Discord__ClientId", discordClientId)
+    .WithEnvironment("Borealis__ApplicationUrl", borealisApplicationUrl)
     .WithReference(postgresdb, "PostgresDb")
-    .WaitFor(migrations)
+    .WaitForCompletion(migrations)
     .WaitFor(postgresdb)
+    .PublishAsDockerFile(options => {
+        options.WithDockerfile("../.."); // This can't have an ending slash
+    })
     .PublishAsDockerComposeService((_, service) => {
         service.Restart = "unless-stopped";
     });
