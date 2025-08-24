@@ -290,15 +290,15 @@ jobs:
         dotnet tool install -g Aspire.Cli
         aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
         # Tag borealis-migrations image with all tags
-        for tag in ${{ steps.meta-migration.outputs.tags }}; do
+        for tag in "${{ steps.meta-migration.outputs.tags }}"; do
           docker image tag borealis-migrations "$tag"
         done
         # Tag borealis-pgloader image with all tags
-        for tag in ${{ steps.meta-pgloader.outputs.tags }}; do
+        for tag in "${{ steps.meta-pgloader.outputs.tags }}"; do
           docker image tag borealis-pgloader "$tag"
         done
         # Tag borealis-web image with all tags
-        for tag in ${{ steps.meta-web.outputs.tags }}; do
+        for tag in "${{ steps.meta-web.outputs.tags }}"; do
           docker image tag borealis-web "$tag"
         done
     - name: Push Docker images
