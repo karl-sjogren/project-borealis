@@ -52,15 +52,13 @@ public class DiscordBotService : IDiscordBotService {
 
         if(player.HasFireCrystalFurnace && !string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
             var badgeUrl = await _viteService.GetAssetUrlAsync($"assets/furnace-levels/{player.FurnaceLevelString.ToLowerInvariant()}.png");
-            if(badgeUrl?.StartsWith("http", StringComparison.OrdinalIgnoreCase) == false) {
-                badgeUrl = $"{options.ApplicationUrl}/{badgeUrl}";
+
+            if(badgeUrl is not null) {
+                var thumbnail = new ThumbnailBuilder()
+                    .WithMedia($"{options.ApplicationUrl}/{badgeUrl}");
+
+                section.WithAccessory(thumbnail);
             }
-
-            _logger.LogWarning("Badge URL for player {PlayerId}: {BadgeUrl}", player.Id, badgeUrl);
-            var thumbnail = new ThumbnailBuilder()
-                .WithMedia($"{options.ApplicationUrl}/{badgeUrl}");
-
-            section.WithAccessory(thumbnail);
         }
 
         var builder = new ComponentBuilderV2()
