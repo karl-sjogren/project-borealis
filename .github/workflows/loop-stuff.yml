@@ -21,7 +21,7 @@ jobs:
           MY_LIST: "a\nb\nc"
         run: |
           for tag in "${{ env.MY_LIST }}"; do
-            echo "$tag"
+            echo "letter: $tag"
           done
         shell: bash
 
