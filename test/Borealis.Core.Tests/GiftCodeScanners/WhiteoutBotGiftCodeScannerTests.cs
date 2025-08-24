@@ -6,16 +6,16 @@ using Microsoft.Extensions.Logging.Testing;
 
 namespace Borealis.Core.Tests.GiftCodeScanners;
 
-public class WosLandGiftCodeScannerTests {
+public class WhiteoutBotGiftCodeScannerTests {
     [Fact]
     public async Task ScanGiftCodes_WhenClientReturnsExpectedFeedData_ShouldJustReturnCodesAsync() {
         // Arrange
-        var httpClient = A.Fake<IWosLandHttpClient>();
+        var httpClient = A.Fake<IWhiteoutBotHttpClient>();
 
         A.CallTo(() => httpClient.GetGiftCodesAsync(A<CancellationToken>._))
-            .Returns(new List<string> { "code1", "code2" });
+            .Returns(["code1", "code2"]);
 
-        var scanner = new WosLandGiftCodeScanner(httpClient, NullLogger<WosLandGiftCodeScanner>.Instance);
+        var scanner = new WhiteoutBotGiftCodeScanner(httpClient, NullLogger<WhiteoutBotGiftCodeScanner>.Instance);
 
         // Act
         var result = await scanner.ScanGiftCodesAsync(CancellationToken.None);
@@ -30,13 +30,13 @@ public class WosLandGiftCodeScannerTests {
     [Fact]
     public async Task ScanGiftCodes_WhenClientThrowsUnauthorizedException_ShouldReturnEmptyListAsync() {
         // Arrange
-        var httpClient = A.Fake<IWosLandHttpClient>();
+        var httpClient = A.Fake<IWhiteoutBotHttpClient>();
 
         A.CallTo(() => httpClient.GetGiftCodesAsync(A<CancellationToken>._))
-            .Throws(new HttpUnauthorizedException());
+            .Throws(new HttpForbiddenException());
 
-        var fakeLogger = new FakeLogger<WosLandGiftCodeScanner>();
-        var scanner = new WosLandGiftCodeScanner(httpClient, fakeLogger);
+        var fakeLogger = new FakeLogger<WhiteoutBotGiftCodeScanner>();
+        var scanner = new WhiteoutBotGiftCodeScanner(httpClient, fakeLogger);
 
         // Act
         var result = await scanner.ScanGiftCodesAsync(CancellationToken.None);
@@ -47,6 +47,6 @@ public class WosLandGiftCodeScannerTests {
 
         var logs = fakeLogger.Collector.GetSnapshot();
         logs.ShouldNotBeEmpty();
-        logs.ShouldContain(log => log.Level == LogLevel.Error && log.Message.Contains("Failed to scan gift codes from WOS Land. Most likely due to an invalid API Key."));
+        logs.ShouldContain(log => log.Level == LogLevel.Error && log.Message.Contains("Failed to scan gift codes from Whiteout Bot. Most likely due to an invalid API Key."));
     }
 }

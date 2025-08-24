@@ -1,5 +1,5 @@
 namespace Borealis.Core.Contracts;
 
-public interface IWosLandHttpClient {
+public interface IWhiteoutBotHttpClient {
     Task<ICollection<string>> GetGiftCodesAsync(CancellationToken cancellationToken);
 }
