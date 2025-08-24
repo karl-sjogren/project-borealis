@@ -10,6 +10,8 @@ using OpenTelemetry.Trace;
 namespace Microsoft.Extensions.Hosting;
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 
+#pragma warning disable IDE0055 // Fix formatting
+
 // Adds common .NET Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
 // This project should be referenced by each service project in your solution.
 // To learn more about using this project, see https://aka.ms/dotnet/aspire/service-defaults
@@ -103,3 +105,5 @@ public static class Extensions {
         return app;
     }
 }
+
+#pragma warning restore IDE0055 // Fix formatting
