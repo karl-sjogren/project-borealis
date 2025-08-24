@@ -20,7 +20,7 @@ jobs:
         env:
           MY_LIST: "a\nb\nc"
         run: |
-          for tag in "${{ env.MY_LIST }}"; do
+          for tag in "${${{ env.MY_LIST }}//$'\n'/ }"; do
             echo "letter: $tag"
           done
         shell: bash
