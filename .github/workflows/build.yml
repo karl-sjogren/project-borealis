@@ -313,7 +313,9 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: docker-compose
-        path: artifacts/docker-compose.yml
+        path: |
+          artifacts/.env
+          artifacts/docker-compose.yaml
 
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v2
