@@ -289,15 +289,29 @@ jobs:
       run: |
         dotnet tool install -g Aspire.Cli
         aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
-        docker image tag borealis-migrations ${{ steps.meta-migration.outputs.tags }}
-        docker image tag borealis-pgloader ${{ steps.meta-pgloader.outputs.tags }}
-        docker image tag borealis-web ${{ steps.meta-web.outputs.tags }}
+        # Tag borealis-migrations image with all tags
+        for tag in ${{ steps.meta-migration.outputs.tags }}; do
+          docker image tag borealis-migrations "$tag"
+        done
+        # Tag borealis-pgloader image with all tags
+        for tag in ${{ steps.meta-pgloader.outputs.tags }}; do
+          docker image tag borealis-pgloader "$tag"
+        done
+        # Tag borealis-web image with all tags
+        for tag in ${{ steps.meta-web.outputs.tags }}; do
+          docker image tag borealis-web "$tag"
+        done
     - name: Push Docker images
       run: |
-        docker push ghcr.io/karl-sjogren/borealis-migrations
-        docker push ghcr.io/karl-sjogren/borealis-pgloader
-        docker push ghcr.io/karl-sjogren/borealis-web
-
+        for tag in ${{ steps.meta-migration.outputs.tags }}; do
+          docker push "$tag"
+        done
+        for tag in ${{ steps.meta-pgloader.outputs.tags }}; do
+          docker push "$tag"
+        done
+        for tag in ${{ steps.meta-web.outputs.tags }}; do
+          docker push "$tag"
+        done
     - name: Upload docker-compose
       uses: actions/upload-artifact@v4
       with:
