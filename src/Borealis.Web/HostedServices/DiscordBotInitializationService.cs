@@ -19,7 +19,7 @@ public class DiscordBotInitializationService : IHostedService {
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
-        var token = _configuration["DiscordBotToken"] ?? throw new InvalidOperationException("DiscordBotToken is not set in the configuration.");
+        var token = _configuration["Discord:BotToken"] ?? throw new InvalidOperationException("Discord:BotToken is not set in the configuration.");
 
         var client = _discordClient as DiscordSocketClient;
         if(client == null) {

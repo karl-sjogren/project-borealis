@@ -34,7 +34,9 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   PUBLISH_CODECOV: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/develop') || startsWith(github.ref, 'refs/heads/main')
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME_MIGRATION: borealis-migrations
+  IMAGE_NAME_PGLOADER: borealis-pgloader
+  IMAGE_NAME_WEB: borealis-web
 
 jobs:
   frontend-test:
@@ -241,6 +243,11 @@ jobs:
     - name: Checkout sources
       uses: actions/checkout@v5
 
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
     - name: Log in to the Container registry
       uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
       with:
@@ -248,28 +255,62 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata (tags, labels) for Docker
-      id: meta
+    - name: Extract metadata (tags, labels) for migration image
+      id: meta-migration
       uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
       with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_MIGRATION }}
         tags: |
           type=raw,value=latest,enable=true
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
 
-    - name: Build and push Docker image
-      id: push
-      uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+    - name: Extract metadata (tags, labels) for pgloader image
+      id: meta-pgloader
+      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
       with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_PGLOADER }}
+        tags: |
+          type=raw,value=latest,enable=true
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
 
-    - name: Generate artifact attestation
-      uses: actions/attest-build-provenance@v2
+    - name: Extract metadata (tags, labels) for web image
+      id: meta-web
+      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
       with:
-        subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-        subject-digest: ${{ steps.push.outputs.digest }}
-        push-to-registry: true
+        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_WEB }}
+        tags: |
+          type=raw,value=latest,enable=true
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+
+    - name: Build Docker images
+      run: |
+        dotnet tool install -g Aspire.Cli
+        aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
+        # Tag borealis-migrations image with all tags
+        for tag in "${{ steps.meta-migration.outputs.tags }}"; do
+          docker image tag borealis-migrations "$tag"
+        done
+        # Tag borealis-pgloader image with all tags
+        for tag in "${{ steps.meta-pgloader.outputs.tags }}"; do
+          docker image tag borealis-pgloader "$tag"
+        done
+        # Tag borealis-web image with all tags
+        for tag in "${{ steps.meta-web.outputs.tags }}"; do
+          docker image tag borealis-web "$tag"
+        done
+    - name: Push Docker images
+      run: |
+        docker push --all-tags ghcr.io/karl-sjogren/borealis-migrations
+        docker push --all-tags ghcr.io/karl-sjogren/borealis-pgloader
+        docker push --all-tags ghcr.io/karl-sjogren/borealis-web
+    - name: Upload docker-compose
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-compose
+        include-hidden-files: true
+        path: |
+          artifacts/.env
+          artifacts/docker-compose.yaml
