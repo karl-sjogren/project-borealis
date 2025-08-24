@@ -20,7 +20,7 @@ jobs:
         env:
           MY_LIST: "a\nb\nc"
         run: |
-          for tag in "${${{ env.MY_LIST }}//$'\n'/ }"; do
+          for tag in "${{ env.MY_LIST }}"; do
             echo "letter: $tag"
           done
         shell: bash
@@ -35,7 +35,7 @@ jobs:
               "c"
             ]'
         run: |
-          for tag in "${{ env.MY_LIST }}"; do
-            echo "$tag"
+          echo '${{ env.MY_LIST }}' | jq -c '.[]' | while read i; do
+              echo "letter: $i"
           done
         shell: bash
