@@ -313,6 +313,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: docker-compose
+        include-hidden-files: true
         path: |
           artifacts/.env
           artifacts/docker-compose.yaml
