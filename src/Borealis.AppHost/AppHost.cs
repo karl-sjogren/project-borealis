@@ -11,11 +11,11 @@ builder.AddDockerComposeEnvironment("project-borealis")
         options.WithExternalHttpEndpoints();
     });
 
-var discordBotToken = builder.AddParameter("discord-bot-token");
-var discordClientSecret = builder.AddParameter("discord-client-secret");
+var discordBotToken = builder.AddParameter("discord-bot-token", secret: true);
+var discordClientSecret = builder.AddParameter("discord-client-secret", secret: true);
 var discordClientId = builder.AddParameter("discord-client-id");
 
-var borealisApplicationUrl = builder.AddParameter("borealis-application-url", "http://localhost:8080/");
+var borealisApplicationUrl = builder.AddParameter("borealis-application-url", "https://borealis.karl-sjogren.com/");
 
 var postgresUsername = builder.AddParameter("postgres-user", "postgres");
 var postgresPassword = builder.AddParameter("postgres-password", "postgres");
