@@ -291,18 +291,18 @@ jobs:
         aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
 
         # Tag borealis-migrations image with all tags
-        echo '${{ steps.meta-migration.outputs.json }}' | jq -c '.tags[]' | while read i; do
-          docker image tag borealis-migrations $i
+        echo '${{ steps.meta-migration.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
+          docker image tag borealis-migrations "$i"
         done
 
         # Tag borealis-pgloader image with all tags
-        echo '${{ steps.meta-pgloader.outputs.json }}' | jq -c '.tags[]' | while read i; do
-          docker image tag borealis-pgloader $i
+        echo '${{ steps.meta-pgloader.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
+          docker image tag borealis-pgloader "$i"
         done
 
         # Tag borealis-web image with all tags
-        echo '${{ steps.meta-web.outputs.json }}' | jq -c '.tags[]' | while read i; do
-          docker image tag borealis-web $i
+        echo '${{ steps.meta-web.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
+          docker image tag borealis-web "$i"
         done
     - name: Push Docker images
       run: |
