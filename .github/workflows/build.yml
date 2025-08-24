@@ -289,17 +289,20 @@ jobs:
       run: |
         dotnet tool install -g Aspire.Cli
         aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
+
         # Tag borealis-migrations image with all tags
-        for tag in "${{ steps.meta-migration.outputs.tags }}"; do
-          docker image tag borealis-migrations "$tag"
+        echo '${{ steps.meta-migration.outputs.json }}' | jq -c '.tags[]' | while read i; do
+          docker image tag borealis-migrations "$i"
         done
+
         # Tag borealis-pgloader image with all tags
-        for tag in "${{ steps.meta-pgloader.outputs.tags }}"; do
-          docker image tag borealis-pgloader "$tag"
+        echo '${{ steps.meta-pgloader.outputs.json }}' | jq -c '.tags[]' | while read i; do
+          docker image tag borealis-pgloader "$i"
         done
+
         # Tag borealis-web image with all tags
-        for tag in "${{ steps.meta-web.outputs.tags }}"; do
-          docker image tag borealis-web "$tag"
+        echo '${{ steps.meta-web.outputs.json }}' | jq -c '.tags[]' | while read i; do
+          docker image tag borealis-web "$i"
         done
     - name: Push Docker images
       run: |
