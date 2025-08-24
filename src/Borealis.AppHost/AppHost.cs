@@ -1,15 +1,21 @@
+using Microsoft.Extensions.Configuration;
+
 var builder = DistributedApplication.CreateBuilder(args);
+
+builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?> {
+    ["AppHost:BrowserToken"] = "",
+});
 
 builder.AddDockerComposeEnvironment("project-borealis")
     .WithDashboard(options => {
         options.WithExternalHttpEndpoints();
     });
 
-var discordBotToken = builder.AddParameter("discord-bot-token");
-var discordClientSecret = builder.AddParameter("discord-client-secret");
+var discordBotToken = builder.AddParameter("discord-bot-token", secret: true);
+var discordClientSecret = builder.AddParameter("discord-client-secret", secret: true);
 var discordClientId = builder.AddParameter("discord-client-id");
 
-var borealisApplicationUrl = builder.AddParameter("borealis-application-url");
+var borealisApplicationUrl = builder.AddParameter("borealis-application-url", "https://borealis.karl-sjogren.com/");
 
 var postgresUsername = builder.AddParameter("postgres-user", "postgres");
 var postgresPassword = builder.AddParameter("postgres-password", "postgres");
@@ -48,6 +54,12 @@ var pgLoader = builder.AddDockerfile("borealis-pgloader", "docker/pgloader")
         service.Restart = "no";
     });
 
+var whiteoutBotService = builder.AddExternalService("whiteout-bot", new Uri("http://gift-code-api.whiteout-bot.com/"));
+var destructoidService = builder.AddExternalService("destructoid", new Uri("https://www.destructoid.com/"));
+var wosgiftcodesService = builder.AddExternalService("wosgiftcodes", new Uri("https://wosgiftcodes.com/"));
+var wosrewardsService = builder.AddExternalService("wosrewards", new Uri("https://wosrewards.com/"));
+var wosGiftcodeApiService = builder.AddExternalService("wos-giftcode-api", new Uri("https://wos-giftcode-api.centurygame.com/"));
+
 var web = builder
     .AddProject<Projects.Borealis_Web>("borealis-web")
     .WithExternalHttpEndpoints()
@@ -56,6 +68,11 @@ var web = builder
     .WithEnvironment("Discord__ClientId", discordClientId)
     .WithEnvironment("Borealis__ApplicationUrl", borealisApplicationUrl)
     .WithReference(postgresdb, "PostgresDb")
+    .WithReference(whiteoutBotService)
+    .WithReference(destructoidService)
+    .WithReference(wosgiftcodesService)
+    .WithReference(wosrewardsService)
+    .WithReference(wosGiftcodeApiService)
     .WaitForCompletion(migrations)
     .WaitFor(postgresdb)
     .PublishAsDockerFile(options => {

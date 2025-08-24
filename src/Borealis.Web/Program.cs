@@ -29,7 +29,7 @@ builder.Services.AddSerilog();
 builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddOptions<CapSolverOptions>().Bind(builder.Configuration.GetSection("CapSolver")).ValidateOnStart();
-builder.Services.AddOptions<WosLandOptions>().Bind(builder.Configuration.GetSection("WosLand")).ValidateOnStart();
+builder.Services.AddOptions<WhiteoutBotOptions>().Bind(builder.Configuration.GetSection("WosLand")).ValidateOnStart();
 builder.Services.AddOptions<WhiteoutSurvivalOptions>().Bind(builder.Configuration.GetSection("WhiteoutSurvival")).ValidateOnStart();
 
 builder.Services.AddOptions<BorealisOptions>().Bind(builder.Configuration.GetSection("Borealis")).ValidateOnStart();
@@ -42,11 +42,6 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddMvc(options => {
     options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
 });
-
-var enableLettuceEncrypt = builder.Configuration.GetValue("LettuceEncrypt:Enabled", false);
-if(builder.Environment.IsProduction() && enableLettuceEncrypt) {
-    builder.Services.AddLettuceEncrypt();
-}
 
 builder.Services.AddHttpClients();
 builder.Services.AddCaptchaServices();
@@ -67,13 +62,14 @@ builder.Services.AddScoped<IWhiteoutSurvivalService, WhiteoutSurvivalService>();
 
 builder.Services.AddScoped<IGiftCodeScanner, DestructoidGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosGiftCodesGiftCodeScanner>();
-builder.Services.AddScoped<IGiftCodeScanner, WosLandGiftCodeScanner>();
+builder.Services.AddScoped<IGiftCodeScanner, WhiteoutBotGiftCodeScanner>();
 builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
 if(builder.Environment.IsProduction()) {
-    builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
     builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
+    builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
+    builder.Services.AddHostedService<RetryGiftCodesHostedService>();
     builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
     builder.Services.AddHostedService<UpdatePlayersHostedService>();
 }

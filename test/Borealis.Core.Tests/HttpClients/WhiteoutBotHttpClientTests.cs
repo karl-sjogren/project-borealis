@@ -6,14 +6,14 @@ using Borealis.WhiteoutSurvivalHttpClient.Exceptions;
 
 namespace Borealis.Core.Tests.HttpClients;
 
-public class WosLandHttpClientTests {
-    private static WosLandHttpClient CreateClient(HttpClient httpClient) => new(httpClient, NullLogger<WosLandHttpClient>.Instance);
+public class WhiteoutBotHttpClientTests {
+    private static WhiteoutBotHttpClient CreateClient(HttpClient httpClient) => new(httpClient, NullLogger<WhiteoutBotHttpClient>.Instance);
 
     [Fact]
     public async Task GetGiftCodesSuccessAsync() {
-        var httpClient = HttpClientActivator<WosLandHttpClient>.GetClient(async (request, _) => {
+        var httpClient = HttpClientActivator<WhiteoutBotHttpClient>.GetClient(async (request, _) => {
             if(request.RequestUri?.PathAndQuery.EndsWith("/giftcode_api.php", StringComparison.Ordinal) == true) {
-                var json = await Resources.GetStringAsync("WosLandSuccess.json");
+                var json = await Resources.GetStringAsync("WhiteoutBotSuccess.json");
                 return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FakeHttpContent(json) };
             }
 
@@ -23,22 +23,25 @@ public class WosLandHttpClientTests {
         var result = await httpClient.GetGiftCodesAsync(TestCancellationToken);
 
         result.ShouldNotBeNull();
-        result.Count.ShouldBe(2);
+        result.Count.ShouldBe(5);
         result.ShouldContain("code-1");
         result.ShouldContain("code-2");
+        result.ShouldContain("code-3");
+        result.ShouldContain("code-4");
+        result.ShouldContain("code-5");
     }
 
     [Fact]
     public async Task GetGiftCodesWrongApiKeyAsync() {
-        var httpClient = HttpClientActivator<WosLandHttpClient>.GetClient(async (request, _) => {
+        var httpClient = HttpClientActivator<WhiteoutBotHttpClient>.GetClient(async (request, _) => {
             if(request.RequestUri?.PathAndQuery.EndsWith("/giftcode_api.php", StringComparison.Ordinal) == true) {
-                var json = await Resources.GetStringAsync("WosLandWrongApiKey.json");
-                return new HttpResponseMessage(HttpStatusCode.Unauthorized) { Content = new FakeHttpContent(json) };
+                var json = await Resources.GetStringAsync("WhiteoutBotWrongApiKey.json");
+                return new HttpResponseMessage(HttpStatusCode.Forbidden) { Content = new FakeHttpContent(json) };
             }
 
             throw new Exception("Unexpected uri was called during test. " + request.RequestUri?.PathAndQuery);
         }, CreateClient);
 
-        await Should.ThrowAsync<HttpUnauthorizedException>(async () => await httpClient.GetGiftCodesAsync(TestCancellationToken));
+        await Should.ThrowAsync<HttpForbiddenException>(async () => await httpClient.GetGiftCodesAsync(TestCancellationToken));
     }
 }

@@ -1,5 +1,5 @@
 namespace Borealis.Core.Options;
 
-public class WosLandOptions {
+public class WhiteoutBotOptions {
     public string? ApiKey { get; set; }
 }

@@ -5,22 +5,26 @@ using Borealis.Core.Options;
 using Discord;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Shorthand.Vite.Contracts;
 
 namespace Borealis.Core.Services;
 
 public class DiscordBotService : IDiscordBotService {
     private readonly BorealisContext _borealisContext;
     private readonly IDiscordClient _discordClient;
+    private readonly IViteService _viteService;
     private readonly IOptions<BorealisOptions> _borealisOptions;
     private readonly ILogger<DiscordBotService> _logger;
 
     public DiscordBotService(
             BorealisContext borealisContext,
             IDiscordClient discordClient,
+            IViteService viteService,
             IOptions<BorealisOptions> borealisOptions,
             ILogger<DiscordBotService> logger) {
         _borealisContext = borealisContext;
         _discordClient = discordClient;
+        _viteService = viteService;
         _borealisOptions = borealisOptions;
         _logger = logger;
     }
@@ -41,20 +45,39 @@ public class DiscordBotService : IDiscordBotService {
     private async Task SendPlayerMessageAsync(string? channelId, string message, Player player) {
         var options = _borealisOptions.Value;
 
-        var builder = new ComponentBuilder();
+        var section = new SectionBuilder()
+            .WithTextDisplay($"## {player.Name}")
+            .WithTextDisplay($"**Level**: {player.FurnaceLevelString}, **State**: {player.State}")
+            .WithTextDisplay($"**Last 5 names**: {string.Join(", ", player.PreviousNames.Reverse().Take(5).Select(x => x.Name))}");
 
-        // TODO Add containers and stuff when supported
+        if(player.HasFireCrystalFurnace && !string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
+            var badgeUrl = await _viteService.GetAssetUrlAsync($"assets/furnace-levels/{player.FurnaceLevelString.ToLowerInvariant()}.png");
+            if(badgeUrl?.StartsWith("http", StringComparison.OrdinalIgnoreCase) == false) {
+                badgeUrl = $"{options.ApplicationUrl}/{badgeUrl}";
+            }
+
+            _logger.LogWarning("Badge URL for player {PlayerId}: {BadgeUrl}", player.Id, badgeUrl);
+            var thumbnail = new ThumbnailBuilder()
+                .WithMedia($"{options.ApplicationUrl}/{badgeUrl}");
+
+            section.WithAccessory(thumbnail);
+        }
+
+        var builder = new ComponentBuilderV2()
+            .WithTextDisplay(message)
+            .WithSeparator(spacing: SeparatorSpacingSize.Large)
+            .AddComponent(section);
 
         if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
-            builder.AddRow(new ActionRowBuilder()
+            builder.AddComponent(new ActionRowBuilder()
                 .WithButton("View player", style: ButtonStyle.Link, url: $"{options.ApplicationUrl}players/{player.Id}")
             );
         }
 
-        await SendMessageAsync(channelId, message, builder.Build());
+        await SendMessageAsync(channelId, builder.Build());
     }
 
-    public async Task SendMessageAsync(string? channelId, string message, MessageComponent? messageComponent = null) {
+    public async Task SendMessageAsync(string? channelId, MessageComponent? messageComponent = null) {
         if(!ulong.TryParse(channelId, out var parseChannelId)) {
             _logger.LogWarning("Invalid channel ID: {ChannelId}", channelId);
             return;
@@ -65,7 +88,7 @@ public class DiscordBotService : IDiscordBotService {
             throw new InvalidOperationException($"Channel {parseChannelId} is not a valid message channel.");
         }
 
-        await channel.SendMessageAsync(message, components: messageComponent);
+        await channel.SendMessageAsync(components: messageComponent);
     }
 
     public async Task SendGiftCodeAddedMessageAsync(GiftCode giftCode, CancellationToken cancellationToken) {
@@ -76,16 +99,16 @@ public class DiscordBotService : IDiscordBotService {
 
         var options = _borealisOptions.Value;
 
-        var builder = new ComponentBuilder();
+        var builder = new ComponentBuilderV2()
+            .WithTextDisplay($"New gift code found: **{giftCode.Code}**");
 
         if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
-            builder.AddRow(new ActionRowBuilder()
+            builder.AddComponent(new ActionRowBuilder()
                 .WithButton("View gift code", style: ButtonStyle.Link, url: $"{options.ApplicationUrl}gift-codes/{giftCode.Id}")
             );
         }
 
-        var message = $"New gift code found: {giftCode.Code}";
-        await SendMessageAsync(settings.GiftCodeChannelId, message, builder.Build());
+        await SendMessageAsync(settings.GiftCodeChannelId, builder.Build());
     }
 
     public async Task SendPlayerChangedNameMessageAsync(Player player, string newName, string oldName, CancellationToken cancellationToken) {
@@ -104,7 +127,7 @@ public class DiscordBotService : IDiscordBotService {
             .Distinct()
             .ToList();
 
-        var message = $"Player {oldName} (#{player.State}) changed their name to {newName}.";
+        var message = $"Player **{oldName}** (#{player.State}) changed their name to **{newName}**.";
         if(previousNames.Count > 0) {
             message += $" Previous names: {string.Join(", ", previousNames)}.";
         }
@@ -122,7 +145,7 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
-        var message = $"Player {player.Name} (#{player.State}) increased their furnace level to {furnaceLevel}.";
+        var message = $"Player **{player.Name}** (#{player.State}) increased their furnace level to **{furnaceLevel}**.";
         await SendPlayerMessageAsync(settings.PlayerFurnaceLevelChannelId, message, player);
     }
 
@@ -136,7 +159,7 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
-        var message = $"Player {player.Name} moved state from {oldState} to {newState}.";
+        var message = $"Player **{player.Name}** moved state from **{oldState}** to **{newState}**.";
         await SendPlayerMessageAsync(settings.PlayerMovedStateChannelId, message, player);
     }
 
