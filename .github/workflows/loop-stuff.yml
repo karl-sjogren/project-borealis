@@ -28,11 +28,11 @@ jobs:
       - name: JSON List
         env:
           MY_LIST: |
-            '[
+            [
               "a",
               "b",
               "c"
-            ]'
+            ]
         run: |
           echo '${{ env.MY_LIST }}' | jq -c '.[]' | while read i; do
               echo "letter: $i"
