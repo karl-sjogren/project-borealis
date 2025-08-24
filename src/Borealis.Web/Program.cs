@@ -67,8 +67,9 @@ builder.Services.AddScoped<IGiftCodeScanner, WosRewardsGiftCodeScanner>();
 
 builder.Services.AddSingleton<IGiftCodeRedemptionQueue, GiftCodeRedemptionQueue>();
 if(builder.Environment.IsProduction()) {
-    builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
     builder.Services.AddHostedService<GiftCodeCheckDailyHostedService>();
+    builder.Services.AddHostedService<GiftCodeRedemptionQueueProcessingHostedService>();
+    builder.Services.AddHostedService<RetryGiftCodesHostedService>();
     builder.Services.AddHostedService<ScanForGiftCodesHostedService>();
     builder.Services.AddHostedService<UpdatePlayersHostedService>();
 }
