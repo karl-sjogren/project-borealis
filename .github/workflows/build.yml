@@ -242,6 +242,11 @@ jobs:
     - name: Checkout sources
       uses: actions/checkout@v4
 
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        global-json-file: global.json
+
     - name: Log in to the Container registry
       uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772
       with:
