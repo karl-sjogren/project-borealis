@@ -13,7 +13,16 @@ public static partial class IServiceCollectionExtensions {
             .AddHttpClient<IWhiteoutBotHttpClient, WhiteoutBotHttpClient>((provider, client) => {
                 var options = provider.GetRequiredService<IOptions<WhiteoutBotOptions>>().Value;
 
+                client.BaseAddress = new Uri("https+http://whiteout-bot");
                 client.DefaultRequestHeaders.Add("X-API-Key", options.ApiKey ?? string.Empty);
+            });
+
+        services
+            .AddHttpClient<IWhiteoutSurvivalHttpClientProxy, WhiteoutSurvivalHttpClientProxy>((provider, client) => {
+                var options = provider.GetRequiredService<IOptions<WhiteoutSurvivalProxyOptions>>().Value;
+
+                client.BaseAddress = new Uri("https+http://borealis-wos-proxy/");
+                client.DefaultRequestHeaders.Add("x-functions-key", options.FunctionKey ?? string.Empty);
             });
 
         services.AddHttpClient<ICapSolverHttpClient, CapSolverHttpClient>((_, client) => {

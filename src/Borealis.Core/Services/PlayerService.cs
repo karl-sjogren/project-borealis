@@ -1,7 +1,6 @@
 using Borealis.Core.Contracts;
 using Borealis.Core.Models;
 using Borealis.Core.Requests;
-using Borealis.WhiteoutSurvivalHttpClient;
 using Borealis.WhiteoutSurvivalHttpClient.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +8,7 @@ namespace Borealis.Core.Services;
 
 public class PlayerService : QueryServiceBase<Player>, IPlayerService {
     private readonly BorealisContext _context;
-    private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
+    private readonly IWhiteoutSurvivalService _whiteoutSurvivalService;
     private readonly IDiscordBotService _discordBotService;
     private readonly TimeProvider _timeProvider;
     private readonly ILogger<PlayerService> _logger;
@@ -19,12 +18,12 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
 
     public PlayerService(
             BorealisContext context,
-            IWhiteoutSurvivalHttpClient whiteoutSurvivalHttpClient,
+            IWhiteoutSurvivalService whiteoutSurvivalService,
             IDiscordBotService discordBotService,
             TimeProvider timeProvider,
             ILogger<PlayerService> logger) {
         _context = context;
-        _whiteoutSurvivalHttpClient = whiteoutSurvivalHttpClient;
+        _whiteoutSurvivalService = whiteoutSurvivalService;
         _discordBotService = discordBotService;
         _timeProvider = timeProvider;
         _logger = logger;
@@ -79,40 +78,39 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
     }
 
     public async Task<Result<Player>> SynchronizePlayerAsync(int whiteoutSurvivalPlayerId, bool addAsInAlliance, CancellationToken cancellationToken) {
-        WhiteoutSurvivalResponseWrapper<WhiteoutSurvivalPlayerResponse> response;
+        WhiteoutSurvivalPlayerResponse playerResponse;
 
         try {
-            response = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(whiteoutSurvivalPlayerId, cancellationToken);
+            playerResponse = await _whiteoutSurvivalService.GetPlayerInfoAsync(whiteoutSurvivalPlayerId, cancellationToken);
         } catch(Exception ex) {
             _logger.LogError(ex, "Failed to synchronize player {PlayerId}", whiteoutSurvivalPlayerId);
             return Results.Failure<Player>(new FailedToSynchronizePlayerMessage(whiteoutSurvivalPlayerId));
         }
 
-        if(response.Code != 0 || response.Data is null) {
+        if(playerResponse is null) {
             return Results.NotFound<Player>();
         }
-
-        var externalPlayer = response.Data;
 
         var existingPlayer = await _context.Players.FirstOrDefaultAsync(x => x.ExternalId == whiteoutSurvivalPlayerId, cancellationToken);
         if(existingPlayer is null) {
             var now = _timeProvider.GetUtcNow();
             existingPlayer = new Player {
-                ExternalId = externalPlayer.FurnaceId,
-                Name = externalPlayer.Name,
-                FurnaceLevel = externalPlayer.FurnaceLevel,
+                ExternalId = playerResponse.FurnaceId,
+                Name = playerResponse.Name,
+                FurnaceLevel = playerResponse.FurnaceLevel,
                 IsInAlliance = addAsInAlliance,
                 IsMuted = !addAsInAlliance,
-                State = externalPlayer.State,
+                State = playerResponse.State,
                 UpdatedAt = now,
                 CreatedAt = now
             };
+
             _context.Add(existingPlayer);
         } else {
             var now = _timeProvider.GetUtcNow();
-            if(existingPlayer.Name != externalPlayer.Name) {
+            if(existingPlayer.Name != playerResponse.Name) {
                 if(!existingPlayer.IsMuted) {
-                    await _discordBotService.SendPlayerChangedNameMessageAsync(existingPlayer, externalPlayer.Name, existingPlayer.Name, cancellationToken);
+                    await _discordBotService.SendPlayerChangedNameMessageAsync(existingPlayer, playerResponse.Name, existingPlayer.Name, cancellationToken);
                 }
 
                 existingPlayer.PreviousNames.Add(new PlayerNameHistoryEntry {
@@ -121,8 +119,8 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
                 });
             }
 
-            if(existingPlayer.State != externalPlayer.State) {
-                await _discordBotService.SendPlayerChangedStateMessageAsync(existingPlayer, externalPlayer.State, existingPlayer.State, cancellationToken);
+            if(existingPlayer.State != playerResponse.State) {
+                await _discordBotService.SendPlayerChangedStateMessageAsync(existingPlayer, playerResponse.State, existingPlayer.State, cancellationToken);
 
                 existingPlayer.PreviousStates.Add(new PlayerStateHistoryEntry {
                     State = existingPlayer.State,
@@ -131,13 +129,13 @@ public class PlayerService : QueryServiceBase<Player>, IPlayerService {
             }
 
             var hasUpdatedFurnaceLevel = false;
-            if(existingPlayer.FurnaceLevel != externalPlayer.FurnaceLevel) {
+            if(existingPlayer.FurnaceLevel != playerResponse.FurnaceLevel) {
                 hasUpdatedFurnaceLevel = true;
             }
 
-            existingPlayer.Name = externalPlayer.Name;
-            existingPlayer.FurnaceLevel = externalPlayer.FurnaceLevel;
-            existingPlayer.State = externalPlayer.State;
+            existingPlayer.Name = playerResponse.Name;
+            existingPlayer.FurnaceLevel = playerResponse.FurnaceLevel;
+            existingPlayer.State = playerResponse.State;
 
             if(hasUpdatedFurnaceLevel) {
                 await _discordBotService.SendPlayerChangedFurnaceLevelMessageAsync(existingPlayer, existingPlayer.ExactFurnaceLevelString, cancellationToken);

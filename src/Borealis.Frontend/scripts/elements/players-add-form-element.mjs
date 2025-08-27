@@ -161,16 +161,16 @@ export class PlayersAddForm extends LitElement {
 
       if(!result.success) {
         player.addState = 'ERROR';
-        player.errorMessage = result.message;
+        player.errorMessage = result.message?.message;
         this.players = [...this.players];
         continue;
       }
 
       player.addState = 'DONE';
-      player.name = result.data.name;
+      player.name = result.object.name;
       player.isInAlliance = this.addAsInAlliance;
-      player.furnaceLevelString = result.data.furnaceLevelString;
-      player.state = result.data.state;
+      player.furnaceLevelString = result.object.furnaceLevelString;
+      player.state = result.object.state;
 
       this.players = [...this.players];
     }

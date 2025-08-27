@@ -7,20 +7,23 @@ namespace Borealis.Core.Services;
 
 public class WhiteoutSurvivalService : IWhiteoutSurvivalService {
     private readonly IWhiteoutSurvivalHttpClient _whiteoutSurvivalHttpClient;
+    private readonly IWhiteoutSurvivalHttpClientProxy _whiteoutSurvivalHttpClientProxy;
     private readonly ICaptchaSolver _captchaSolver;
     private readonly ILogger<WhiteoutSurvivalService> _logger;
 
     public WhiteoutSurvivalService(
             IWhiteoutSurvivalHttpClient whiteoutSurvivalHttpClient,
+            IWhiteoutSurvivalHttpClientProxy whiteoutSurvivalHttpClientProxy,
             ICaptchaSolver captchaSolver,
             ILogger<WhiteoutSurvivalService> logger) {
         _whiteoutSurvivalHttpClient = whiteoutSurvivalHttpClient;
+        _whiteoutSurvivalHttpClientProxy = whiteoutSurvivalHttpClientProxy;
         _captchaSolver = captchaSolver;
         _logger = logger;
     }
 
     public async Task<WhiteoutSurvivalPlayerResponse> GetPlayerInfoAsync(int playerId, CancellationToken cancellationToken) {
-        var response = await _whiteoutSurvivalHttpClient.GetPlayerInfoAsync(playerId, cancellationToken);
+        var response = await _whiteoutSurvivalHttpClientProxy.GetPlayerInfoAsync(playerId, cancellationToken);
 
         return response.Data;
     }
