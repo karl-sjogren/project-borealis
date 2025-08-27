@@ -12,7 +12,7 @@ public class WhiteoutBotHttpClient : HttpClientBase, IWhiteoutBotHttpClient {
     }
 
     public async Task<ICollection<string>> GetGiftCodesAsync(CancellationToken cancellationToken) {
-        var request = new HttpRequestMessage(HttpMethod.Get, "http://gift-code-api.whiteout-bot.com/giftcode_api.php");
+        var request = new HttpRequestMessage(HttpMethod.Get, "giftcode_api.php");
 
         var response = await HttpClient.SendAsync(request, cancellationToken);
         var responseDTO = await response.Content.ReadFromJsonAsync<ResponseDTO>(cancellationToken);

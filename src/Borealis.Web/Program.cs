@@ -31,6 +31,7 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddOptions<CapSolverOptions>().Bind(builder.Configuration.GetSection("CapSolver")).ValidateOnStart();
 builder.Services.AddOptions<WhiteoutBotOptions>().Bind(builder.Configuration.GetSection("WosLand")).ValidateOnStart();
 builder.Services.AddOptions<WhiteoutSurvivalOptions>().Bind(builder.Configuration.GetSection("WhiteoutSurvival")).ValidateOnStart();
+builder.Services.AddOptions<WhiteoutSurvivalProxyOptions>().Bind(builder.Configuration.GetSection("WhiteoutSurvivalProxy")).ValidateOnStart();
 
 builder.Services.AddOptions<BorealisOptions>().Bind(builder.Configuration.GetSection("Borealis")).ValidateOnStart();
 builder.Services.AddSingleton<IValidateOptions<BorealisOptions>, BorealisOptionsValidator>();
