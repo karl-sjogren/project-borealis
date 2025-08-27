@@ -82,6 +82,7 @@ if(builder.ExecutionContext.IsRunMode) {
 } else {
     var proxyUrl = builder.AddParameter("borealis-wos-proxy-url");
     var proxyProject = builder.AddExternalService("borealis-wos-proxy", proxyUrl);
+    web.WithReference(proxyProject);
 }
 
 if(builder.ExecutionContext.IsRunMode) {
