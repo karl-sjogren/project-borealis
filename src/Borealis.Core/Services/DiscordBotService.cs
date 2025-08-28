@@ -98,7 +98,7 @@ public class DiscordBotService : IDiscordBotService {
         var options = _borealisOptions.Value;
 
         var builder = new ComponentBuilderV2()
-            .WithTextDisplay($"New gift code found: **{giftCode.Code}**");
+            .WithTextDisplay($"New gift code found: **{giftCode.Code}**, added by **{giftCode.Source}**");
 
         if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
             builder.AddComponent(new ActionRowBuilder()
