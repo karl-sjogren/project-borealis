@@ -48,7 +48,7 @@ public class DiscordBotService : IDiscordBotService {
         var section = new SectionBuilder()
             .WithTextDisplay($"## {player.Name}")
             .WithTextDisplay($"**Level**: {player.FurnaceLevelString}, **State**: {player.State}")
-            .WithTextDisplay($"**Last 5 names**: {string.Join(", ", player.PreviousNames.Reverse().Take(5).Select(x => x.Name))}");
+            .WithTextDisplay($"**Last 5 names**: {string.Join(", ", player.PreviousNames.Reverse().Distinct().Take(5).Select(x => x.Name))}");
 
         if(player.HasFireCrystalFurnace && !string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
             var badgeUrl = await _viteService.GetAssetUrlAsync($"assets/furnace-levels/{player.FurnaceLevelString.ToLowerInvariant()}.png");
@@ -98,7 +98,7 @@ public class DiscordBotService : IDiscordBotService {
         var options = _borealisOptions.Value;
 
         var builder = new ComponentBuilderV2()
-            .WithTextDisplay($"New gift code found: **{giftCode.Code}**");
+            .WithTextDisplay($"New gift code found: **{giftCode.Code}**, added by **{giftCode.Source}**");
 
         if(!string.IsNullOrWhiteSpace(options.ApplicationUrl)) {
             builder.AddComponent(new ActionRowBuilder()
@@ -119,16 +119,7 @@ public class DiscordBotService : IDiscordBotService {
             return;
         }
 
-        var previousNames = player.PreviousNames
-            .Select(x => x.Name)
-            .Except([newName, oldName])
-            .Distinct()
-            .ToList();
-
         var message = $"Player **{oldName}** (#{player.State}) changed their name to **{newName}**.";
-        if(previousNames.Count > 0) {
-            message += $" Previous names: {string.Join(", ", previousNames)}.";
-        }
 
         await SendPlayerMessageAsync(settings.PlayerRenameChannelId, message, player);
     }

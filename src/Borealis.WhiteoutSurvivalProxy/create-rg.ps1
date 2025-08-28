@@ -21,7 +21,7 @@ $clientId=$(echo $output | jq -r '.clientId')
 $storageId=$(az storage account show --resource-group "${prefix}-rg" --name "${prefix}st" --query 'id' -o tsv)
 az role assignment create --assignee-object-id $principalId --assignee-principal-type ServicePrincipal --role "Storage Blob Data Owner" --scope $storageId
 
-az functionapp create --resource-group "${prefix}-rg" --name "${prefix}-func-app" --flexconsumption-location $location --runtime dotnet-isolated --runtime-version "9" --storage-account "${prefix}st" --deployment-storage-auth-type UserAssignedIdentity --deployment-storage-auth-value "${prefix}-func-host-storage-user" --instance-memory 512 --maximum-instance-count 1
+az functionapp create --resource-group "${prefix}-rg" --name "${prefix}-func-app" --flexconsumption-location $location --runtime dotnet-isolated --runtime-version "9" --storage-account "${prefix}st" --deployment-storage-auth-type UserAssignedIdentity --deployment-storage-auth-value "${prefix}-func-host-storage-user" --instance-memory 512 --maximum-instance-count 70
 
 $appInsights=$(az monitor app-insights component show --resource-group "${prefix}-rg" --app "${prefix}-func-app" --query "id" --output tsv)
 az role assignment create --role "Monitoring Metrics Publisher" --assignee $principalId --scope $appInsights
