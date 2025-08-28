@@ -24,7 +24,6 @@ public class UpdatePlayersHostedService : TimedHostedService {
             var players = await playerService.GetPagedAsync(new PlayerQuery { PageIndex = 0, PageSize = 10_000, ShowAll = true }, stoppingToken);
             foreach(var player in players.Items.OrderByDescending(x => x.UpdatedAt)) {
                 await playerService.SynchronizePlayerAsync(player.ExternalId, false, stoppingToken);
-                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
             }
         } catch(Exception ex) {
             _logger.LogError(ex, "An error occurred while processing the gift code redemption queue.");
