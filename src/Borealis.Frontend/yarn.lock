@@ -2422,8 +2422,8 @@ __metadata:
     esbuild-plugin-browserslist: "npm:^1.0.1"
     eslint: "npm:^9.34.0"
     eslint-plugin-compat: "npm:^6.0.2"
-    eslint-plugin-jsdoc: "npm:^54.1.1"
-    eslint-plugin-testing-library: "npm:^7.6.6"
+    eslint-plugin-jsdoc: "npm:^54.3.0"
+    eslint-plugin-testing-library: "npm:^7.6.7"
     eslint-plugin-vitest: "npm:^0.5.4"
     jquery: "npm:^3.7.1"
     jsdom: "npm:^26.1.0"
@@ -3669,9 +3669,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:^54.1.1":
-  version: 54.1.1
-  resolution: "eslint-plugin-jsdoc@npm:54.1.1"
+"eslint-plugin-jsdoc@npm:^54.3.0":
+  version: 54.3.0
+  resolution: "eslint-plugin-jsdoc@npm:54.3.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.53.0"
     are-docs-informative: "npm:^0.0.2"
@@ -3685,19 +3685,19 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10/775c410bb62343a3d46dc1c84c6933209a5e662d76e86cbba3edf189948884383a932c1d23cf4d97fcb38cb8ac2ba511ac020d16f94299aee7711eefc60edd0b
+  checksum: 10/a627ca503e020505ca228d76ec3c225ee5b5aa04c4f490221703f325ea64c08222699eaa0441b28633760f6132295e07f6434cd5becfe57d95777074bd934a5b
   languageName: node
   linkType: hard
 
-"eslint-plugin-testing-library@npm:^7.6.6":
-  version: 7.6.6
-  resolution: "eslint-plugin-testing-library@npm:7.6.6"
+"eslint-plugin-testing-library@npm:^7.6.7":
+  version: 7.6.7
+  resolution: "eslint-plugin-testing-library@npm:7.6.7"
   dependencies:
     "@typescript-eslint/scope-manager": "npm:^8.15.0"
     "@typescript-eslint/utils": "npm:^8.15.0"
   peerDependencies:
     eslint: ^8.57.0 || ^9.0.0
-  checksum: 10/620032f284d48ded915485f383936099feac4694e697d189b8426e429bfeff091f4812d4bea8977341f7809bf7e7201887a732ff7b659fbc2c1174a13c4e2456
+  checksum: 10/e1e73398da57e51693be0c2a4857e96d6fc93476220f8e067f97fc9ca2c18bd4591f4dda0c2f5e5d4f5b9bd33d056ea2b1520d440bbb50bf132cbbcd459a8abf
   languageName: node
   linkType: hard
 
