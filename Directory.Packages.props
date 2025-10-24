@@ -12,7 +12,7 @@
     <PackageVersion Include="Aspire.Hosting.Azure.EventHubs" Version="9.4.1" />
     <PackageVersion Include="Aspire.Hosting.Azure.Functions" Version="9.4.1-preview.1.25408.4" />
     <PackageVersion Include="Aspire.Hosting.Docker" Version="9.4.1-preview.1.25408.4" />
-    <PackageVersion Include="Aspire.Hosting.NodeJs" Version="9.4.1" />
+    <PackageVersion Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
     <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="9.4.1" />
     <PackageVersion Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.4.1" />
     <PackageVersion Include="AspNet.Security.OAuth.Discord" Version="9.4.0" />
