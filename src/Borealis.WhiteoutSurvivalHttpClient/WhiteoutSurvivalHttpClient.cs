@@ -36,6 +36,8 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
             Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
         };
 
+        RealisticHttpHeaderGenerator.GenerateHeaders(request.Headers);
+
         var response = await HttpClient.SendAsync(request, cancellationToken);
 
         await EnsureSuccessStatusCodeAsync(response, cancellationToken);
@@ -55,6 +57,8 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
         var request = new HttpRequestMessage(HttpMethod.Post, "captcha") {
             Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
         };
+
+        RealisticHttpHeaderGenerator.GenerateHeaders(request.Headers);
 
         var response = await HttpClient.SendAsync(request, cancellationToken);
 
@@ -76,6 +80,8 @@ public class WhiteoutSurvivalHttpClient : HttpClientBase, IWhiteoutSurvivalHttpC
         var request = new HttpRequestMessage(HttpMethod.Post, "gift_code") {
             Content = new WhiteoutSurvivalSignedRequestContent(_options.Secret, data)
         };
+
+        RealisticHttpHeaderGenerator.GenerateHeaders(request.Headers);
 
         var response = await HttpClient.SendAsync(request, cancellationToken);
 

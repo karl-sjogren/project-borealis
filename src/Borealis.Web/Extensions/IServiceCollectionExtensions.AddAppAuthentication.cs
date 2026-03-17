@@ -13,7 +13,7 @@ public static partial class IServiceCollectionExtensions {
     public static IServiceCollection AddAppAuthentication(this IServiceCollection services, IConfiguration configuration) {
         services.Configure<ForwardedHeadersOptions>(options => {
             options.ForwardedHeaders = ForwardedHeaders.All;
-            options.KnownNetworks.Clear();
+            options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
         });
 
