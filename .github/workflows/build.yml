@@ -263,7 +263,7 @@ jobs:
       env:
         REGISTRY_ENDPOINT: ${{ env.REGISTRY }}
         REGISTRY_REPOSITORY: borealis-web
-      run: aspire do push --debug
+      run: aspire do push
 
     - name: Upload docker-compose
       uses: actions/upload-artifact@v4
