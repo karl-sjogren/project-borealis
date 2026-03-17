@@ -255,60 +255,16 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata (tags, labels) for migration image
-      id: meta-migration
-      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
-      with:
-        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_MIGRATION }}
-        tags: |
-          type=raw,value=latest,enable=true
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-
-    - name: Extract metadata (tags, labels) for pgloader image
-      id: meta-pgloader
-      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
-      with:
-        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_PGLOADER }}
-        tags: |
-          type=raw,value=latest,enable=true
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-
-    - name: Extract metadata (tags, labels) for web image
-      id: meta-web
-      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
-      with:
-        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_WEB }}
-        tags: |
-          type=raw,value=latest,enable=true
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-
-    - name: Build Docker images
+    - name: Install Aspire CLI
       run: |
         dotnet tool install -g Aspire.Cli
-        aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
 
-        # Tag borealis-migrations image with all tags
-        echo '${{ steps.meta-migration.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
-          docker image tag borealis-migrations "$i"
-        done
+    - name: Build and push images
+      env:
+        REGISTRY_ENDPOINT: ${{ env.REGISTRY }}
+        REGISTRY_REPOSITORY: borealis-web
+      run: aspire do push
 
-        # Tag borealis-pgloader image with all tags
-        echo '${{ steps.meta-pgloader.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
-          docker image tag borealis-pgloader "$i"
-        done
-
-        # Tag borealis-web image with all tags
-        echo '${{ steps.meta-web.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
-          docker image tag borealis-web "$i"
-        done
-    - name: Push Docker images
-      run: |
-        docker push --all-tags ghcr.io/karl-sjogren/borealis-migrations
-        docker push --all-tags ghcr.io/karl-sjogren/borealis-pgloader
-        docker push --all-tags ghcr.io/karl-sjogren/borealis-web
     - name: Upload docker-compose
       uses: actions/upload-artifact@v7
       with:
