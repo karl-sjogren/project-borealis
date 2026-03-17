@@ -78,7 +78,7 @@ jobs:
       working-directory: ./src/Borealis.Frontend/
 
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: frontend-test-results
         path: |
@@ -113,7 +113,7 @@ jobs:
       run: dotnet test --configuration Release
 
     - name: Upload test results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: net-test-results
         path: |
@@ -176,7 +176,7 @@ jobs:
         verbosity: 'Info'
 
     - name: Upload coverage report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-report
         path: coverage-report
@@ -190,7 +190,7 @@ jobs:
         files: coverage-report/Cobertura.xml
 
     - name: Upload coverage history
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-history
         path: coverage-history
@@ -226,7 +226,7 @@ jobs:
       working-directory: ./
 
     - name: Upload packages
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: packages
         path: artifacts/*.nupkg
@@ -310,7 +310,7 @@ jobs:
         docker push --all-tags ghcr.io/karl-sjogren/borealis-pgloader
         docker push --all-tags ghcr.io/karl-sjogren/borealis-web
     - name: Upload docker-compose
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: docker-compose
         include-hidden-files: true
