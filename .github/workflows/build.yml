@@ -279,12 +279,15 @@ jobs:
       run: |
         dotnet tool install -g Aspire.Cli
         aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
-        aspire do prepare-compose
+
+        aspire do build-borealis-migrations
 
         # Tag borealis-migrations image with all tags
         echo '${{ steps.meta-migration.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
           docker image tag borealis-migrations "$i"
         done
+
+        aspire do build-borealis-web
 
         # Tag borealis-web image with all tags
         echo '${{ steps.meta-web.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
