@@ -255,6 +255,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Install Aspire CLI
+      run: |
+        dotnet tool install -g Aspire.Cli
+
     - name: Build and push images
       env:
         REGISTRY_ENDPOINT: ${{ env.REGISTRY }}
