@@ -262,8 +262,8 @@ jobs:
     - name: Build and push images
       env:
         REGISTRY_ENDPOINT: ${{ env.REGISTRY }}
-        REGISTRY_REPOSITORY: ${{ github.repository }}
-      run: aspire do push
+        REGISTRY_REPOSITORY: borealis-web
+      run: aspire do push --debug
 
     - name: Upload docker-compose
       uses: actions/upload-artifact@v4
