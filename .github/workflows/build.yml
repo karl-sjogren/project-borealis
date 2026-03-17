@@ -265,16 +265,6 @@ jobs:
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
 
-    - name: Extract metadata (tags, labels) for pgloader image
-      id: meta-pgloader
-      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
-      with:
-        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_PGLOADER }}
-        tags: |
-          type=raw,value=latest,enable=true
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-
     - name: Extract metadata (tags, labels) for web image
       id: meta-web
       uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
@@ -295,11 +285,6 @@ jobs:
           docker image tag borealis-migrations "$i"
         done
 
-        # Tag borealis-pgloader image with all tags
-        echo '${{ steps.meta-pgloader.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
-          docker image tag borealis-pgloader "$i"
-        done
-
         # Tag borealis-web image with all tags
         echo '${{ steps.meta-web.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
           docker image tag borealis-web "$i"
@@ -307,7 +292,6 @@ jobs:
     - name: Push Docker images
       run: |
         docker push --all-tags ghcr.io/karl-sjogren/borealis-migrations
-        docker push --all-tags ghcr.io/karl-sjogren/borealis-pgloader
         docker push --all-tags ghcr.io/karl-sjogren/borealis-web
     - name: Upload docker-compose
       uses: actions/upload-artifact@v4
