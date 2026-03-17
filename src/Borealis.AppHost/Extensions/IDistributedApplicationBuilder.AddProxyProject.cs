@@ -10,7 +10,7 @@ public static partial class IDistributedApplicationBuilderExtensions {
             var proxyProject = builder.AddAzureFunctionsProject<Borealis_WhiteoutSurvivalProxy>("borealis-wos-proxy");
             web.WithReference(proxyProject);
         } else {
-            var proxyUrl = builder.AddParameter("borealis-wos-proxy-url");
+            var proxyUrl = builder.AddParameter("borealis-wos-proxy-url", "", true);
             var proxyProject = builder.AddExternalService("borealis-wos-proxy", proxyUrl);
             web.WithReference(proxyProject);
         }
