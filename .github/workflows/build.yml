@@ -255,48 +255,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Extract metadata (tags, labels) for migration image
-      id: meta-migration
-      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
-      with:
-        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_MIGRATION }}
-        tags: |
-          type=raw,value=latest,enable=true
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
+    - name: Build and push images
+      env:
+        REGISTRY_ENDPOINT: ${{ env.REGISTRY }}
+        REGISTRY_REPOSITORY: ${{ github.repository }}
+      run: aspire do push
 
-    - name: Extract metadata (tags, labels) for web image
-      id: meta-web
-      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
-      with:
-        images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_WEB }}
-        tags: |
-          type=raw,value=latest,enable=true
-          type=semver,pattern={{version}}
-          type=semver,pattern={{major}}.{{minor}}
-
-    - name: Build Docker images
-      run: |
-        dotnet tool install -g Aspire.Cli
-        aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
-
-        aspire do build-borealis-migrations
-
-        # Tag borealis-migrations image with all tags
-        echo '${{ steps.meta-migration.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
-          docker image tag borealis-migrations "$i"
-        done
-
-        aspire do build-borealis-web
-
-        # Tag borealis-web image with all tags
-        echo '${{ steps.meta-web.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
-          docker image tag borealis-web "$i"
-        done
-    - name: Push Docker images
-      run: |
-        docker push --all-tags ghcr.io/karl-sjogren/borealis-migrations
-        docker push --all-tags ghcr.io/karl-sjogren/borealis-web
     - name: Upload docker-compose
       uses: actions/upload-artifact@v4
       with:
