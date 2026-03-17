@@ -5,7 +5,8 @@ public static partial class IDistributedApplicationBuilderExtensions {
             this IDistributedApplicationBuilder builder,
             IResourceBuilder<ProjectResource> web) {
         if(builder.ExecutionContext.IsRunMode) {
-            var frontend = builder.AddNpmApp("frontend", "../Borealis.Frontend", "dev");
+            var frontend = builder.AddViteApp("frontend", "../Borealis.Frontend", "dev")
+                .WithYarn();
 
             web.WaitFor(frontend);
         }
