@@ -249,7 +249,7 @@ jobs:
         global-json-file: global.json
 
     - name: Log in to the Container registry
-      uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1
+      uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2
       with:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
@@ -257,7 +257,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for migration image
       id: meta-migration
-      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
+      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
       with:
         images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_MIGRATION }}
         tags: |
@@ -267,7 +267,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for pgloader image
       id: meta-pgloader
-      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
+      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
       with:
         images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_PGLOADER }}
         tags: |
@@ -277,7 +277,7 @@ jobs:
 
     - name: Extract metadata (tags, labels) for web image
       id: meta-web
-      uses: docker/metadata-action@c1e51972afc2121e065aed6d45c65596fe445f3f
+      uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf
       with:
         images: ${{ env.REGISTRY }}/karl-sjogren/${{ env.IMAGE_NAME_WEB }}
         tags: |
