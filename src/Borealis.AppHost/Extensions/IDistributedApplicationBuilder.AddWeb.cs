@@ -31,12 +31,12 @@ public static partial class IDistributedApplicationBuilderExtensions {
     private static IResourceBuilder<ProjectResource> AddEnvironmentVariables(
             this IResourceBuilder<ProjectResource> web,
             IDistributedApplicationBuilder builder) {
-        var discordBotToken = builder.AddParameter("discord-bot-token", secret: true);
-        var discordClientSecret = builder.AddParameter("discord-client-secret", secret: true);
-        var discordClientId = builder.AddParameter("discord-client-id");
+        var discordBotToken = builder.AddParameter("discord-bot-token", "", secret: true);
+        var discordClientSecret = builder.AddParameter("discord-client-secret", "", secret: true);
+        var discordClientId = builder.AddParameter("discord-client-id", "");
 
         var borealisApplicationUrl = builder.AddParameter("borealis-application-url", "https://borealis.karl-sjogren.com/");
-        var whiteoutSurvivalProxyFunctionKey = builder.AddParameter("whiteout-survival-proxy-function-key", secret: true);
+        var whiteoutSurvivalProxyFunctionKey = builder.AddParameter("whiteout-survival-proxy-function-key", "", secret: true);
 
         web
             .WithEnvironment("Discord__BotToken", discordBotToken)
