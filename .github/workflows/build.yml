@@ -288,7 +288,7 @@ jobs:
     - name: Build Docker images
       run: |
         dotnet tool install -g Aspire.Cli
-        aspire publish ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
+        aspire deploy ./src/Borealis.AppHost/Borealis.AppHost.csproj -o ./artifacts
 
         # Tag borealis-migrations image with all tags
         echo '${{ steps.meta-migration.outputs.json }}' | jq -r -c '.tags[]' | while read i; do
